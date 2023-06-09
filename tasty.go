@@ -124,9 +124,11 @@ func (c *Client) get(url string, header http.Header, params, result any) *Error 
 			return c.decodeError(resp)
 		}
 
-		err = json.NewDecoder(resp.Body).Decode(result)
-		if err != nil {
-			return &Error{Message: fmt.Sprintf("Client Side Error: %v", err)}
+		if result != nil {
+			err = json.NewDecoder(resp.Body).Decode(result)
+			if err != nil {
+				return &Error{Message: fmt.Sprintf("Client Side Error: %v", err)}
+			}
 		}
 
 		break
@@ -157,7 +159,7 @@ func (c *Client) post(url string, header http.Header, payload, result any) *Erro
 		// body, err = ioutil.ReadAll(resp.Body)
 
 		// if err != nil {
-		// 	return err
+		// 	return  &Error{Message: fmt.Sprintf("Client Side Error: %v", err)}
 		// }
 
 		// fmt.Println(string(body))
@@ -172,9 +174,11 @@ func (c *Client) post(url string, header http.Header, payload, result any) *Erro
 			return c.decodeError(resp)
 		}
 
-		err = json.NewDecoder(resp.Body).Decode(result)
-		if err != nil {
-			return &Error{Message: fmt.Sprintf("Client Side Error: %v", err)}
+		if result != nil {
+			err = json.NewDecoder(resp.Body).Decode(result)
+			if err != nil {
+				return &Error{Message: fmt.Sprintf("Client Side Error: %v", err)}
+			}
 		}
 
 		break
@@ -217,9 +221,11 @@ func (c *Client) delete(url string, header http.Header, result any) *Error {
 			return c.decodeError(resp)
 		}
 
-		err = json.NewDecoder(resp.Body).Decode(result)
-		if err != nil {
-			return &Error{Message: fmt.Sprintf("Client Side Error: %v", err)}
+		if result != nil {
+			err = json.NewDecoder(resp.Body).Decode(result)
+			if err != nil {
+				return &Error{Message: fmt.Sprintf("Client Side Error: %v", err)}
+			}
 		}
 
 		break
