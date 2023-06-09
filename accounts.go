@@ -139,3 +139,29 @@ func (c *Client) GetAccountBalanceSnapshots(accountNumber string, query models.A
 
 	return accountsRes.Data.AccountBalanceSnapshots, nil
 }
+
+func (c *Client) GetAccountNetLiqHistory(accountNumber string, query models.HistoricLiquidityQuery) ([]models.NetLiqOHLC, *Error) {
+	if c.Session.SessionToken == nil {
+		return []models.NetLiqOHLC{}, &Error{Message: "Session is invalid: Session Token cannot be nil."}
+	}
+
+	reqURL := fmt.Sprintf("%s/accounts/%s/net-liq/history", c.baseURL, accountNumber)
+
+	type accountResponse struct {
+		Data struct {
+			HistoricLiquidity []models.NetLiqOHLC `json:"items"`
+		} `json:"data"`
+	}
+
+	accountsRes := new(accountResponse)
+
+	header := http.Header{}
+	header.Add("Authorization", *c.Session.SessionToken)
+
+	err := c.get(reqURL, header, query, accountsRes)
+	if err != nil {
+		return []models.NetLiqOHLC{}, err
+	}
+
+	return accountsRes.Data.HistoricLiquidity, nil
+}

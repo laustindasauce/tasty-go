@@ -92,6 +92,43 @@ func TestGetMarketMetrics(t *testing.T) {
 	require.Equal(t, time.Date(2023, time.June, 7, 11, 1, 36, 77000000, time.UTC), earnings.UpdatedAt)
 }
 
+func TestGetHistoricDividends(t *testing.T) {
+	setup()
+	defer teardown()
+
+	symbol := "AAPL"
+
+	mux.HandleFunc(fmt.Sprintf("/market-metrics/historic-corporate-events/dividends/%s", symbol), func(writer http.ResponseWriter, request *http.Request) {
+		fmt.Fprint(writer, historicDividendsResp)
+	})
+
+	resp, err := client.GetHistoricDividends(symbol)
+	require.Nil(t, err)
+
+	require.Equal(t, 39, len(resp))
+	require.Equal(t, "2023-05-12", resp[0].OccurredDate)
+	require.Equal(t, models.StringToFloat32(0.24), resp[0].Amount)
+}
+
+func TestGetHistoricEarnings(t *testing.T) {
+	setup()
+	defer teardown()
+
+	query := models.HistoricEarningsQuery{StartDate: time.Now().AddDate(-1, 0, 0)}
+	symbol := "AAPL"
+
+	mux.HandleFunc(fmt.Sprintf("/market-metrics/historic-corporate-events/earnings-reports/%s", symbol), func(writer http.ResponseWriter, request *http.Request) {
+		fmt.Fprint(writer, historicEarningsResp)
+	})
+
+	resp, err := client.GetHistoricEarnings(symbol, query)
+	require.Nil(t, err)
+
+	require.Equal(t, 4, len(resp))
+	require.Equal(t, "2022-06-30", resp[0].OccurredDate)
+	require.Equal(t, models.StringToFloat32(1.2), resp[0].Eps)
+}
+
 const marketMetricsResp = `{
   "data": {
     "items": [
@@ -238,6 +275,63 @@ const marketMetricsResp = `{
         "price-earnings-ratio": "0.0",
         "earnings-per-share": "0.0"
       }
+    ]
+  }
+}`
+
+const historicDividendsResp = `{
+  "data": {
+    "items": [
+      { "occurred-date": "2023-05-12", "amount": "0.24" },
+      { "occurred-date": "2023-02-10", "amount": "0.23" },
+      { "occurred-date": "2022-11-04", "amount": "0.23" },
+      { "occurred-date": "2022-08-05", "amount": "0.23" },
+      { "occurred-date": "2022-05-06", "amount": "0.23" },
+      { "occurred-date": "2022-02-04", "amount": "0.22" },
+      { "occurred-date": "2021-11-05", "amount": "0.22" },
+      { "occurred-date": "2021-08-06", "amount": "0.22" },
+      { "occurred-date": "2021-05-07", "amount": "0.22" },
+      { "occurred-date": "2021-02-05", "amount": "0.205" },
+      { "occurred-date": "2020-11-06", "amount": "0.205" },
+      { "occurred-date": "2020-08-07", "amount": "0.205" },
+      { "occurred-date": "2020-05-08", "amount": "0.205" },
+      { "occurred-date": "2020-02-07", "amount": "0.1925" },
+      { "occurred-date": "2019-11-07", "amount": "0.1925" },
+      { "occurred-date": "2019-08-09", "amount": "0.1925" },
+      { "occurred-date": "2019-05-10", "amount": "0.1925" },
+      { "occurred-date": "2019-02-08", "amount": "0.1825" },
+      { "occurred-date": "2018-11-08", "amount": "0.1825" },
+      { "occurred-date": "2018-08-10", "amount": "0.1825" },
+      { "occurred-date": "2018-05-11", "amount": "0.1825" },
+      { "occurred-date": "2018-02-09", "amount": "0.1575" },
+      { "occurred-date": "2017-11-10", "amount": "0.1575" },
+      { "occurred-date": "2017-08-10", "amount": "0.1575" },
+      { "occurred-date": "2017-05-11", "amount": "0.1575" },
+      { "occurred-date": "2017-02-09", "amount": "0.1425" },
+      { "occurred-date": "2016-11-03", "amount": "0.1425" },
+      { "occurred-date": "2016-08-04", "amount": "0.1425" },
+      { "occurred-date": "2016-05-05", "amount": "0.1425" },
+      { "occurred-date": "2016-02-04", "amount": "0.13" },
+      { "occurred-date": "2015-11-05", "amount": "0.13" },
+      { "occurred-date": "2015-08-06", "amount": "0.13" },
+      { "occurred-date": "2015-05-07", "amount": "0.13" },
+      { "occurred-date": "2015-02-05", "amount": "0.1175" },
+      { "occurred-date": "2014-11-06", "amount": "0.1175" },
+      { "occurred-date": "2014-08-07", "amount": "0.1175" },
+      { "occurred-date": "2014-05-08", "amount": "0.1175" },
+      { "occurred-date": "2014-02-06", "amount": "0.108928571" },
+      { "occurred-date": "2013-11-06", "amount": "0.108928571" }
+    ]
+  }
+}`
+
+const historicEarningsResp = `{
+  "data": {
+    "items": [
+      { "occurred-date": "2022-06-30", "eps": "1.2" },
+      { "occurred-date": "2022-09-30", "eps": "1.29" },
+      { "occurred-date": "2022-12-31", "eps": "1.89" },
+      { "occurred-date": "2023-03-31", "eps": "1.53" }
     ]
   }
 }`
