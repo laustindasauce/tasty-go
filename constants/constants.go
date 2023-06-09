@@ -117,3 +117,22 @@ var (
 	Route  OrderRuleAction = &route
 	Cancel OrderRuleAction = &cancel
 )
+
+type TimeBack *string
+
+var (
+	oneDay               = "1d"
+	oneWeek              = "1w"
+	oneMonth             = "1m"
+	threeMonths          = "3m"
+	sixMonths            = "6m"
+	oneYear              = "1y"
+	all                  = "all"
+	OneDay      TimeBack = &oneDay
+	OneWeek     TimeBack = &oneWeek
+	OneMonth    TimeBack = &oneMonth
+	ThreeMonths TimeBack = &threeMonths
+	SixMonths   TimeBack = &sixMonths
+	OneYear     TimeBack = &oneYear
+	All         TimeBack = &all
+)
