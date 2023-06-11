@@ -57,3 +57,15 @@ func (j *SimpleDate) UnmarshalJSON(b []byte) error {
 func (j SimpleDate) MarshalJSON() ([]byte, error) {
 	return json.Marshal(time.Time(j))
 }
+
+type Pagination struct {
+	PerPage            int     `json:"per-page"`
+	PageOffset         int     `json:"page-offset"`
+	ItemOffset         int     `json:"item-offset"`
+	TotalItems         int     `json:"total-items"`
+	TotalPages         int     `json:"total-pages"`
+	CurrentItemCount   int     `json:"current-item-count"`
+	PreviousLink       *string `json:"previous-link"`
+	NextLink           *string `json:"next-link"`
+	PagingLinkTemplate *string `json:"paging-link-template"`
+}

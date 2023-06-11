@@ -136,3 +136,31 @@ var (
 	OneYear     TimeBack = &oneYear
 	All         TimeBack = &all
 )
+
+type Cryptocurrency string
+
+const (
+	Cardano     Cryptocurrency = "ADA"
+	Bitcoin     Cryptocurrency = "BTC"
+	BitcoinCash Cryptocurrency = "BCH"
+	Polkadot    Cryptocurrency = "DOT"
+	Dogecoin    Cryptocurrency = "DOGE"
+	Ethereum    Cryptocurrency = "ETH"
+	Litecoin    Cryptocurrency = "LTC"
+	Solana      Cryptocurrency = "SOL"
+)
+
+type Lendability string
+
+const (
+	EasyToBorrow   Lendability = "Easy To Borrow"
+	LocateRequired Lendability = "Locate Required"
+	Preborrow      Lendability = "Preborrow"
+)
+
+type OptionType string
+
+const (
+	Call OptionType = "C"
+	Put  OptionType = "P"
+)

@@ -5,13 +5,17 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
+	"net/url"
+	"strings"
 
 	"github.com/google/go-querystring/query"
 )
 
 const (
-	apiBaseURL     = "https://api.tastyworks.com"
-	apiCertBaseUrl = "https://api.cert.tastyworks.com"
+	apiBaseURL      = "https://api.tastyworks.com"
+	apiBaseHost     = "api.tastyworks.com"
+	apiCertBaseUrl  = "https://api.cert.tastyworks.com"
+	apiCertBaseHost = "api.cert.tastyworks.com"
 )
 
 var (
@@ -21,6 +25,7 @@ var (
 type Client struct {
 	httpClient *http.Client
 	baseURL    string
+	baseHost   string
 	Session    Session
 }
 
@@ -29,6 +34,7 @@ func NewClient(httpClient *http.Client) (*Client, error) {
 	c := &Client{
 		httpClient: httpClient,
 		baseURL:    apiBaseURL,
+		baseHost:   apiBaseHost,
 	}
 
 	return c, nil
@@ -39,6 +45,7 @@ func NewCertClient(httpClient *http.Client) (*Client, error) {
 	c := &Client{
 		httpClient: httpClient,
 		baseURL:    apiCertBaseUrl,
+		baseHost:   apiCertBaseHost,
 	}
 
 	return c, nil
@@ -79,6 +86,66 @@ func (c *Client) decodeError(resp *http.Response) *Error {
 	e = &errRes.Error
 
 	return e
+}
+
+// customGet handles the get requests for the client with unique paths
+func (c *Client) customGet(path string, header http.Header, params, result any) *Error {
+	for {
+		r := new(http.Request)
+
+		r.Method = "GET"
+
+		r.URL = &url.URL{
+			Scheme: strings.Split(c.baseURL, ":")[0],
+			Host:   c.baseHost,
+			Opaque: path,
+		}
+
+		r.Header = header
+
+		r.Header.Add("Content-Type", "application/json")
+
+		if params != nil {
+			queryString, err := query.Values(params)
+			if err != nil {
+				return &Error{Message: fmt.Sprintf("Client Side Error: %v", err)}
+			}
+			// fmt.Println(queryString.Encode())
+			r.URL.RawQuery = queryString.Encode()
+		}
+
+		resp, err := c.httpClient.Do(r)
+		if err != nil {
+			return &Error{Message: fmt.Sprintf("Client Side Error: %v", err)}
+		}
+
+		// body, err := ioutil.ReadAll(resp.Body)
+		// if err != nil {
+		// 	return &Error{Message: fmt.Sprintf("Client Side Error: %v", err)}
+		// }
+
+		// fmt.Println(string(body))
+
+		defer resp.Body.Close()
+
+		if resp.StatusCode == http.StatusNoContent {
+			return nil
+		}
+		if ContainsInt(errorStatusCodes, resp.StatusCode) {
+			return c.decodeError(resp)
+		}
+
+		if result != nil {
+			err = json.NewDecoder(resp.Body).Decode(result)
+			if err != nil {
+				return &Error{Message: fmt.Sprintf("Client Side Error: %v", err)}
+			}
+		}
+
+		break
+	}
+
+	return nil
 }
 
 // get handles the get requests for the client

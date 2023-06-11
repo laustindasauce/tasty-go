@@ -1,15 +1,31 @@
 package models
 
+import (
+	"time"
+
+	"github.com/austinbspencer/tasty-go/constants"
+)
+
+type DestinationVenueSymbol struct {
+	ID                   int    `json:"id"`
+	Symbol               string `json:"symbol"`
+	DestinationVenue     string `json:"destination-venue"`
+	MaxQuantityPrecision int    `json:"max-quantity-precision"`
+	MaxPricePrecision    int    `json:"max-price-precision"`
+	Routable             bool   `json:"routable"`
+}
+
 type Cryptocurrency struct {
-	ID               int             `json:"id"`
-	Symbol           string          `json:"symbol"`
-	InstrumentType   string          `json:"instrument-type"`
-	ShortDescription string          `json:"short-description"`
-	Description      string          `json:"description"`
-	IsClosingOnly    bool            `json:"is-closing-only"`
-	Active           bool            `json:"active"`
-	TickSize         StringToFloat32 `json:"tick-size"`
-	StreamerSymbol   string          `json:"streamer-symbol"`
+	ID                      int                      `json:"id"`
+	Symbol                  string                   `json:"symbol"`
+	InstrumentType          string                   `json:"instrument-type"`
+	ShortDescription        string                   `json:"short-description"`
+	Description             string                   `json:"description"`
+	IsClosingOnly           bool                     `json:"is-closing-only"`
+	Active                  bool                     `json:"active"`
+	TickSize                StringToFloat32          `json:"tick-size"`
+	StreamerSymbol          string                   `json:"streamer-symbol"`
+	DestinationVenueSymbols []DestinationVenueSymbol `json:"destination-venue-symbols"`
 }
 
 type TickSize struct {
@@ -19,8 +35,10 @@ type TickSize struct {
 }
 
 type Equity struct {
+	ID                             int             `json:"id"`
 	Symbol                         string          `json:"symbol"`
 	InstrumentType                 string          `json:"instrument-type"`
+	Cusip                          string          `json:"cusip"`
 	ShortDescription               string          `json:"short-description"`
 	IsIndex                        bool            `json:"is-index"`
 	ListedMarket                   string          `json:"listed-market"`
@@ -28,7 +46,7 @@ type Equity struct {
 	Lendability                    string          `json:"lendability"`
 	BorrowRate                     StringToFloat32 `json:"borrow-rate"`
 	HaltedAt                       string          `json:"halted-at"`
-	StopsTradingAt                 string          `json:"stops-trading-at"`
+	StopsTradingAt                 time.Time       `json:"stops-trading-at"`
 	MarketTimeInstrumentCollection string          `json:"market-time-instrument-collection"`
 	IsClosingOnly                  bool            `json:"is-closing-only"`
 	IsOptionsClosingOnly           bool            `json:"is-options-closing-only"`
@@ -37,8 +55,8 @@ type Equity struct {
 	IsIlliquid                     bool            `json:"is-illiquid"`
 	IsEtf                          bool            `json:"is-etf"`
 	StreamerSymbol                 string          `json:"streamer-symbol"`
-	TickSizes                      TickSize        `json:"tick-sizes"`
-	OptionTickSizes                TickSize        `json:"option-tick-sizes"`
+	TickSizes                      []TickSize      `json:"tick-sizes"`
+	OptionTickSizes                []TickSize      `json:"option-tick-sizes"`
 }
 
 type EquityOption struct {
@@ -57,10 +75,10 @@ type EquityOption struct {
 	ExpirationType                 string          `json:"expiration-type"`
 	SettlementType                 string          `json:"settlement-type"`
 	HaltedAt                       string          `json:"halted-at"`
-	StopsTradingAt                 string          `json:"stops-trading-at"`
+	StopsTradingAt                 time.Time       `json:"stops-trading-at"`
 	MarketTimeInstrumentCollection string          `json:"market-time-instrument-collection"`
 	DaysToExpiration               int             `json:"days-to-expiration"`
-	ExpiresAt                      string          `json:"expires-at"`
+	ExpiresAt                      time.Time       `json:"expires-at"`
 	IsClosingOnly                  bool            `json:"is-closing-only"`
 	OldSecurityNumber              string          `json:"old-security-number"`
 	StreamerSymbol                 string          `json:"streamer-symbol"`
@@ -69,6 +87,14 @@ type EquityOption struct {
 type FutureETFEquivalent struct {
 	Symbol        string `json:"symbol"`
 	ShareQuantity int    `json:"share-quantity"`
+}
+
+type Roll struct {
+	Name               string `json:"name"`
+	ActiveCount        int    `json:"active-count"`
+	CashSettled        bool   `json:"cash-settled"`
+	BusinessDaysOffset int    `json:"business-days-offset"`
+	FirstNotice        bool   `json:"first-notice"`
 }
 
 type Future struct {
@@ -88,8 +114,8 @@ type Future struct {
 	NextActiveMonth              bool                `json:"next-active-month"`
 	IsClosingOnly                bool                `json:"is-closing-only"`
 	FirstNoticeDate              string              `json:"first-notice-date"`
-	StopsTradingAt               string              `json:"stops-trading-at"`
-	ExpiresAt                    string              `json:"expires-at"`
+	StopsTradingAt               time.Time           `json:"stops-trading-at"`
+	ExpiresAt                    time.Time           `json:"expires-at"`
 	ProductGroup                 string              `json:"product-group"`
 	Exchange                     string              `json:"exchange"`
 	RollTargetSymbol             string              `json:"roll-target-symbol"`
@@ -100,9 +126,9 @@ type Future struct {
 	TrueUnderlyingSymbol         string              `json:"true-underlying-symbol"`
 	FutureETFEquivalent          FutureETFEquivalent `json:"future-etf-equivalent"`
 	FutureProduct                FutureProduct       `json:"future-product"`
-	TickSizes                    TickSize            `json:"tick-sizes"`
-	OptionTickSizes              TickSize            `json:"option-tick-sizes"`
-	SpreadTickSizes              TickSize            `json:"spread-tick-sizes"`
+	TickSizes                    []TickSize          `json:"tick-sizes"`
+	OptionTickSizes              []TickSize          `json:"option-tick-sizes"`
+	SpreadTickSizes              []TickSize          `json:"spread-tick-sizes"`
 }
 
 type FutureOptionProduct struct {
@@ -122,10 +148,15 @@ type FutureProduct struct {
 	RootSymbol                   string          `json:"root-symbol"`
 	Code                         string          `json:"code"`
 	Description                  string          `json:"description"`
+	ClearingCode                 string          `json:"clearing-code"`
+	ClearingExchangeCode         string          `json:"clearing-exchange-code"`
+	ClearportCode                string          `json:"clearport-code"`
+	LegacyCode                   string          `json:"legacy-code"`
 	Exchange                     string          `json:"exchange"`
+	LegacyExchangeCode           string          `json:"legacy-exchange-code"`
 	ProductType                  string          `json:"product-type"`
-	ListedMonths                 string          `json:"listed-months"`
-	ActiveMonths                 string          `json:"active-months"`
+	ListedMonths                 []string        `json:"listed-months"`
+	ActiveMonths                 []string        `json:"active-months"`
 	NotionalMultiplier           StringToFloat32 `json:"notional-multiplier"`
 	TickSize                     StringToFloat32 `json:"tick-size"`
 	DisplayFactor                StringToFloat32 `json:"display-factor"`
@@ -141,6 +172,7 @@ type FutureProduct struct {
 	ProductSubtype               string          `json:"product-subtype"`
 	TrueUnderlyingCode           string          `json:"true-underlying-code"`
 	MarketSector                 string          `json:"market-sector"`
+	Roll                         Roll            `json:"roll"`
 }
 
 type FutureOption struct {
@@ -171,8 +203,8 @@ type FutureOption struct {
 	DaysToExpiration     int                 `json:"days-to-expiration"`
 	IsClosingOnly        bool                `json:"is-closing-only"`
 	Active               bool                `json:"active"`
-	StopsTradingAt       string              `json:"stops-trading-at"`
-	ExpiresAt            string              `json:"expires-at"`
+	StopsTradingAt       time.Time           `json:"stops-trading-at"`
+	ExpiresAt            time.Time           `json:"expires-at"`
 	FutureOptionProduct  FutureOptionProduct `json:"future-option-product"`
 }
 
@@ -214,8 +246,8 @@ type FuturesExpirations struct {
 	NotionalValue        StringToFloat32 `json:"notional-value"`
 	DisplayFactor        StringToFloat32 `json:"display-factor"`
 	StrikeFactor         StringToFloat32 `json:"strike-factor"`
-	StopsTradingAt       string          `json:"stops-trading-at"`
-	ExpiresAt            string          `json:"expires-at"`
+	StopsTradingAt       time.Time       `json:"stops-trading-at"`
+	ExpiresAt            time.Time       `json:"expires-at"`
 	TickSizes            TickSize        `json:"tick-sizes"`
 	Strikes              Strikes         `json:"strikes"`
 }
@@ -229,15 +261,15 @@ type Expirations struct {
 }
 
 type Futures struct {
-	Symbol           string `json:"symbol"`
-	RootSymbol       string `json:"root-symbol"`
-	MaturityDate     string `json:"maturity-date"`
-	ExpirationDate   string `json:"expiration-date"`
-	DaysToExpiration int    `json:"days-to-expiration"`
-	ActiveMonth      bool   `json:"active-month"`
-	NextActiveMonth  bool   `json:"next-active-month"`
-	StopsTradingAt   string `json:"stops-trading-at"`
-	ExpiresAt        string `json:"expires-at"`
+	Symbol           string    `json:"symbol"`
+	RootSymbol       string    `json:"root-symbol"`
+	MaturityDate     string    `json:"maturity-date"`
+	ExpirationDate   string    `json:"expiration-date"`
+	DaysToExpiration int       `json:"days-to-expiration"`
+	ActiveMonth      bool      `json:"active-month"`
+	NextActiveMonth  bool      `json:"next-active-month"`
+	StopsTradingAt   time.Time `json:"stops-trading-at"`
+	ExpiresAt        time.Time `json:"expires-at"`
 }
 
 type OptionChains struct {
@@ -283,4 +315,43 @@ type CompactOptionChainSerializer struct {
 	Deliverables      Deliverables `json:"deliverables"`
 	Symbols           string       `json:"symbols"`
 	StreamerSymbols   string       `json:"streamer-symbols"`
+}
+
+type ActiveEquitiesQuery struct {
+	// PerPage equities to return per page. Default: 1000
+	PerPage int `url:"per-page"`
+	// PageOffset defaults to 0
+	PageOffset int `url:"page-offset"`
+	// Lendability Available values : Easy To Borrow, Locate Required, Preborrow
+	Lendability constants.Lendability `url:"lendability"`
+}
+
+type EquitiesQuery struct {
+	// The symbols of the equity(s), i.e AAPL
+	Symbols []string `url:"symbol[]"`
+	// Available values : Easy To Borrow, Locate Required, Preborrow
+	Lendability constants.Lendability `url:"lendability"`
+	// Flag indicating if equity is an index instrument
+	IsIndex bool `url:"is-index"`
+	// Flag indicating if equity is an etf instrument
+	IsETF bool `url:"is-etf"`
+}
+
+type EquityOptionsQuery struct {
+	// The symbol(s) of the equity option(s) using OCC Symbology, i.e. [FB 180629C00200000]
+	Symbols []string `url:"symbol[]"`
+	// Whether an option is available for trading with the broker.
+	// Terminology is somewhat misleading as this is generally used
+	// to filter non-standard / flex options out.
+	Active bool `url:"active"`
+	// Include expired options
+	WithExpired bool `url:"with-expired"`
+}
+
+type FuturesQuery struct {
+	// The symbol(s) of the future(s), i.e. symbol[]=ESZ9. Leading forward slash is not required.
+	Symbols []string `url:"symbol[]"`
+	// The product code of the future(s), i.e. ES or 6A
+	// Ignored if Symbols parameter is given
+	ProductCode []string `url:"product-code[]"`
 }
