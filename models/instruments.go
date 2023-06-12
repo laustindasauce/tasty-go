@@ -132,47 +132,55 @@ type Future struct {
 }
 
 type FutureOptionProduct struct {
-	RootSymbol          string          `json:"root-symbol"`
-	CashSettled         bool            `json:"cash-settled"`
-	Code                string          `json:"code"`
-	DisplayFactor       StringToFloat32 `json:"display-factor"`
-	Exchange            string          `json:"exchange"`
-	ProductType         string          `json:"product-type"`
-	ExpirationType      string          `json:"expiration-type"`
-	SettlementDelayDays int             `json:"settlement-delay-days"`
-	ProductSubtype      string          `json:"product-subtype"`
-	MarketSector        string          `json:"market-sector"`
+	RootSymbol              string          `json:"root-symbol"`
+	CashSettled             bool            `json:"cash-settled"`
+	Code                    string          `json:"code"`
+	LegacyCode              string          `json:"legacy-code"`
+	ClearportCode           string          `json:"clearport-code"`
+	ClearingCode            string          `json:"clearing-code"`
+	ClearingExchangeCode    string          `json:"clearing-exchange-code"`
+	ClearingPriceMultiplier StringToFloat32 `json:"clearing-price-multiplier"`
+	DisplayFactor           StringToFloat32 `json:"display-factor"`
+	Exchange                string          `json:"exchange"`
+	ProductType             string          `json:"product-type"`
+	ExpirationType          string          `json:"expiration-type"`
+	SettlementDelayDays     int             `json:"settlement-delay-days"`
+	IsRollover              bool            `json:"is-rollover"`
+	ProductSubtype          string          `json:"product-subtype"`
+	MarketSector            string          `json:"market-sector"`
+	FutureProduct           FutureProduct   `json:"future-product"`
 }
 
 type FutureProduct struct {
-	RootSymbol                   string          `json:"root-symbol"`
-	Code                         string          `json:"code"`
-	Description                  string          `json:"description"`
-	ClearingCode                 string          `json:"clearing-code"`
-	ClearingExchangeCode         string          `json:"clearing-exchange-code"`
-	ClearportCode                string          `json:"clearport-code"`
-	LegacyCode                   string          `json:"legacy-code"`
-	Exchange                     string          `json:"exchange"`
-	LegacyExchangeCode           string          `json:"legacy-exchange-code"`
-	ProductType                  string          `json:"product-type"`
-	ListedMonths                 []string        `json:"listed-months"`
-	ActiveMonths                 []string        `json:"active-months"`
-	NotionalMultiplier           StringToFloat32 `json:"notional-multiplier"`
-	TickSize                     StringToFloat32 `json:"tick-size"`
-	DisplayFactor                StringToFloat32 `json:"display-factor"`
-	BaseTick                     int             `json:"base-tick"`
-	SubTick                      int             `json:"sub-tick"`
-	StreamerExchangeCode         string          `json:"streamer-exchange-code"`
-	SmallNotional                bool            `json:"small-notional"`
-	BackMonthFirstCalendarSymbol bool            `json:"back-month-first-calendar-symbol"`
-	FirstNotice                  bool            `json:"first-notice"`
-	CashSettled                  bool            `json:"cash-settled"`
-	ContractLimit                int             `json:"contract-limit"`
-	SecurityGroup                string          `json:"security-group"`
-	ProductSubtype               string          `json:"product-subtype"`
-	TrueUnderlyingCode           string          `json:"true-underlying-code"`
-	MarketSector                 string          `json:"market-sector"`
-	Roll                         Roll            `json:"roll"`
+	RootSymbol                   string                `json:"root-symbol"`
+	Code                         string                `json:"code"`
+	Description                  string                `json:"description"`
+	ClearingCode                 string                `json:"clearing-code"`
+	ClearingExchangeCode         string                `json:"clearing-exchange-code"`
+	ClearportCode                string                `json:"clearport-code"`
+	LegacyCode                   string                `json:"legacy-code"`
+	Exchange                     string                `json:"exchange"`
+	LegacyExchangeCode           string                `json:"legacy-exchange-code"`
+	ProductType                  string                `json:"product-type"`
+	ListedMonths                 []string              `json:"listed-months"`
+	ActiveMonths                 []string              `json:"active-months"`
+	NotionalMultiplier           StringToFloat32       `json:"notional-multiplier"`
+	TickSize                     StringToFloat32       `json:"tick-size"`
+	DisplayFactor                StringToFloat32       `json:"display-factor"`
+	BaseTick                     int                   `json:"base-tick"`
+	SubTick                      int                   `json:"sub-tick"`
+	StreamerExchangeCode         string                `json:"streamer-exchange-code"`
+	SmallNotional                bool                  `json:"small-notional"`
+	BackMonthFirstCalendarSymbol bool                  `json:"back-month-first-calendar-symbol"`
+	FirstNotice                  bool                  `json:"first-notice"`
+	CashSettled                  bool                  `json:"cash-settled"`
+	ContractLimit                int                   `json:"contract-limit"`
+	SecurityGroup                string                `json:"security-group"`
+	ProductSubtype               string                `json:"product-subtype"`
+	TrueUnderlyingCode           string                `json:"true-underlying-code"`
+	MarketSector                 string                `json:"market-sector"`
+	OptionProducts               []FutureOptionProduct `json:"option-products"`
+	Roll                         Roll                  `json:"roll"`
 }
 
 type FutureOption struct {
@@ -184,6 +192,7 @@ type FutureOption struct {
 	OptionRootSymbol     string              `json:"option-root-symbol"`
 	StrikePrice          StringToFloat32     `json:"strike-price"`
 	Exchange             string              `json:"exchange"`
+	ExchangeSymbol       string              `json:"exchange-symbol"`
 	StreamerSymbol       string              `json:"streamer-symbol"`
 	OptionType           string              `json:"option-type"`
 	ExerciseStyle        string              `json:"exercise-style"`
@@ -195,6 +204,8 @@ type FutureOption struct {
 	IsConfirmed          bool                `json:"is-confirmed"`
 	NotionalValue        StringToFloat32     `json:"notional-value"`
 	DisplayFactor        StringToFloat32     `json:"display-factor"`
+	SecurityExchange     string              `json:"security-exchange"`
+	SxID                 string              `json:"sx-id"`
 	SettlementType       string              `json:"settlement-type"`
 	StrikeFactor         StringToFloat32     `json:"strike-factor"`
 	MaturityDate         string              `json:"maturity-date"`
@@ -225,7 +236,7 @@ type Warrant struct {
 	Active         bool   `json:"active"`
 }
 
-type Strikes struct {
+type Strike struct {
 	StrikePrice        StringToFloat32 `json:"strike-price"`
 	Call               string          `json:"call"`
 	CallStreamerSymbol string          `json:"call-streamer-symbol"`
@@ -233,7 +244,7 @@ type Strikes struct {
 	PutStreamerSymbol  string          `json:"put-streamer-symbol"`
 }
 
-type FuturesExpirations struct {
+type FuturesExpiration struct {
 	UnderlyingSymbol     string          `json:"underlying-symbol"`
 	RootSymbol           string          `json:"root-symbol"`
 	OptionRootSymbol     string          `json:"option-root-symbol"`
@@ -248,22 +259,21 @@ type FuturesExpirations struct {
 	StrikeFactor         StringToFloat32 `json:"strike-factor"`
 	StopsTradingAt       time.Time       `json:"stops-trading-at"`
 	ExpiresAt            time.Time       `json:"expires-at"`
-	TickSizes            TickSize        `json:"tick-sizes"`
-	Strikes              Strikes         `json:"strikes"`
+	TickSizes            []TickSize      `json:"tick-sizes"`
+	Strikes              []Strike        `json:"strikes"`
 }
 
 type Expirations struct {
-	ExpirationType   string  `json:"expiration-type"`
-	ExpirationDate   string  `json:"expiration-date"`
-	DaysToExpiration int     `json:"days-to-expiration"`
-	SettlementType   string  `json:"settlement-type"`
-	Strikes          Strikes `json:"strikes"`
+	ExpirationType   string   `json:"expiration-type"`
+	ExpirationDate   string   `json:"expiration-date"`
+	DaysToExpiration int      `json:"days-to-expiration"`
+	SettlementType   string   `json:"settlement-type"`
+	Strikes          []Strike `json:"strikes"`
 }
 
-type Futures struct {
+type NestedFuture struct {
 	Symbol           string    `json:"symbol"`
 	RootSymbol       string    `json:"root-symbol"`
-	MaturityDate     string    `json:"maturity-date"`
 	ExpirationDate   string    `json:"expiration-date"`
 	DaysToExpiration int       `json:"days-to-expiration"`
 	ActiveMonth      bool      `json:"active-month"`
@@ -273,15 +283,15 @@ type Futures struct {
 }
 
 type OptionChains struct {
-	UnderlyingSymbol string             `json:"underlying-symbol"`
-	RootSymbol       string             `json:"root-symbol"`
-	ExerciseStyle    string             `json:"exercise-style"`
-	Expirations      FuturesExpirations `json:"expirations"`
+	UnderlyingSymbol string              `json:"underlying-symbol"`
+	RootSymbol       string              `json:"root-symbol"`
+	ExerciseStyle    string              `json:"exercise-style"`
+	Expirations      []FuturesExpiration `json:"expirations"`
 }
 
-type FuturesNestedOptionChainSerializer struct {
-	Futures      Futures      `json:"futures"`
-	OptionChains OptionChains `json:"option-chains"`
+type NestedFuturesOptionChains struct {
+	Futures      []NestedFuture `json:"futures"`
+	OptionChains []OptionChains `json:"option-chains"`
 }
 
 type Deliverables struct {
@@ -295,7 +305,7 @@ type Deliverables struct {
 	Percent         string          `json:"percent"`
 }
 
-type NestedOptionChainSerializer struct {
+type NestedOptionChains struct {
 	UnderlyingSymbol  string       `json:"underlying-symbol"`
 	RootSymbol        string       `json:"root-symbol"`
 	OptionChainType   string       `json:"option-chain-type"`
@@ -305,7 +315,7 @@ type NestedOptionChainSerializer struct {
 	Expirations       Expirations  `json:"expirations"`
 }
 
-type CompactOptionChainSerializer struct {
+type CompactOptionChains struct {
 	UnderlyingSymbol  string       `json:"underlying-symbol"`
 	RootSymbol        string       `json:"root-symbol"`
 	OptionChainType   string       `json:"option-chain-type"`
@@ -350,8 +360,21 @@ type EquityOptionsQuery struct {
 
 type FuturesQuery struct {
 	// The symbol(s) of the future(s), i.e. symbol[]=ESZ9. Leading forward slash is not required.
-	Symbols []string `url:"symbol[]"`
+	Symbols []string `url:"symbol[],omitempty"`
 	// The product code of the future(s), i.e. ES or 6A
 	// Ignored if Symbols parameter is given
-	ProductCode []string `url:"product-code[]"`
+	ProductCode []string `url:"product-code[],omitempty"`
+}
+
+type FutureOptionsQuery struct {
+	// The symbol(s) of the future(s), i.e. symbol[]=ESZ9. Leading forward slash is not required.
+	Symbols []string `url:"symbol[]"`
+	// Future option root, i.e. EW3 or SO
+	OptionRootSymbol string `url:"option-root-symbol,omitempty"`
+	// Expiration date
+	ExpirationDate time.Time `layout:"2006-01-02" url:"expiration-date,omitempty"`
+	// P(ut) or C(all)
+	OptionType constants.OptionType `url:"option-type,omitempty"`
+	// Strike price using display factor
+	StrikePrice float32 `url:"strike-price,omitempty"`
 }

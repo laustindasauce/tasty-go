@@ -24,13 +24,13 @@ func TestGetStrikeWithPadding(t *testing.T) {
 }
 
 func TestGetEquity(t *testing.T) {
-	sym := OCCSymbology{
+	sym := EquityOptionsSymbology{
 		Symbol:     "AAPL",
 		Strike:     185,
 		OptionType: constants.Call,
 		Expiration: time.Date(2023, 6, 16, 0, 0, 0, 0, time.UTC),
 	}
-	occSymbol := sym.GetOCCSymbology()
+	occSymbol := sym.Build()
 
 	require.Equal(t, "AAPL  230616C00185000", occSymbol)
 }

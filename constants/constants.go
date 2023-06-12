@@ -164,3 +164,29 @@ const (
 	Call OptionType = "C"
 	Put  OptionType = "P"
 )
+
+type MonthCode string
+
+const (
+	January   MonthCode = "F"
+	February  MonthCode = "G"
+	March     MonthCode = "H"
+	April     MonthCode = "J"
+	May       MonthCode = "K"
+	June      MonthCode = "M"
+	July      MonthCode = "N"
+	August    MonthCode = "Q"
+	September MonthCode = "U"
+	October   MonthCode = "V"
+	November  MonthCode = "X"
+	December  MonthCode = "Z"
+)
+
+type Exchange string
+
+const (
+	CME    Exchange = "CME"
+	SMALLS Exchange = "SMALLS"
+	CFE    Exchange = "CFE"
+	CBOED  Exchange = "CBOED"
+)
