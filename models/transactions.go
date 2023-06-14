@@ -23,7 +23,7 @@ type Transaction struct {
 	InstrumentType                   constants.InstrumentType `json:"instrument-type"`
 	UnderlyingSymbol                 string                   `json:"underlying-symbol"`
 	TransactionType                  string                   `json:"transaction-type"`
-	TransactionSubType               string                   `json:"transaction-sub-type"`
+	TransactionSubType               constants.OrderAction    `json:"transaction-sub-type"`
 	Description                      string                   `json:"description"`
 	Action                           constants.OrderAction    `json:"action"`
 	Quantity                         StringToFloat32          `json:"quantity"`
@@ -31,20 +31,20 @@ type Transaction struct {
 	ExecutedAt                       time.Time                `json:"executed-at"`
 	TransactionDate                  string                   `json:"transaction-date"`
 	Value                            StringToFloat32          `json:"value"`
-	ValueEffect                      string                   `json:"value-effect"`
+	ValueEffect                      constants.PriceEffect    `json:"value-effect"`
 	RegulatoryFees                   StringToFloat32          `json:"regulatory-fees"`
-	RegulatoryFeesEffect             string                   `json:"regulatory-fees-effect"`
+	RegulatoryFeesEffect             constants.PriceEffect    `json:"regulatory-fees-effect"`
 	ClearingFees                     StringToFloat32          `json:"clearing-fees"`
-	ClearingFeesEffect               string                   `json:"clearing-fees-effect"`
+	ClearingFeesEffect               constants.PriceEffect    `json:"clearing-fees-effect"`
 	OtherCharge                      StringToFloat32          `json:"other-charge"`
-	OtherChargeEffect                string                   `json:"other-charge-effect"`
+	OtherChargeEffect                constants.PriceEffect    `json:"other-charge-effect"`
 	OtherChargeDescription           string                   `json:"other-charge-description"`
 	NetValue                         StringToFloat32          `json:"net-value"`
-	NetValueEffect                   string                   `json:"net-value-effect"`
+	NetValueEffect                   constants.PriceEffect    `json:"net-value-effect"`
 	Commission                       StringToFloat32          `json:"commission"`
-	CommissionEffect                 string                   `json:"commission-effect"`
+	CommissionEffect                 constants.PriceEffect    `json:"commission-effect"`
 	ProprietaryIndexOptionFees       StringToFloat32          `json:"proprietary-index-option-fees"`
-	ProprietaryIndexOptionFeesEffect string                   `json:"proprietary-index-option-fees-effect"`
+	ProprietaryIndexOptionFeesEffect constants.PriceEffect    `json:"proprietary-index-option-fees-effect"`
 	IsEstimatedFee                   bool                     `json:"is-estimated-fee"`
 	ExtExchangeOrderNumber           string                   `json:"ext-exchange-order-number"`
 	ExtGlobalOrderNumber             int                      `json:"ext-global-order-number"`
@@ -65,6 +65,6 @@ type Transaction struct {
 }
 
 type TransactionFees struct {
-	TotalFees       StringToFloat32 `json:"total-fees"`
-	TotalFeesEffect string          `json:"total-fees-effect"`
+	TotalFees       StringToFloat32       `json:"total-fees"`
+	TotalFeesEffect constants.PriceEffect `json:"total-fees-effect"`
 }
