@@ -338,7 +338,6 @@ func (c *Client) GetFutureOptions(query queries.FutureOptions) ([]models.FutureO
 
 	err := c.request(http.MethodGet, path, header, query, nil, instrumentRes)
 	if err != nil {
-		fmt.Println(err)
 		return []models.FutureOption{}, err
 	}
 
@@ -368,8 +367,6 @@ func (c *Client) GetFutureOption(symbol string) (models.FutureOption, *Error) {
 		return models.FutureOption{}, err
 	}
 
-	fmt.Println(instrumentRes.Context)
-
 	return instrumentRes.FutureOption, nil
 }
 
@@ -394,7 +391,6 @@ func (c *Client) GetFutureProducts() ([]models.FutureProduct, *Error) {
 
 	err := c.request(http.MethodGet, path, header, nil, nil, instrumentRes)
 	if err != nil {
-		fmt.Println(err)
 		return []models.FutureProduct{}, err
 	}
 
