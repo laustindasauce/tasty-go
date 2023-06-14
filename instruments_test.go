@@ -8,6 +8,7 @@ import (
 
 	"github.com/austinbspencer/tasty-go/constants"
 	"github.com/austinbspencer/tasty-go/models"
+	"github.com/austinbspencer/tasty-go/queries"
 	"github.com/austinbspencer/tasty-go/utils"
 	"github.com/stretchr/testify/require"
 )
@@ -55,7 +56,7 @@ func TestGetActiveEquities(t *testing.T) {
 		fmt.Fprint(writer, activeEquitiesResp)
 	})
 
-	resp, pagination, err := client.GetActiveEquities(models.ActiveEquitiesQuery{PerPage: 4})
+	resp, pagination, err := client.GetActiveEquities(queries.ActiveEquities{PerPage: 4})
 	require.Nil(t, err)
 
 	require.Equal(t, 4, len(resp))
@@ -111,7 +112,7 @@ func TestGetEquities(t *testing.T) {
 		fmt.Fprint(writer, equitiesResp)
 	})
 
-	resp, err := client.GetEquities(models.EquitiesQuery{Symbols: []string{"AAPL", "TSLA"}})
+	resp, err := client.GetEquities(queries.Equities{Symbols: []string{"AAPL", "TSLA"}})
 	require.Nil(t, err)
 
 	require.Equal(t, 2, len(resp))
@@ -210,7 +211,7 @@ func TestGetEquityOptions(t *testing.T) {
 	}
 	occSymbol := sym.Build()
 
-	resp, err := client.GetEquityOptions(models.EquityOptionsQuery{Symbols: []string{occSymbol}})
+	resp, err := client.GetEquityOptions(queries.EquityOptions{Symbols: []string{occSymbol}})
 	require.Nil(t, err)
 
 	require.Equal(t, 1, len(resp))
@@ -291,7 +292,7 @@ func TestGetFutures(t *testing.T) {
 
 	productCode := "ES"
 
-	resp, err := client.GetFutures(models.FuturesQuery{ProductCode: []string{productCode}})
+	resp, err := client.GetFutures(queries.Futures{ProductCode: []string{productCode}})
 	require.Nil(t, err)
 
 	require.Equal(t, 1, len(resp))
@@ -605,7 +606,7 @@ func TestGetFutureOptions(t *testing.T) {
 
 	symbol := fcc.Build()
 
-	query := models.FutureOptionsQuery{
+	query := queries.FutureOptions{
 		Symbols: []string{symbol},
 	}
 

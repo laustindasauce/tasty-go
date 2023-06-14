@@ -8,6 +8,7 @@ import (
 
 	"github.com/austinbspencer/tasty-go/constants"
 	"github.com/austinbspencer/tasty-go/models"
+	"github.com/austinbspencer/tasty-go/queries"
 	"github.com/stretchr/testify/require"
 )
 
@@ -148,7 +149,7 @@ func TestGetAccountPositions(t *testing.T) {
 	defer teardown()
 
 	accountNumber := "5YZ55555"
-	query := models.AccountPositionQuery{UnderlyingSymbol: []string{"RIVN"}}
+	query := queries.AccountPosition{UnderlyingSymbol: []string{"RIVN"}}
 
 	mux.HandleFunc(fmt.Sprintf("/accounts/%s/positions", accountNumber), func(writer http.ResponseWriter, request *http.Request) {
 		fmt.Fprint(writer, accountPositionsResp)
@@ -190,7 +191,7 @@ func TestGetAccountBalanceSnapshots(t *testing.T) {
 	defer teardown()
 
 	accountNumber := "5YZ55555"
-	query := models.AccountBalanceSnapshotsQuery{SnapshotDate: time.Now().AddDate(0, -2, 0)}
+	query := queries.AccountBalanceSnapshots{SnapshotDate: time.Now().AddDate(0, -2, 0)}
 
 	mux.HandleFunc(fmt.Sprintf("/accounts/%s/balance-snapshots", accountNumber), func(writer http.ResponseWriter, request *http.Request) {
 		fmt.Fprint(writer, balanceSnapshotsResp)
@@ -253,7 +254,7 @@ func TestGetAccountNetLiqHistory(t *testing.T) {
 	defer teardown()
 
 	accountNumber := "5YZ55555"
-	query := models.HistoricLiquidityQuery{TimeBack: constants.OneDay}
+	query := queries.HistoricLiquidity{TimeBack: constants.OneDay}
 
 	mux.HandleFunc(fmt.Sprintf("/accounts/%s/net-liq/history", accountNumber), func(writer http.ResponseWriter, request *http.Request) {
 		fmt.Fprint(writer, netLiqHistoryResp)
