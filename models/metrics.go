@@ -90,13 +90,3 @@ type MarketMetricVolatility struct {
 	PriceEarningsRatio                     StringToFloat32                     `json:"price-earnings-ratio"`
 	EarningsPerShare                       StringToFloat32                     `json:"earnings-per-share"`
 }
-
-type MarketMetricsQuery struct {
-	// Symbols is the list of symbols
-	Symbols []string `url:"symbols,comma"`
-}
-
-type HistoricEarningsQuery struct {
-	// StartDate string
-	StartDate time.Time `layout:"2006-01-02" url:"start-date"`
-}
