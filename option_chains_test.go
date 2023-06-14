@@ -140,6 +140,133 @@ func TestGetNestedFuturesOptionChains(t *testing.T) {
 	require.Equal(t, "./EW4N23P3990:XCME", strike.PutStreamerSymbol)
 }
 
+func TestGetEquityOptionChains(t *testing.T) {
+	setup()
+	defer teardown()
+
+	symbol := "AAPL"
+
+	mux.HandleFunc(fmt.Sprintf("/option-chains/%s", symbol), func(writer http.ResponseWriter, request *http.Request) {
+		fmt.Fprint(writer, equityOptionChainsResp)
+	})
+
+	resp, err := client.GetEquityOptionChains(symbol)
+	require.Nil(t, err)
+
+	require.Equal(t, 2, len(resp))
+
+	eo := resp[0]
+
+	require.Equal(t, "AAPL  230616C00060000", eo.Symbol)
+	require.Equal(t, "Equity Option", eo.InstrumentType)
+	require.True(t, eo.Active)
+	require.Equal(t, models.StringToFloat32(60), eo.StrikePrice)
+	require.Equal(t, symbol, eo.RootSymbol)
+	require.Equal(t, symbol, eo.UnderlyingSymbol)
+	require.Equal(t, "2023-06-16", eo.ExpirationDate)
+	require.Equal(t, "American", eo.ExerciseStyle)
+	require.Equal(t, 100, eo.SharesPerContract)
+	require.Equal(t, string(constants.Call), eo.OptionType)
+	require.Equal(t, "Standard", eo.OptionChainType)
+	require.Equal(t, "Regular", eo.ExpirationType)
+	require.Equal(t, "PM", eo.SettlementType)
+	require.Equal(t, "2023-06-16T20:00:00Z", eo.StopsTradingAt.Format(time.RFC3339))
+	require.Equal(t, "Equity Option", eo.MarketTimeInstrumentCollection)
+	require.Equal(t, 4, eo.DaysToExpiration)
+	require.Equal(t, "2023-06-16T20:00:00Z", eo.ExpiresAt.Format(time.RFC3339))
+	require.False(t, eo.IsClosingOnly)
+	require.Equal(t, ".AAPL230616C60", eo.StreamerSymbol)
+}
+
+func TestGetNestedEquityOptionChains(t *testing.T) {
+	setup()
+	defer teardown()
+
+	symbol := "AAPL"
+
+	mux.HandleFunc(fmt.Sprintf("/option-chains/%s/nested", symbol), func(writer http.ResponseWriter, request *http.Request) {
+		fmt.Fprint(writer, equityOptionChainsNestedResp)
+	})
+
+	resp, err := client.GetNestedEquityOptionChains(symbol)
+	require.Nil(t, err)
+
+	eo := resp[0]
+
+	require.Equal(t, symbol, eo.RootSymbol)
+	require.Equal(t, symbol, eo.UnderlyingSymbol)
+	require.Equal(t, 100, eo.SharesPerContract)
+	require.Equal(t, "Standard", eo.OptionChainType)
+
+	tick := eo.TickSizes[0]
+
+	require.Equal(t, models.StringToFloat32(0.01), tick.Value)
+	require.Equal(t, models.StringToFloat32(3.0), tick.Threshold)
+
+	del := eo.Deliverables[0]
+
+	require.Equal(t, 108514, del.ID)
+	require.Equal(t, symbol, del.RootSymbol)
+	require.Equal(t, "Shares", del.DeliverableType)
+	require.Equal(t, "100 shares of AAPL", del.Description)
+	require.Equal(t, models.StringToFloat32(100), del.Amount)
+	require.Equal(t, symbol, del.Symbol)
+	require.Equal(t, "Equity", del.InstrumentType)
+	require.Equal(t, models.StringToFloat32(100), del.Percent)
+
+	exp := eo.Expirations[0]
+
+	require.Equal(t, "Regular", exp.ExpirationType)
+	require.Equal(t, "2023-06-16", exp.ExpirationDate)
+	require.Equal(t, 4, exp.DaysToExpiration)
+	require.Equal(t, "PM", exp.SettlementType)
+
+	strike := exp.Strikes[0]
+
+	require.Equal(t, models.StringToFloat32(60), strike.StrikePrice)
+	require.Equal(t, "AAPL  230616C00060000", strike.Call)
+	require.Equal(t, ".AAPL230616C60", strike.CallStreamerSymbol)
+	require.Equal(t, "AAPL  230616P00060000", strike.Put)
+	require.Equal(t, ".AAPL230616P60", strike.PutStreamerSymbol)
+}
+
+func TestGetCompactEquityOptionChains(t *testing.T) {
+	setup()
+	defer teardown()
+
+	symbol := "AAPL"
+
+	mux.HandleFunc(fmt.Sprintf("/option-chains/%s/compact", symbol), func(writer http.ResponseWriter, request *http.Request) {
+		fmt.Fprint(writer, equityOptionChainsCompactResp)
+	})
+
+	resp, err := client.GetCompactEquityOptionChains(symbol)
+	require.Nil(t, err)
+
+	eo := resp[0]
+
+	require.Equal(t, symbol, eo.RootSymbol)
+	require.Equal(t, symbol, eo.UnderlyingSymbol)
+	require.Equal(t, 100, eo.SharesPerContract)
+	require.Equal(t, "Standard", eo.OptionChainType)
+
+	del := eo.Deliverables[0]
+
+	require.Equal(t, 108514, del.ID)
+	require.Equal(t, symbol, del.RootSymbol)
+	require.Equal(t, "Shares", del.DeliverableType)
+	require.Equal(t, "100 shares of AAPL", del.Description)
+	require.Equal(t, models.StringToFloat32(100), del.Amount)
+	require.Equal(t, symbol, del.Symbol)
+	require.Equal(t, "Equity", del.InstrumentType)
+	require.Equal(t, models.StringToFloat32(100), del.Percent)
+
+	// symbols
+	require.Equal(t, "AAPL  230616C00060000", eo.Symbols[0])
+	// streamer symbols
+	require.Equal(t, ".AAPL230616C60", eo.StreamerSymbols[0])
+}
+
 const futuresOptionChainsResp = `{
   "data": {
     "items": [
@@ -302,4 +429,155 @@ const futuresOptionChainsNested = `{
     ]
   },
   "context": "/futures-option-chains/ES/nested"
+}`
+
+const equityOptionChainsResp = `{
+  "data": {
+    "items": [
+      {
+        "symbol": "AAPL  230616C00060000",
+        "instrument-type": "Equity Option",
+        "active": true,
+        "strike-price": "60.0",
+        "root-symbol": "AAPL",
+        "underlying-symbol": "AAPL",
+        "expiration-date": "2023-06-16",
+        "exercise-style": "American",
+        "shares-per-contract": 100,
+        "option-type": "C",
+        "option-chain-type": "Standard",
+        "expiration-type": "Regular",
+        "settlement-type": "PM",
+        "stops-trading-at": "2023-06-16T20:00:00.000+00:00",
+        "market-time-instrument-collection": "Equity Option",
+        "days-to-expiration": 4,
+        "expires-at": "2023-06-16T20:00:00.000+00:00",
+        "is-closing-only": false,
+        "streamer-symbol": ".AAPL230616C60"
+      },
+      {
+        "symbol": "AAPL  230616P00060000",
+        "instrument-type": "Equity Option",
+        "active": true,
+        "strike-price": "60.0",
+        "root-symbol": "AAPL",
+        "underlying-symbol": "AAPL",
+        "expiration-date": "2023-06-16",
+        "exercise-style": "American",
+        "shares-per-contract": 100,
+        "option-type": "P",
+        "option-chain-type": "Standard",
+        "expiration-type": "Regular",
+        "settlement-type": "PM",
+        "stops-trading-at": "2023-06-16T20:00:00.000+00:00",
+        "market-time-instrument-collection": "Equity Option",
+        "days-to-expiration": 4,
+        "expires-at": "2023-06-16T20:00:00.000+00:00",
+        "is-closing-only": false,
+        "streamer-symbol": ".AAPL230616P60"
+      }
+    ]
+  },
+  "context": "/option-chains/AAPL"
+}`
+
+const equityOptionChainsNestedResp = `{
+  "data": {
+    "items": [
+      {
+        "underlying-symbol": "AAPL",
+        "root-symbol": "AAPL",
+        "option-chain-type": "Standard",
+        "shares-per-contract": 100,
+        "tick-sizes": [
+          {
+            "value": "0.01",
+            "threshold": "3.0"
+          },
+          {
+            "value": "0.05"
+          }
+        ],
+        "deliverables": [
+          {
+            "id": 108514,
+            "root-symbol": "AAPL",
+            "deliverable-type": "Shares",
+            "description": "100 shares of AAPL",
+            "amount": "100.0",
+            "symbol": "AAPL",
+            "instrument-type": "Equity",
+            "percent": "100"
+          }
+        ],
+        "expirations": [
+          {
+            "expiration-type": "Regular",
+            "expiration-date": "2023-06-16",
+            "days-to-expiration": 4,
+            "settlement-type": "PM",
+            "strikes": [
+              {
+                "strike-price": "60.0",
+                "call": "AAPL  230616C00060000",
+                "call-streamer-symbol": ".AAPL230616C60",
+                "put": "AAPL  230616P00060000",
+                "put-streamer-symbol": ".AAPL230616P60"
+              },
+              {
+                "strike-price": "65.0",
+                "call": "AAPL  230616C00065000",
+                "call-streamer-symbol": ".AAPL230616C65",
+                "put": "AAPL  230616P00065000",
+                "put-streamer-symbol": ".AAPL230616P65"
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  "context": "/option-chains/AAPL/nested"
+}`
+
+const equityOptionChainsCompactResp = `{
+  "data": {
+    "items": [
+      {
+        "underlying-symbol": "AAPL",
+        "root-symbol": "AAPL",
+        "option-chain-type": "Standard",
+        "settlement-type": "PM",
+        "shares-per-contract": 100,
+        "expiration-type": "Regular",
+        "deliverables": [
+          {
+            "id": 108514,
+            "root-symbol": "AAPL",
+            "deliverable-type": "Shares",
+            "description": "100 shares of AAPL",
+            "amount": "100.0",
+            "symbol": "AAPL",
+            "instrument-type": "Equity",
+            "percent": "100"
+          }
+        ],
+        "symbols": [
+          "AAPL  230616C00060000",
+          "AAPL  230616P00060000",
+          "AAPL  230616C00065000",
+          "AAPL  230616P00065000"
+        ],
+        "streamer-symbols": [
+          ".AAPL230616C60",
+          ".AAPL230616P60",
+          ".AAPL230616C65",
+          ".AAPL230616P65",
+          ".AAPL230616C70",
+          ".AAPL230616P70"
+        ]
+      }
+    ]
+  },
+  "context": "/option-chains/AAPL/compact"
 }`

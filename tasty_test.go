@@ -4,6 +4,7 @@ import (
 	"log"
 	"net/http"
 	"net/http/httptest"
+	"strings"
 )
 
 var (
@@ -25,6 +26,8 @@ func setup() {
 		SessionToken: &sessionToken,
 	}
 	client.baseURL = server.URL
+	// Required for customGet method
+	client.baseHost = strings.Split(server.URL, "/")[2]
 }
 
 func teardown() {

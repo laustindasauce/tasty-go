@@ -154,6 +154,30 @@ func TestGetMarginRequirements(t *testing.T) {
 	require.Equal(t, "2023-06-09", entry.ExpirationDate)
 }
 
+func TestGetEffectiveMarginRequirements(t *testing.T) {
+	setup()
+	defer teardown()
+
+	accountNumber := "5YZ55555"
+	underlyingSymbol := "AAPL"
+
+	mux.HandleFunc(fmt.Sprintf("/accounts/%s/margin-requirements/%s/effective", accountNumber, underlyingSymbol), func(writer http.ResponseWriter, request *http.Request) {
+		fmt.Fprint(writer, effectiveMarginRequirementsResp)
+	})
+
+	resp, err := client.GetEffectiveMarginRequirements(accountNumber, underlyingSymbol)
+	require.Nil(t, err)
+
+	require.Equal(t, underlyingSymbol, resp.UnderlyingSymbol)
+	require.Equal(t, models.StringToFloat32(.5), resp.LongEquityInitial)
+	require.Equal(t, models.StringToFloat32(.5), resp.ShortEquityInitial)
+	require.Equal(t, models.StringToFloat32(.25), resp.LongEquityMaintenance)
+	require.Equal(t, models.StringToFloat32(.3), resp.ShortEquityMaintenance)
+	require.Equal(t, models.StringToFloat32(.2), resp.NakedOptionStandard)
+	require.Equal(t, models.StringToFloat32(.1), resp.NakedOptionMinimum)
+	require.Equal(t, models.StringToFloat32(250), resp.NakedOptionFloor)
+}
+
 const marginReqResp = `{
   "data": {
     "account-number": "5YZ55555",
@@ -272,4 +296,18 @@ const marginReqResp = `{
     ],
     "last-state-timestamp": 1686135853860
   }
+}`
+
+const effectiveMarginRequirementsResp = `{
+    "data": {
+        "underlying-symbol": "AAPL",
+        "long-equity-initial": "0.5",
+        "short-equity-initial": "0.5",
+        "long-equity-maintenance": "0.25",
+        "short-equity-maintenance": "0.3",
+        "naked-option-standard": "0.2",
+        "naked-option-minimum": "0.1",
+        "naked-option-floor": "250.0"
+    },
+    "context": "/accounts/5YZ55555/margin-requirements/AAPL/effective"
 }`

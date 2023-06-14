@@ -8,6 +8,7 @@ import (
 	"net/url"
 	"strings"
 
+	"github.com/austinbspencer/tasty-go/utils"
 	"github.com/google/go-querystring/query"
 )
 
@@ -19,7 +20,7 @@ const (
 )
 
 var (
-	errorStatusCodes = []int{400, 401, 403, 404, 415, 500}
+	errorStatusCodes = []int{400, 401, 403, 404, 415, 422, 500}
 )
 
 type Client struct {
@@ -51,17 +52,26 @@ func NewCertClient(httpClient *http.Client) (*Client, error) {
 	return c, nil
 }
 
+type TastyError struct {
+	Domain string `json:"domain"`
+	Reason string `json:"reason"`
+}
+
 // Error represents an error returned by the TastyWorks API.
 type Error struct {
+	// Simple code error string
+	Code string `json:"code"`
 	// A short description of the error.
 	Message string `json:"message"`
+	// Slice of errors
+	Errors []TastyError `json:"errors"`
 	// The HTTP status code.
-	Err int `json:"error,omitempty"`
+	StatusCode int `json:"error,omitempty"`
 }
 
 // Error ...
 func (e Error) Error() string {
-	return e.Message
+	return fmt.Sprintf("Error in request;\nCode: %s\nMessage: %s", e.Code, e.Message)
 }
 
 // decodeError decodes an Error from response status code based off
@@ -77,23 +87,24 @@ func (c *Client) decodeError(resp *http.Response) *Error {
 
 	err := json.NewDecoder(resp.Body).Decode(errRes)
 	if err != nil {
-		fmt.Println(err)
 		e.Message = fmt.Sprintf("TastyWorks: unexpected HTTP %d: %s (empty error)", resp.StatusCode, err.Error())
-		e.Err = resp.StatusCode
+		e.StatusCode = resp.StatusCode
 		return e
 	}
+
+	errRes.Error.StatusCode = resp.StatusCode
 
 	e = &errRes.Error
 
 	return e
 }
 
-// customGet handles the get requests for the client with unique paths
-func (c *Client) customGet(path string, header http.Header, params, result any) *Error {
+// customRequest handles any requests for the client with unique paths
+func (c *Client) customRequest(method, path string, header http.Header, params, payload, result any) *Error {
 	for {
 		r := new(http.Request)
 
-		r.Method = "GET"
+		r.Method = method
 
 		r.URL = &url.URL{
 			Scheme: strings.Split(c.baseURL, ":")[0],
@@ -110,7 +121,6 @@ func (c *Client) customGet(path string, header http.Header, params, result any) 
 			if err != nil {
 				return &Error{Message: fmt.Sprintf("Client Side Error: %v", err)}
 			}
-			// fmt.Println(queryString.Encode())
 			r.URL.RawQuery = queryString.Encode()
 		}
 
@@ -131,7 +141,7 @@ func (c *Client) customGet(path string, header http.Header, params, result any) 
 		if resp.StatusCode == http.StatusNoContent {
 			return nil
 		}
-		if ContainsInt(errorStatusCodes, resp.StatusCode) {
+		if utils.ContainsInt(errorStatusCodes, resp.StatusCode) {
 			return c.decodeError(resp)
 		}
 
@@ -148,10 +158,15 @@ func (c *Client) customGet(path string, header http.Header, params, result any) 
 	return nil
 }
 
-// get handles the get requests for the client
-func (c *Client) get(url string, header http.Header, params, result any) *Error {
+// request handles any requests for the client
+func (c *Client) request(method, url string, header http.Header, params, payload, result any) *Error {
 	for {
-		r, err := http.NewRequest("GET", url, nil)
+		body, err := json.Marshal(payload)
+		if err != nil {
+			return &Error{Message: fmt.Sprintf("Client Side Error: %v", err)}
+		}
+
+		r, err := http.NewRequest(method, url, bytes.NewBuffer(body))
 		if err != nil {
 			return &Error{Message: fmt.Sprintf("Client Side Error: %v", err)}
 		}
@@ -165,17 +180,16 @@ func (c *Client) get(url string, header http.Header, params, result any) *Error 
 			if err != nil {
 				return &Error{Message: fmt.Sprintf("Client Side Error: %v", err)}
 			}
-			// fmt.Println(queryString.Encode())
 			r.URL.RawQuery = queryString.Encode()
 		}
 
-		fmt.Println("Path: ", r.URL.Path)
 		resp, err := c.httpClient.Do(r)
 		if err != nil {
 			return &Error{Message: fmt.Sprintf("Client Side Error: %v", err)}
 		}
 
-		// body, err := ioutil.ReadAll(resp.Body)
+		// body, err = ioutil.ReadAll(resp.Body)
+
 		// if err != nil {
 		// 	return &Error{Message: fmt.Sprintf("Client Side Error: %v", err)}
 		// }
@@ -187,104 +201,7 @@ func (c *Client) get(url string, header http.Header, params, result any) *Error 
 		if resp.StatusCode == http.StatusNoContent {
 			return nil
 		}
-		if ContainsInt(errorStatusCodes, resp.StatusCode) {
-			return c.decodeError(resp)
-		}
-
-		if result != nil {
-			err = json.NewDecoder(resp.Body).Decode(result)
-			if err != nil {
-				return &Error{Message: fmt.Sprintf("Client Side Error: %v", err)}
-			}
-		}
-
-		break
-	}
-
-	return nil
-}
-
-// post handles the post requests for the client
-func (c *Client) post(url string, header http.Header, payload, result any) *Error {
-	for {
-		body, err := json.Marshal(payload)
-
-		r, err := http.NewRequest("POST", url, bytes.NewBuffer(body))
-		if err != nil {
-			return &Error{Message: fmt.Sprintf("Client Side Error: %v", err)}
-		}
-
-		r.Header = header
-
-		r.Header.Add("Content-Type", "application/json")
-
-		resp, err := c.httpClient.Do(r)
-		if err != nil {
-			return &Error{Message: fmt.Sprintf("Client Side Error: %v", err)}
-		}
-
-		// body, err = ioutil.ReadAll(resp.Body)
-
-		// if err != nil {
-		// 	return  &Error{Message: fmt.Sprintf("Client Side Error: %v", err)}
-		// }
-
-		// fmt.Println(string(body))
-
-		defer resp.Body.Close()
-
-		fmt.Println(resp.StatusCode)
-		if resp.StatusCode == http.StatusNoContent {
-			return nil
-		}
-		if ContainsInt(errorStatusCodes, resp.StatusCode) {
-			return c.decodeError(resp)
-		}
-
-		if result != nil {
-			err = json.NewDecoder(resp.Body).Decode(result)
-			if err != nil {
-				return &Error{Message: fmt.Sprintf("Client Side Error: %v", err)}
-			}
-		}
-
-		break
-	}
-
-	return nil
-}
-
-// delete handles the delete requests for the client
-func (c *Client) delete(url string, header http.Header, result any) *Error {
-	for {
-		r, err := http.NewRequest("DELETE", url, nil)
-		if err != nil {
-			return &Error{Message: fmt.Sprintf("Client Side Error: %v", err)}
-		}
-
-		r.Header = header
-
-		r.Header.Add("Content-Type", "application/json")
-
-		resp, err := c.httpClient.Do(r)
-		if err != nil {
-			return &Error{Message: fmt.Sprintf("Client Side Error: %v", err)}
-		}
-
-		// body, err := ioutil.ReadAll(resp.Body)
-
-		// if err != nil {
-		// 	return err
-		// }
-
-		// fmt.Println(string(body))
-
-		defer resp.Body.Close()
-
-		if resp.StatusCode == http.StatusNoContent {
-			return nil
-		}
-		if ContainsInt(errorStatusCodes, resp.StatusCode) {
+		if utils.ContainsInt(errorStatusCodes, resp.StatusCode) {
 			return c.decodeError(resp)
 		}
 

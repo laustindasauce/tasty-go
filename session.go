@@ -39,7 +39,7 @@ func (c *Client) CreateSession(login LoginInfo) (Session, *Error) {
 		header.Add("X-Tastyworks-OTP", *login.TwoFactorCode)
 	}
 
-	err := c.post(reqURL, header, login, session)
+	err := c.request(http.MethodPost, reqURL, header, nil, login, session)
 	if err == nil {
 		(*c).Session = session.Session
 	} else {
@@ -60,7 +60,7 @@ func (c *Client) ValidateSession() (Session, *Error) {
 	header := http.Header{}
 	header.Add("Authorization", *c.Session.SessionToken)
 
-	err := c.post(reqURL, header, nil, session)
+	err := c.request(http.MethodPost, reqURL, header, nil, nil, session)
 	if err == nil {
 		(*c).Session = session.Session
 	} else {
@@ -79,5 +79,5 @@ func (c *Client) DestroySession() *Error {
 	header := http.Header{}
 	header.Add("Authorization", *c.Session.SessionToken)
 
-	return c.delete(reqURL, header, nil)
+	return c.request(http.MethodDelete, reqURL, header, nil, nil, nil)
 }

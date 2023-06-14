@@ -27,7 +27,7 @@ func (c *Client) GetMyAccounts() ([]models.Account, *Error) {
 	header := http.Header{}
 	header.Add("Authorization", *c.Session.SessionToken)
 
-	err := c.get(reqURL, header, nil, accountsRes)
+	err := c.request(http.MethodGet, reqURL, header, nil, nil, accountsRes)
 	if err != nil {
 		return []models.Account{}, err
 	}
@@ -55,7 +55,7 @@ func (c *Client) GetAccountTradingStatus(accountNumber string) (models.AccountTr
 	header := http.Header{}
 	header.Add("Authorization", *c.Session.SessionToken)
 
-	err := c.get(reqURL, header, nil, accountsRes)
+	err := c.request(http.MethodGet, reqURL, header, nil, nil, accountsRes)
 	if err != nil {
 		return models.AccountTradingStatus{}, err
 	}
@@ -77,7 +77,7 @@ func (c *Client) GetAccountBalances(accountNumber string) (models.AccountBalance
 	header := http.Header{}
 	header.Add("Authorization", *c.Session.SessionToken)
 
-	err := c.get(reqURL, header, nil, accountsRes)
+	err := c.request(http.MethodGet, reqURL, header, nil, nil, accountsRes)
 	if err != nil {
 		return models.AccountBalance{}, err
 	}
@@ -102,7 +102,7 @@ func (c *Client) GetAccountPositions(accountNumber string, query models.AccountP
 	header := http.Header{}
 	header.Add("Authorization", *c.Session.SessionToken)
 
-	err := c.get(reqURL, header, query, accountsRes)
+	err := c.request(http.MethodGet, reqURL, header, query, nil, accountsRes)
 	if err != nil {
 		return []models.AccountPosition{}, err
 	}
@@ -115,7 +115,8 @@ func (c *Client) GetAccountBalanceSnapshots(accountNumber string, query models.A
 		return []models.AccountBalanceSnapshots{}, &Error{Message: "Session is invalid: Session Token cannot be nil."}
 	}
 
-	if query.TimeOfDay == nil {
+	// Default to EOD
+	if query.TimeOfDay == "" {
 		query.TimeOfDay = constants.EndOfDay
 	}
 
@@ -132,7 +133,7 @@ func (c *Client) GetAccountBalanceSnapshots(accountNumber string, query models.A
 	header := http.Header{}
 	header.Add("Authorization", *c.Session.SessionToken)
 
-	err := c.get(reqURL, header, query, accountsRes)
+	err := c.request(http.MethodGet, reqURL, header, query, nil, accountsRes)
 	if err != nil {
 		return []models.AccountBalanceSnapshots{}, err
 	}
@@ -158,10 +159,35 @@ func (c *Client) GetAccountNetLiqHistory(accountNumber string, query models.Hist
 	header := http.Header{}
 	header.Add("Authorization", *c.Session.SessionToken)
 
-	err := c.get(reqURL, header, query, accountsRes)
+	err := c.request(http.MethodGet, reqURL, header, query, nil, accountsRes)
 	if err != nil {
 		return []models.NetLiqOHLC{}, err
 	}
 
 	return accountsRes.Data.HistoricLiquidity, nil
+}
+
+// Get the position limit
+func (c *Client) GetAccountPositionLimit(accountNumber string) (models.PositionLimit, *Error) {
+	if c.Session.SessionToken == nil {
+		return models.PositionLimit{}, &Error{Message: "Session is invalid: Session Token cannot be nil."}
+	}
+
+	path := fmt.Sprintf("%s/accounts/%s/position-limit", c.baseURL, accountNumber)
+
+	type accountResponse struct {
+		PositionLimit models.PositionLimit `json:"data"`
+	}
+
+	accountsRes := new(accountResponse)
+
+	header := http.Header{}
+	header.Add("Authorization", *c.Session.SessionToken)
+
+	err := c.request(http.MethodGet, path, header, nil, nil, accountsRes)
+	if err != nil {
+		return models.PositionLimit{}, err
+	}
+
+	return accountsRes.PositionLimit, nil
 }

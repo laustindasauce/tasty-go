@@ -1,4 +1,4 @@
-package tasty
+package utils
 
 // ContainsInt returns whether or not the int exists in the slice
 func ContainsInt(s []int, e int) bool {

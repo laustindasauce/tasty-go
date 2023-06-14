@@ -35,7 +35,7 @@ func (c *Client) GetCryptocurrencies(symbols []string) ([]models.Cryptocurrency,
 	header := http.Header{}
 	header.Add("Authorization", *c.Session.SessionToken)
 
-	err := c.get(reqURL, header, query, instrumentRes)
+	err := c.request(http.MethodGet, reqURL, header, query, nil, instrumentRes)
 	if err != nil {
 		return []models.Cryptocurrency{}, err
 	}
@@ -61,7 +61,7 @@ func (c *Client) GetCryptocurrency(symbol constants.Cryptocurrency) (models.Cryp
 	header := http.Header{}
 	header.Add("Authorization", *c.Session.SessionToken)
 
-	err := c.customGet(path, header, nil, instrumentRes)
+	err := c.customRequest(http.MethodGet, path, header, nil, nil, instrumentRes)
 	if err != nil {
 		return models.Cryptocurrency{}, err
 	}
@@ -89,7 +89,7 @@ func (c *Client) GetActiveEquities(query models.ActiveEquitiesQuery) ([]models.E
 	header := http.Header{}
 	header.Add("Authorization", *c.Session.SessionToken)
 
-	err := c.get(reqURL, header, query, instrumentRes)
+	err := c.request(http.MethodGet, reqURL, header, query, nil, instrumentRes)
 	if err != nil {
 		return []models.Equity{}, models.Pagination{}, err
 	}
@@ -116,7 +116,7 @@ func (c *Client) GetEquities(query models.EquitiesQuery) ([]models.Equity, *Erro
 	header := http.Header{}
 	header.Add("Authorization", *c.Session.SessionToken)
 
-	err := c.get(reqURL, header, query, instrumentRes)
+	err := c.request(http.MethodGet, reqURL, header, query, nil, instrumentRes)
 	if err != nil {
 		return []models.Equity{}, err
 	}
@@ -130,7 +130,10 @@ func (c *Client) GetEquity(symbol string) (models.Equity, *Error) {
 		return models.Equity{}, &Error{Message: "Session is invalid: Session Token cannot be nil."}
 	}
 
-	reqURL := fmt.Sprintf("%s/instruments/equities/%s", c.baseURL, symbol)
+	// url escape required for instances where "/" exists in symbol i.e. BRK/B
+	symbol = url.QueryEscape(symbol)
+
+	path := fmt.Sprintf("//%s/instruments/equities/%s", c.baseHost, symbol)
 
 	type instrumentResponse struct {
 		Equity models.Equity `json:"data"`
@@ -141,7 +144,8 @@ func (c *Client) GetEquity(symbol string) (models.Equity, *Error) {
 	header := http.Header{}
 	header.Add("Authorization", *c.Session.SessionToken)
 
-	err := c.get(reqURL, header, nil, instrumentRes)
+	// customGet required for instances where "/" exists in symbol i.e. BRK/B
+	err := c.customRequest(http.MethodGet, path, header, nil, nil, instrumentRes)
 	if err != nil {
 		return models.Equity{}, err
 	}
@@ -168,7 +172,7 @@ func (c *Client) GetEquityOptions(query models.EquityOptionsQuery) ([]models.Equ
 	header := http.Header{}
 	header.Add("Authorization", *c.Session.SessionToken)
 
-	err := c.get(reqURL, header, query, instrumentRes)
+	err := c.request(http.MethodGet, reqURL, header, query, nil, instrumentRes)
 	if err != nil {
 		return []models.EquityOption{}, err
 	}
@@ -202,7 +206,7 @@ func (c *Client) GetEquityOption(sym utils.EquityOptionsSymbology, active bool) 
 	header := http.Header{}
 	header.Add("Authorization", *c.Session.SessionToken)
 
-	err := c.get(reqURL, header, query, instrumentRes)
+	err := c.request(http.MethodGet, reqURL, header, query, nil, instrumentRes)
 	if err != nil {
 		return models.EquityOption{}, err
 	}
@@ -229,7 +233,7 @@ func (c *Client) GetFutures(query models.FuturesQuery) ([]models.Future, *Error)
 	header := http.Header{}
 	header.Add("Authorization", *c.Session.SessionToken)
 
-	err := c.get(reqURL, header, query, instrumentRes)
+	err := c.request(http.MethodGet, reqURL, header, query, nil, instrumentRes)
 	if err != nil {
 		return []models.Future{}, err
 	}
@@ -254,7 +258,7 @@ func (c *Client) GetFuture(symbol string) (models.Future, *Error) {
 	header := http.Header{}
 	header.Add("Authorization", *c.Session.SessionToken)
 
-	err := c.get(reqURL, header, nil, instrumentRes)
+	err := c.request(http.MethodGet, reqURL, header, nil, nil, instrumentRes)
 	if err != nil {
 		return models.Future{}, err
 	}
@@ -281,7 +285,7 @@ func (c *Client) GetFutureOptionProducts() ([]models.FutureOptionProduct, *Error
 	header := http.Header{}
 	header.Add("Authorization", *c.Session.SessionToken)
 
-	err := c.get(reqURL, header, nil, instrumentRes)
+	err := c.request(http.MethodGet, reqURL, header, nil, nil, instrumentRes)
 	if err != nil {
 		return []models.FutureOptionProduct{}, err
 	}
@@ -306,7 +310,7 @@ func (c *Client) GetFutureOptionProduct(exchange, rootSymbol string) (models.Fut
 	header := http.Header{}
 	header.Add("Authorization", *c.Session.SessionToken)
 
-	err := c.get(reqURL, header, nil, instrumentRes)
+	err := c.request(http.MethodGet, reqURL, header, nil, nil, instrumentRes)
 	if err != nil {
 		return models.FutureOptionProduct{}, err
 	}
@@ -333,7 +337,7 @@ func (c *Client) GetFutureOptions(query models.FutureOptionsQuery) ([]models.Fut
 	header := http.Header{}
 	header.Add("Authorization", *c.Session.SessionToken)
 
-	err := c.get(reqURL, header, query, instrumentRes)
+	err := c.request(http.MethodGet, reqURL, header, query, nil, instrumentRes)
 	if err != nil {
 		fmt.Println(err)
 		return []models.FutureOption{}, err
@@ -360,7 +364,7 @@ func (c *Client) GetFutureOption(symbol string) (models.FutureOption, *Error) {
 	header := http.Header{}
 	header.Add("Authorization", *c.Session.SessionToken)
 
-	err := c.get(reqURL, header, nil, instrumentRes)
+	err := c.request(http.MethodGet, reqURL, header, nil, nil, instrumentRes)
 	if err != nil {
 		return models.FutureOption{}, err
 	}
@@ -389,7 +393,7 @@ func (c *Client) GetFutureProducts() ([]models.FutureProduct, *Error) {
 	header := http.Header{}
 	header.Add("Authorization", *c.Session.SessionToken)
 
-	err := c.get(reqURL, header, nil, instrumentRes)
+	err := c.request(http.MethodGet, reqURL, header, nil, nil, instrumentRes)
 	if err != nil {
 		fmt.Println(err)
 		return []models.FutureProduct{}, err
@@ -415,7 +419,7 @@ func (c *Client) GetFutureProduct(exchange constants.Exchange, productCode strin
 	header := http.Header{}
 	header.Add("Authorization", *c.Session.SessionToken)
 
-	err := c.get(reqURL, header, nil, instrumentRes)
+	err := c.request(http.MethodGet, reqURL, header, nil, nil, instrumentRes)
 	if err != nil {
 		return models.FutureProduct{}, err
 	}
@@ -442,7 +446,7 @@ func (c *Client) GetQuantityDecimalPrecisions() ([]models.QuantityDecimalPrecisi
 	header := http.Header{}
 	header.Add("Authorization", *c.Session.SessionToken)
 
-	err := c.get(reqURL, header, nil, instrumentRes)
+	err := c.request(http.MethodGet, reqURL, header, nil, nil, instrumentRes)
 	if err != nil {
 		return []models.QuantityDecimalPrecision{}, err
 	}
@@ -476,7 +480,7 @@ func (c *Client) GetWarrants(symbols []string) ([]models.Warrant, *Error) {
 	header := http.Header{}
 	header.Add("Authorization", *c.Session.SessionToken)
 
-	err := c.get(reqURL, header, query, instrumentRes)
+	err := c.request(http.MethodGet, reqURL, header, query, nil, instrumentRes)
 	if err != nil {
 		return []models.Warrant{}, err
 	}
@@ -501,7 +505,7 @@ func (c *Client) GetWarrant(symbol string) (models.Warrant, *Error) {
 	header := http.Header{}
 	header.Add("Authorization", *c.Session.SessionToken)
 
-	err := c.get(reqURL, header, nil, instrumentRes)
+	err := c.request(http.MethodGet, reqURL, header, nil, nil, instrumentRes)
 	if err != nil {
 		return models.Warrant{}, err
 	}

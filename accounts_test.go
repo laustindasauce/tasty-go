@@ -281,6 +281,31 @@ func TestGetAccountNetLiqHistory(t *testing.T) {
 	require.Equal(t, "2023-06-08 13:30:00+00", liq.Time)
 }
 
+func TestGetAccountPositionLimit(t *testing.T) {
+	setup()
+	defer teardown()
+
+	accountNumber := "5YZ55555"
+
+	mux.HandleFunc(fmt.Sprintf("/accounts/%s/position-limit", accountNumber), func(writer http.ResponseWriter, request *http.Request) {
+		fmt.Fprint(writer, positionLimitResp)
+	})
+
+	resp, err := client.GetAccountPositionLimit(accountNumber)
+	require.Nil(t, err)
+
+	require.Equal(t, accountNumber, resp.AccountNumber)
+	require.Equal(t, 50000, resp.EquityOrderSize)
+	require.Equal(t, 10000, resp.EquityOptionOrderSize)
+	require.Equal(t, 2500, resp.FutureOrderSize)
+	require.Equal(t, 2500, resp.FutureOptionOrderSize)
+	require.Equal(t, 500, resp.UnderlyingOpeningOrderLimit)
+	require.Equal(t, 500000, resp.EquityPositionSize)
+	require.Equal(t, 20000, resp.EquityOptionPositionSize)
+	require.Equal(t, 5000, resp.FuturePositionSize)
+	require.Equal(t, 5000, resp.FutureOptionPositionSize)
+}
+
 const myAccountsResp = `{
   "data": {
     "items": [
@@ -583,4 +608,20 @@ const netLiqHistoryResp = `{
       }
     ]
   }
+}`
+
+const positionLimitResp = `{
+  "data": {
+      "account-number": "5YZ55555",
+      "equity-order-size": 50000,
+      "equity-option-order-size": 10000,
+      "future-order-size": 2500,
+      "future-option-order-size": 2500,
+      "underlying-opening-order-limit": 500,
+      "equity-position-size": 500000,
+      "equity-option-position-size": 20000,
+      "future-position-size": 5000,
+      "future-option-position-size": 5000
+  },
+  "context": "/accounts/5YZ55555/position-limit"
 }`

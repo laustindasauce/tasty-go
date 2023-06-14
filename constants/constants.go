@@ -1,8 +1,29 @@
 package constants
 
 type InstrumentType string
+type TimeOfDay string
+type TimeInForce string
+type OrderType string
+type PriceEffect string
+type OrderAction string
+type Direction string
+type Indicator string
+type Comparator string
+type OrderRuleAction string
+type TimeBack string
+type Cryptocurrency string
+type Lendability string
+type OptionType string
+type MonthCode string
+type Exchange string
+type SortOrder string
+
+// The normal flow for a filled order would be Received -> Routed -> In Flight -> Live -> Filled.
+// Order status updates come in real-time to websocket clients that have sent the account-subscribe message.
+type OrderStatus string
 
 const (
+	// InstrumentType
 	Bond           InstrumentType = "Bond"
 	Crypto         InstrumentType = "Cryptocurrency"
 	CurrencyPair   InstrumentType = "Currency Pair"
@@ -14,132 +35,54 @@ const (
 	Index          InstrumentType = "Index"
 	Unknown        InstrumentType = "Unknown"
 	Warrant        InstrumentType = "Warrant"
-)
-
-type TimeOfDay *string
-
-var (
-	eod                      = "EOD"
-	bod                      = "BOD"
-	EndOfDay       TimeOfDay = &eod
-	BeginningOfDay TimeOfDay = &bod
-)
-
-type TimeInForce *string
-
-var (
-	day                = "Day"
-	gtc                = "GTC"
-	gtd                = "GTD"
-	ext                = "Ext"
-	gtcExt             = "GTC Ext"
-	ioc                = "IOC"
-	Day    TimeInForce = &day
-	GTC    TimeInForce = &gtc
-	GTD    TimeInForce = &gtd
-	Ext    TimeInForce = &ext
-	GTCExt TimeInForce = &gtcExt
-	IOC    TimeInForce = &ioc
-)
-
-type OrderType *string
-
-var (
-	limit                     = "Limit"
-	market                    = "Market"
-	marketableLimit           = "Marketable Limit"
-	stop                      = "Stop"
-	stopLimit                 = "Stop Limit"
-	notionalMarket            = "Notional Market"
-	Limit           OrderType = &limit
-	Market          OrderType = &market
-	MarketableLimit OrderType = &marketableLimit
-	Stop            OrderType = &stop
-	StopLimit       OrderType = &stopLimit
-	NotionalMarket  OrderType = &notionalMarket
-)
-
-type PriceEffect *string
-
-var (
-	credit             = "Credit"
-	debit              = "Debit"
-	Credit PriceEffect = &credit
-	Debit  PriceEffect = &debit
-)
-
-type OrderAction *string
-
-var (
-	sto              = "Sell to Open"
-	stc              = "Sell to Close"
-	bto              = "Buy to Open"
-	btc              = "Buy to Close"
-	sell             = "Sell"
-	buy              = "Buy"
-	STO  OrderAction = &sto
-	STC  OrderAction = &stc
-	BTO  OrderAction = &bto
-	BTC  OrderAction = &btc
-	Sell OrderAction = &sell
-	Buy  OrderAction = &buy
-)
-
-type Direction *string
-
-var (
-	long            = "long"
-	short           = "short"
-	Long  Direction = &long
-	Short Direction = &short
-)
-
-type Indicator string
-
-const (
+	// TimeOfDay
+	EndOfDay       TimeOfDay = "EOD"
+	BeginningOfDay TimeOfDay = "BOD"
+	// TimeInForce
+	Day    TimeInForce = "Day"
+	GTC    TimeInForce = "GTC"
+	GTD    TimeInForce = "GTD"
+	Ext    TimeInForce = "Ext"
+	GTCExt TimeInForce = "GTC Ext"
+	IOC    TimeInForce = "IOC"
+	// OrderType
+	Limit           OrderType = "Limit"
+	Market          OrderType = "Market"
+	MarketableLimit OrderType = "Marketable Limit"
+	Stop            OrderType = "Stop"
+	StopLimit       OrderType = "Stop Limit"
+	NotionalMarket  OrderType = "Notional Market"
+	// PriceEffect
+	Credit PriceEffect = "Credit"
+	Debit  PriceEffect = "Debit"
+	None   PriceEffect = "None"
+	// OrderAction
+	STO  OrderAction = "Sell to Open"
+	STC  OrderAction = "Sell to Close"
+	BTO  OrderAction = "Buy to Open"
+	BTC  OrderAction = "Buy to Close"
+	Sell OrderAction = "Sell"
+	Buy  OrderAction = "Buy"
+	// Direction
+	Long  Direction = "Long"
+	Short Direction = "Short"
+	// Indicator
 	Last Indicator = "last"
-)
-
-type Comparator *string
-
-var (
-	gte            = "gte"
-	lte            = "lte"
-	GTE Comparator = &gte
-	LTE Comparator = &lte
-)
-
-type OrderRuleAction *string
-
-var (
-	route                  = "route"
-	cancel                 = "cancel"
-	Route  OrderRuleAction = &route
-	Cancel OrderRuleAction = &cancel
-)
-
-type TimeBack *string
-
-var (
-	oneDay               = "1d"
-	oneWeek              = "1w"
-	oneMonth             = "1m"
-	threeMonths          = "3m"
-	sixMonths            = "6m"
-	oneYear              = "1y"
-	all                  = "all"
-	OneDay      TimeBack = &oneDay
-	OneWeek     TimeBack = &oneWeek
-	OneMonth    TimeBack = &oneMonth
-	ThreeMonths TimeBack = &threeMonths
-	SixMonths   TimeBack = &sixMonths
-	OneYear     TimeBack = &oneYear
-	All         TimeBack = &all
-)
-
-type Cryptocurrency string
-
-const (
+	// Comparator
+	GTE Comparator = "gte"
+	LTE Comparator = "lte"
+	// OrderRuleAction
+	Route  OrderRuleAction = "route"
+	Cancel OrderRuleAction = "cancel"
+	// TimeBack
+	OneDay      TimeBack = "1d"
+	OneWeek     TimeBack = "1w"
+	OneMonth    TimeBack = "1m"
+	ThreeMonths TimeBack = "3m"
+	SixMonths   TimeBack = "6m"
+	OneYear     TimeBack = "1y"
+	All         TimeBack = "all"
+	// Cryptocurrency
 	Cardano     Cryptocurrency = "ADA"
 	Bitcoin     Cryptocurrency = "BTC"
 	BitcoinCash Cryptocurrency = "BCH"
@@ -148,26 +91,14 @@ const (
 	Ethereum    Cryptocurrency = "ETH"
 	Litecoin    Cryptocurrency = "LTC"
 	Solana      Cryptocurrency = "SOL"
-)
-
-type Lendability string
-
-const (
+	// Lendability
 	EasyToBorrow   Lendability = "Easy To Borrow"
 	LocateRequired Lendability = "Locate Required"
 	Preborrow      Lendability = "Preborrow"
-)
-
-type OptionType string
-
-const (
+	// OptionType
 	Call OptionType = "C"
 	Put  OptionType = "P"
-)
-
-type MonthCode string
-
-const (
+	// MonthCode
 	January   MonthCode = "F"
 	February  MonthCode = "G"
 	March     MonthCode = "H"
@@ -180,13 +111,43 @@ const (
 	October   MonthCode = "V"
 	November  MonthCode = "X"
 	December  MonthCode = "Z"
-)
-
-type Exchange string
-
-const (
+	// Exchange
 	CME    Exchange = "CME"
 	SMALLS Exchange = "SMALLS"
 	CFE    Exchange = "CFE"
 	CBOED  Exchange = "CBOED"
+	// OrderStatus
+
+	// Initial order state
+	Received OrderStatus = "Received"
+	// Order is on its way out of Tastytrade's system
+	Routed OrderStatus = "Routed"
+	// Order is en route to the exchange
+	InFlight OrderStatus = "In Flight"
+	// Order is live at the exchange
+	Live OrderStatus = "Live"
+	// Customer has requested to cancel the order.
+	// Awaiting a 'cancelled' message from the exchange.
+	CancelRequested OrderStatus = "Cancel Requested"
+	// Customer has submitted a replacement order.
+	// This order is awaiting a 'cancelled' message from the exchange.
+	ReplaceRequested OrderStatus = "Replace Requested"
+	// This pertains to replacement orders. It means the replacement order
+	// is awaiting a 'cancelled' message for the order it is replacing.
+	Contingent OrderStatus = "Contingent"
+	// Order has been fully filled
+	Filled OrderStatus = "Filled"
+	// Order is cancelled
+	Cancelled OrderStatus = "Cancelled"
+	// Order has expired. Usually applies to an option order.
+	Expired OrderStatus = "Expired"
+	// Order has been rejected by either Tastytrade or the exchange.
+	Rejected OrderStatus = "Rejected"
+	// Administrator has manually removed this order from customer account.
+	Removed OrderStatus = "Removed"
+	// Administrator has manually removed part of this order from customer account.
+	PartiallyRemoved OrderStatus = "Partially Removed"
+	// SortOrder
+	Asc  SortOrder = "Asc"
+	Desc SortOrder = "Desc"
 )

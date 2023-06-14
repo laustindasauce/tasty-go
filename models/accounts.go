@@ -236,3 +236,18 @@ type AccountBalanceSnapshotsQuery struct {
 	// Available values: EOD, BOD.
 	TimeOfDay constants.TimeOfDay `url:"time-of-day"`
 }
+
+// PositionLimit model
+type PositionLimit struct {
+	ID                          int    `json:"id"`
+	AccountNumber               string `json:"account-number"`
+	EquityOrderSize             int    `json:"equity-order-size"`
+	EquityOptionOrderSize       int    `json:"equity-option-order-size"`
+	FutureOrderSize             int    `json:"future-order-size"`
+	FutureOptionOrderSize       int    `json:"future-option-order-size"`
+	UnderlyingOpeningOrderLimit int    `json:"underlying-opening-order-limit"`
+	EquityPositionSize          int    `json:"equity-position-size"`
+	EquityOptionPositionSize    int    `json:"equity-option-position-size"`
+	FuturePositionSize          int    `json:"future-position-size"`
+	FutureOptionPositionSize    int    `json:"future-option-position-size"`
+}

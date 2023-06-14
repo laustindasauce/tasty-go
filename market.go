@@ -25,7 +25,7 @@ func (c *Client) GetMarketMetrics(query models.MarketMetricsQuery) ([]models.Mar
 	header := http.Header{}
 	header.Add("Authorization", *c.Session.SessionToken)
 
-	err := c.get(reqURL, header, query, marketMetricsRes)
+	err := c.request(http.MethodGet, reqURL, header, query, nil, marketMetricsRes)
 	if err != nil {
 		return []models.MarketMetricVolatility{}, err
 	}
@@ -51,7 +51,7 @@ func (c *Client) GetHistoricDividends(symbol string) ([]models.DividendInfo, *Er
 	header := http.Header{}
 	header.Add("Authorization", *c.Session.SessionToken)
 
-	err := c.get(reqURL, header, nil, marketMetricsRes)
+	err := c.request(http.MethodGet, reqURL, header, nil, nil, marketMetricsRes)
 	if err != nil {
 		return []models.DividendInfo{}, err
 	}
@@ -77,7 +77,7 @@ func (c *Client) GetHistoricEarnings(symbol string, query models.HistoricEarning
 	header := http.Header{}
 	header.Add("Authorization", *c.Session.SessionToken)
 
-	err := c.get(reqURL, header, query, marketMetricsRes)
+	err := c.request(http.MethodGet, reqURL, header, query, nil, marketMetricsRes)
 	if err != nil {
 		return []models.EarningsInfo{}, err
 	}

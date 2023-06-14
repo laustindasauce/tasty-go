@@ -1,5 +1,7 @@
 package models
 
+import "time"
+
 type Lots struct {
 	ID                string          `json:"id"`
 	TransactionID     int             `json:"transaction-id"`
@@ -22,7 +24,7 @@ type Transaction struct {
 	Action                           string          `json:"action"`
 	Quantity                         StringToFloat32 `json:"quantity"`
 	Price                            StringToFloat32 `json:"price"`
-	ExecutedAt                       string          `json:"executed-at"`
+	ExecutedAt                       time.Time       `json:"executed-at"`
 	TransactionDate                  string          `json:"transaction-date"`
 	Value                            StringToFloat32 `json:"value"`
 	ValueEffect                      string          `json:"value-effect"`
@@ -56,4 +58,9 @@ type Transaction struct {
 	DestinationVenue                 string          `json:"destination-venue"`
 	AgencyPrice                      StringToFloat32 `json:"agency-price"`
 	PrincipalPrice                   StringToFloat32 `json:"principal-price"`
+}
+
+type TransactionFees struct {
+	TotalFees       StringToFloat32 `json:"total-fees"`
+	TotalFeesEffect string          `json:"total-fees-effect"`
 }

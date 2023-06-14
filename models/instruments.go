@@ -263,7 +263,7 @@ type FuturesExpiration struct {
 	Strikes              []Strike        `json:"strikes"`
 }
 
-type Expirations struct {
+type Expiration struct {
 	ExpirationType   string   `json:"expiration-type"`
 	ExpirationDate   string   `json:"expiration-date"`
 	DaysToExpiration int      `json:"days-to-expiration"`
@@ -294,7 +294,7 @@ type NestedFuturesOptionChains struct {
 	OptionChains []OptionChains `json:"option-chains"`
 }
 
-type Deliverables struct {
+type Deliverable struct {
 	ID              int             `json:"id"`
 	RootSymbol      string          `json:"root-symbol"`
 	DeliverableType string          `json:"deliverable-type"`
@@ -302,29 +302,29 @@ type Deliverables struct {
 	Amount          StringToFloat32 `json:"amount"`
 	Symbol          string          `json:"symbol"`
 	InstrumentType  string          `json:"instrument-type"`
-	Percent         string          `json:"percent"`
+	Percent         StringToFloat32 `json:"percent"`
 }
 
 type NestedOptionChains struct {
-	UnderlyingSymbol  string       `json:"underlying-symbol"`
-	RootSymbol        string       `json:"root-symbol"`
-	OptionChainType   string       `json:"option-chain-type"`
-	SharesPerContract int          `json:"shares-per-contract"`
-	TickSizes         TickSize     `json:"tick-sizes"`
-	Deliverables      Deliverables `json:"deliverables"`
-	Expirations       Expirations  `json:"expirations"`
+	UnderlyingSymbol  string        `json:"underlying-symbol"`
+	RootSymbol        string        `json:"root-symbol"`
+	OptionChainType   string        `json:"option-chain-type"`
+	SharesPerContract int           `json:"shares-per-contract"`
+	TickSizes         []TickSize    `json:"tick-sizes"`
+	Deliverables      []Deliverable `json:"deliverables"`
+	Expirations       []Expiration  `json:"expirations"`
 }
 
 type CompactOptionChains struct {
-	UnderlyingSymbol  string       `json:"underlying-symbol"`
-	RootSymbol        string       `json:"root-symbol"`
-	OptionChainType   string       `json:"option-chain-type"`
-	SettlementType    string       `json:"settlement-type"`
-	SharesPerContract int          `json:"shares-per-contract"`
-	ExpirationType    string       `json:"expiration-type"`
-	Deliverables      Deliverables `json:"deliverables"`
-	Symbols           string       `json:"symbols"`
-	StreamerSymbols   string       `json:"streamer-symbols"`
+	UnderlyingSymbol  string        `json:"underlying-symbol"`
+	RootSymbol        string        `json:"root-symbol"`
+	OptionChainType   string        `json:"option-chain-type"`
+	SettlementType    string        `json:"settlement-type"`
+	SharesPerContract int           `json:"shares-per-contract"`
+	ExpirationType    string        `json:"expiration-type"`
+	Deliverables      []Deliverable `json:"deliverables"`
+	Symbols           []string      `json:"symbols"`
+	StreamerSymbols   []string      `json:"streamer-symbols"`
 }
 
 type ActiveEquitiesQuery struct {
