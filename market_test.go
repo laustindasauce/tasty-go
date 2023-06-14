@@ -14,13 +14,13 @@ func TestGetMarketMetrics(t *testing.T) {
 	setup()
 	defer teardown()
 
-	query := models.MarketMetricsQuery{Symbols: []string{"AAPL", "TSLA"}}
+	symbols := []string{"AAPL", "TSLA"}
 
 	mux.HandleFunc("/market-metrics", func(writer http.ResponseWriter, request *http.Request) {
 		fmt.Fprint(writer, marketMetricsResp)
 	})
 
-	resp, err := client.GetMarketMetrics(query)
+	resp, err := client.GetMarketMetrics(symbols)
 	require.Nil(t, err)
 
 	require.Equal(t, 2, len(resp))
@@ -114,14 +114,14 @@ func TestGetHistoricEarnings(t *testing.T) {
 	setup()
 	defer teardown()
 
-	query := models.HistoricEarningsQuery{StartDate: time.Now().AddDate(-1, 0, 0)}
+	startDate := time.Now().AddDate(-1, 0, 0)
 	symbol := "AAPL"
 
 	mux.HandleFunc(fmt.Sprintf("/market-metrics/historic-corporate-events/earnings-reports/%s", symbol), func(writer http.ResponseWriter, request *http.Request) {
 		fmt.Fprint(writer, historicEarningsResp)
 	})
 
-	resp, err := client.GetHistoricEarnings(symbol, query)
+	resp, err := client.GetHistoricEarnings(symbol, startDate)
 	require.Nil(t, err)
 
 	require.Equal(t, 4, len(resp))
