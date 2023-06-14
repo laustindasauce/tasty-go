@@ -37,7 +37,7 @@ func TestGetFuturesOptionChains(t *testing.T) {
 	require.Equal(t, models.StringToFloat32(3990), fo.StrikePrice)
 	require.Equal(t, "CME", fo.Exchange)
 	require.Equal(t, "EW4N3 C3990", fo.ExchangeSymbol)
-	require.Equal(t, string(constants.Call), fo.OptionType)
+	require.Equal(t, constants.Call, fo.OptionType)
 	require.Equal(t, "American", fo.ExerciseStyle)
 	require.True(t, fo.IsVanilla)
 	require.True(t, fo.IsPrimaryDeliverable)
@@ -158,7 +158,7 @@ func TestGetEquityOptionChains(t *testing.T) {
 	eo := resp[0]
 
 	require.Equal(t, "AAPL  230616C00060000", eo.Symbol)
-	require.Equal(t, "Equity Option", eo.InstrumentType)
+	require.Equal(t, constants.EquityOption, eo.InstrumentType)
 	require.True(t, eo.Active)
 	require.Equal(t, models.StringToFloat32(60), eo.StrikePrice)
 	require.Equal(t, symbol, eo.RootSymbol)
@@ -166,7 +166,7 @@ func TestGetEquityOptionChains(t *testing.T) {
 	require.Equal(t, "2023-06-16", eo.ExpirationDate)
 	require.Equal(t, "American", eo.ExerciseStyle)
 	require.Equal(t, 100, eo.SharesPerContract)
-	require.Equal(t, string(constants.Call), eo.OptionType)
+	require.Equal(t, constants.Call, eo.OptionType)
 	require.Equal(t, "Standard", eo.OptionChainType)
 	require.Equal(t, "Regular", eo.ExpirationType)
 	require.Equal(t, "PM", eo.SettlementType)
@@ -211,7 +211,7 @@ func TestGetNestedEquityOptionChains(t *testing.T) {
 	require.Equal(t, "100 shares of AAPL", del.Description)
 	require.Equal(t, models.StringToFloat32(100), del.Amount)
 	require.Equal(t, symbol, del.Symbol)
-	require.Equal(t, "Equity", del.InstrumentType)
+	require.Equal(t, constants.Equity, del.InstrumentType)
 	require.Equal(t, models.StringToFloat32(100), del.Percent)
 
 	exp := eo.Expirations[0]
@@ -258,7 +258,7 @@ func TestGetCompactEquityOptionChains(t *testing.T) {
 	require.Equal(t, "100 shares of AAPL", del.Description)
 	require.Equal(t, models.StringToFloat32(100), del.Amount)
 	require.Equal(t, symbol, del.Symbol)
-	require.Equal(t, "Equity", del.InstrumentType)
+	require.Equal(t, constants.Equity, del.InstrumentType)
 	require.Equal(t, models.StringToFloat32(100), del.Percent)
 
 	// symbols

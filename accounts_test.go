@@ -162,10 +162,10 @@ func TestGetAccountPositions(t *testing.T) {
 
 	require.Equal(t, "5YZ55555", rivn.AccountNumber)
 	require.Equal(t, "RIVN  230609P00014000", rivn.Symbol)
-	require.Equal(t, "Equity Option", rivn.InstrumentType)
+	require.Equal(t, constants.EquityOption, rivn.InstrumentType)
 	require.Equal(t, "RIVN", rivn.UnderlyingSymbol)
 	require.Equal(t, 40, rivn.Quantity)
-	require.Equal(t, "Short", rivn.QuantityDirection)
+	require.Equal(t, constants.Short, rivn.QuantityDirection)
 	require.Equal(t, models.StringToFloat32(0.41), rivn.ClosePrice)
 	require.Equal(t, models.StringToFloat32(0.79), rivn.AverageOpenPrice)
 	require.Equal(t, models.StringToFloat32(0.79), rivn.AverageYearlyMarketClosePrice)

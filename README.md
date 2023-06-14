@@ -4,7 +4,9 @@ TastyWorks API wrapper for Go
 
 ## TO-DO
 
-1. Check that postAccountsAccountNumberOrders == postAccountsAccountNumberOrdersDryRun
-2. Finish routes
-   - Only Session & Accounts complete
-3. Add testing
+- Check that postAccountsAccountNumberOrders == postAccountsAccountNumberOrdersDryRun
+- Add example usages in README.md
+- Create a custom type for the symbols
+- Separate instruments.go into multiple files
+- Convert the constants from string to the constant (ValueEffect ...etc)
+- Reconfirm order is untested as-well-as customers endpoints

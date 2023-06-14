@@ -1,16 +1,18 @@
 package models
 
+import "github.com/austinbspencer/tasty-go/constants"
+
 type PositionEntry struct {
-	InstrumentSymbol    string          `json:"instrument-symbol"`
-	InstrumentType      string          `json:"instrument-type"`
-	Quantity            StringToFloat32 `json:"quantity"`
-	AverageOpenPrice    StringToFloat32 `json:"average-open-price"`
-	ClosePrice          StringToFloat32 `json:"close-price"`
-	FixingPrice         StringToFloat32 `json:"fixing-price"`
-	StrikePrice         StringToFloat32 `json:"strike-price,omitempty"`
-	OptionType          string          `json:"option-type,omitempty"`
-	DeliverableQuantity StringToFloat32 `json:"deliverable-quantity,omitempty"`
-	ExpirationDate      string          `json:"expiration-date,omitempty"`
+	InstrumentSymbol    string                   `json:"instrument-symbol"`
+	InstrumentType      constants.InstrumentType `json:"instrument-type"`
+	Quantity            StringToFloat32          `json:"quantity"`
+	AverageOpenPrice    StringToFloat32          `json:"average-open-price"`
+	ClosePrice          StringToFloat32          `json:"close-price"`
+	FixingPrice         StringToFloat32          `json:"fixing-price"`
+	StrikePrice         StringToFloat32          `json:"strike-price,omitempty"`
+	OptionType          constants.OptionType     `json:"option-type,omitempty"`
+	DeliverableQuantity StringToFloat32          `json:"deliverable-quantity,omitempty"`
+	ExpirationDate      string                   `json:"expiration-date,omitempty"`
 }
 
 type Holding struct {

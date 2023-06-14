@@ -5,6 +5,7 @@ import (
 	"net/http"
 	"testing"
 
+	"github.com/austinbspencer/tasty-go/constants"
 	"github.com/austinbspencer/tasty-go/models"
 	"github.com/stretchr/testify/require"
 )
@@ -92,7 +93,7 @@ func TestGetMarginRequirements(t *testing.T) {
 	entry := entries[0]
 
 	require.Equal(t, "AMD", entry.InstrumentSymbol)
-	require.Equal(t, "Equity", entry.InstrumentType)
+	require.Equal(t, constants.Equity, entry.InstrumentType)
 	require.Equal(t, models.StringToFloat32(336.446), entry.Quantity)
 	require.Equal(t, models.StringToFloat32(0.0), entry.AverageOpenPrice)
 	require.Equal(t, models.StringToFloat32(117.86), entry.ClosePrice)
@@ -143,13 +144,13 @@ func TestGetMarginRequirements(t *testing.T) {
 	entry = entries[0]
 
 	require.Equal(t, "RIVN  230609P00014000", entry.InstrumentSymbol)
-	require.Equal(t, "Equity Option", entry.InstrumentType)
+	require.Equal(t, constants.EquityOption, entry.InstrumentType)
 	require.Equal(t, models.StringToFloat32(-40.0), entry.Quantity)
 	require.Equal(t, models.StringToFloat32(0.0), entry.AverageOpenPrice)
 	require.Equal(t, models.StringToFloat32(0.32), entry.ClosePrice)
 	require.Equal(t, models.StringToFloat32(0.0), entry.FixingPrice)
 	require.Equal(t, models.StringToFloat32(14), entry.StrikePrice)
-	require.Equal(t, "P", entry.OptionType)
+	require.Equal(t, constants.Put, entry.OptionType)
 	require.Equal(t, models.StringToFloat32(4000), entry.DeliverableQuantity)
 	require.Equal(t, "2023-06-09", entry.ExpirationDate)
 }

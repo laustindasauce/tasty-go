@@ -2,6 +2,8 @@ package models
 
 import (
 	"time"
+
+	"github.com/austinbspencer/tasty-go/constants"
 )
 
 type Account struct {
@@ -125,34 +127,34 @@ type AccountBalance struct {
 }
 
 type AccountPosition struct {
-	AccountNumber                 string          `json:"account-number"`
-	Symbol                        string          `json:"symbol"`
-	InstrumentType                string          `json:"instrument-type"`
-	UnderlyingSymbol              string          `json:"underlying-symbol"`
-	Quantity                      int             `json:"quantity"`
-	QuantityDirection             string          `json:"quantity-direction"`
-	ClosePrice                    StringToFloat32 `json:"close-price"`
-	AverageOpenPrice              StringToFloat32 `json:"average-open-price"`
-	AverageYearlyMarketClosePrice StringToFloat32 `json:"average-yearly-market-close-price"`
-	AverageDailyMarketClosePrice  StringToFloat32 `json:"average-daily-market-close-price"`
-	Mark                          StringToFloat32 `json:"mark"`
-	MarkPrice                     StringToFloat32 `json:"mark-price"`
-	Multiplier                    int             `json:"multiplier"`
-	CostEffect                    string          `json:"cost-effect"`
-	IsSuppressed                  bool            `json:"is-suppressed"`
-	IsFrozen                      bool            `json:"is-frozen"`
-	RestrictedQuantity            int             `json:"restricted-quantity"`
-	ExpiresAt                     time.Time       `json:"expires-at"`
-	FixingPrice                   StringToFloat32 `json:"fixing-price"`
-	DeliverableType               string          `json:"deliverable-type"`
-	RealizedDayGain               StringToFloat32 `json:"realized-day-gain"`
-	RealizedDayGainEffect         string          `json:"realized-day-gain-effect"`
-	RealizedDayGainDate           string          `json:"realized-day-gain-date"`
-	RealizedToday                 StringToFloat32 `json:"realized-today"`
-	RealizedTodayEffect           string          `json:"realized-today-effect"`
-	RealizedTodayDate             string          `json:"realized-today-date"`
-	CreatedAt                     time.Time       `json:"created-at"`
-	UpdatedAt                     time.Time       `json:"updated-at"`
+	AccountNumber                 string                   `json:"account-number"`
+	Symbol                        string                   `json:"symbol"`
+	InstrumentType                constants.InstrumentType `json:"instrument-type"`
+	UnderlyingSymbol              string                   `json:"underlying-symbol"`
+	Quantity                      int                      `json:"quantity"`
+	QuantityDirection             constants.Direction      `json:"quantity-direction"`
+	ClosePrice                    StringToFloat32          `json:"close-price"`
+	AverageOpenPrice              StringToFloat32          `json:"average-open-price"`
+	AverageYearlyMarketClosePrice StringToFloat32          `json:"average-yearly-market-close-price"`
+	AverageDailyMarketClosePrice  StringToFloat32          `json:"average-daily-market-close-price"`
+	Mark                          StringToFloat32          `json:"mark"`
+	MarkPrice                     StringToFloat32          `json:"mark-price"`
+	Multiplier                    int                      `json:"multiplier"`
+	CostEffect                    string                   `json:"cost-effect"`
+	IsSuppressed                  bool                     `json:"is-suppressed"`
+	IsFrozen                      bool                     `json:"is-frozen"`
+	RestrictedQuantity            int                      `json:"restricted-quantity"`
+	ExpiresAt                     time.Time                `json:"expires-at"`
+	FixingPrice                   StringToFloat32          `json:"fixing-price"`
+	DeliverableType               string                   `json:"deliverable-type"`
+	RealizedDayGain               StringToFloat32          `json:"realized-day-gain"`
+	RealizedDayGainEffect         string                   `json:"realized-day-gain-effect"`
+	RealizedDayGainDate           string                   `json:"realized-day-gain-date"`
+	RealizedToday                 StringToFloat32          `json:"realized-today"`
+	RealizedTodayEffect           string                   `json:"realized-today-effect"`
+	RealizedTodayDate             string                   `json:"realized-today-date"`
+	CreatedAt                     time.Time                `json:"created-at"`
+	UpdatedAt                     time.Time                `json:"updated-at"`
 }
 
 type AccountBalanceSnapshots struct {

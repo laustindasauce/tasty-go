@@ -30,7 +30,7 @@ func TestGetCryptocurrencies(t *testing.T) {
 
 	require.Equal(t, 1, btc.ID)
 	require.Equal(t, "BTC/USD", btc.Symbol)
-	require.Equal(t, "Cryptocurrency", btc.InstrumentType)
+	require.Equal(t, constants.Crypto, btc.InstrumentType)
 	require.Equal(t, "Bitcoin", btc.ShortDescription)
 	require.Equal(t, "Bitcoin to USD", btc.Description)
 	require.False(t, btc.IsClosingOnly)
@@ -61,7 +61,7 @@ func TestGetCryptocurrency(t *testing.T) {
 
 	require.Equal(t, 1, btc.ID)
 	require.Equal(t, "BTC/USD", btc.Symbol)
-	require.Equal(t, "Cryptocurrency", btc.InstrumentType)
+	require.Equal(t, constants.Crypto, btc.InstrumentType)
 	require.Equal(t, "Bitcoin", btc.ShortDescription)
 	require.Equal(t, "Bitcoin to USD", btc.Description)
 	require.False(t, btc.IsClosingOnly)
@@ -96,7 +96,7 @@ func TestGetActiveEquities(t *testing.T) {
 
 	require.Equal(t, 15625396, equity.ID)
 	require.Equal(t, "YMM", equity.Symbol)
-	require.Equal(t, "Equity", equity.InstrumentType)
+	require.Equal(t, constants.Equity, equity.InstrumentType)
 	require.Equal(t, "35969L108", equity.Cusip)
 	require.Equal(t, "Full Truck Alliance Co. Ltd. American Depositary Shares (each representing 20 Class A Ordinary Shares)", equity.ShortDescription)
 	require.False(t, equity.IsIndex)
@@ -152,7 +152,7 @@ func TestGetEquities(t *testing.T) {
 
 	require.Equal(t, 726, equity.ID)
 	require.Equal(t, "AAPL", equity.Symbol)
-	require.Equal(t, "Equity", equity.InstrumentType)
+	require.Equal(t, constants.Equity, equity.InstrumentType)
 	require.Equal(t, "037833100", equity.Cusip)
 	require.Equal(t, "APPLE INC", equity.ShortDescription)
 	require.False(t, equity.IsIndex)
@@ -195,7 +195,7 @@ func TestGetEquity(t *testing.T) {
 
 	require.Equal(t, 726, equity.ID)
 	require.Equal(t, symbol, equity.Symbol)
-	require.Equal(t, "Equity", equity.InstrumentType)
+	require.Equal(t, constants.Equity, equity.InstrumentType)
 	require.Equal(t, "037833100", equity.Cusip)
 	require.Equal(t, "APPLE INC", equity.ShortDescription)
 	require.False(t, equity.IsIndex)
@@ -250,7 +250,7 @@ func TestGetEquityOptions(t *testing.T) {
 	equity := resp[0]
 
 	require.Equal(t, occSymbol, equity.Symbol)
-	require.Equal(t, "Equity Option", equity.InstrumentType)
+	require.Equal(t, constants.EquityOption, equity.InstrumentType)
 	require.True(t, equity.Active)
 	require.Equal(t, models.StringToFloat32(185.0), equity.StrikePrice)
 	require.Equal(t, symbol, equity.RootSymbol)
@@ -258,7 +258,7 @@ func TestGetEquityOptions(t *testing.T) {
 	require.Equal(t, "2023-06-16", equity.ExpirationDate)
 	require.Equal(t, "American", equity.ExerciseStyle)
 	require.Equal(t, 100, equity.SharesPerContract)
-	require.Equal(t, string(optionType), equity.OptionType)
+	require.Equal(t, optionType, equity.OptionType)
 	require.Equal(t, "Standard", equity.OptionChainType)
 	require.Equal(t, "Regular", equity.ExpirationType)
 	require.Equal(t, "PM", equity.SettlementType)
@@ -293,7 +293,7 @@ func TestGetEquityOption(t *testing.T) {
 	require.Nil(t, err)
 
 	require.Equal(t, occSymbol, equity.Symbol)
-	require.Equal(t, "Equity Option", equity.InstrumentType)
+	require.Equal(t, constants.EquityOption, equity.InstrumentType)
 	require.True(t, equity.Active)
 	require.Equal(t, models.StringToFloat32(185.0), equity.StrikePrice)
 	require.Equal(t, symbol, equity.RootSymbol)
@@ -301,7 +301,7 @@ func TestGetEquityOption(t *testing.T) {
 	require.Equal(t, "2023-06-16", equity.ExpirationDate)
 	require.Equal(t, "American", equity.ExerciseStyle)
 	require.Equal(t, 100, equity.SharesPerContract)
-	require.Equal(t, string(optionType), equity.OptionType)
+	require.Equal(t, optionType, equity.OptionType)
 	require.Equal(t, "Standard", equity.OptionChainType)
 	require.Equal(t, "Regular", equity.ExpirationType)
 	require.Equal(t, "PM", equity.SettlementType)
@@ -661,7 +661,7 @@ func TestGetFutureOptions(t *testing.T) {
 	require.Equal(t, models.StringToFloat32(2975), fo.StrikePrice)
 	require.Equal(t, "CME", fo.Exchange)
 	require.Equal(t, "EW4U9 P2975", fo.ExchangeSymbol)
-	require.Equal(t, string(constants.Put), fo.OptionType)
+	require.Equal(t, constants.Put, fo.OptionType)
 	require.Equal(t, "American", fo.ExerciseStyle)
 	require.True(t, fo.IsVanilla)
 	require.True(t, fo.IsPrimaryDeliverable)
@@ -737,7 +737,7 @@ func TestGetFutureOption(t *testing.T) {
 	require.Equal(t, models.StringToFloat32(2975), fo.StrikePrice)
 	require.Equal(t, "CME", fo.Exchange)
 	require.Equal(t, "EW4U9 P2975", fo.ExchangeSymbol)
-	require.Equal(t, string(constants.Put), fo.OptionType)
+	require.Equal(t, constants.Put, fo.OptionType)
 	require.Equal(t, "American", fo.ExerciseStyle)
 	require.True(t, fo.IsVanilla)
 	require.True(t, fo.IsPrimaryDeliverable)
@@ -921,7 +921,7 @@ func TestGetQuantityDecimalPrecisions(t *testing.T) {
 
 	prec := resp[0]
 
-	require.Equal(t, "Cryptocurrency", prec.InstrumentType)
+	require.Equal(t, constants.Crypto, prec.InstrumentType)
 	require.Equal(t, "AAVE/USD", prec.Symbol)
 	require.Equal(t, 8, prec.Value)
 	require.Equal(t, 6, prec.MinimumIncrementPrecision)
@@ -943,7 +943,7 @@ func TestGetWarrants(t *testing.T) {
 	war := resp[0]
 
 	require.Equal(t, symbol, war.Symbol)
-	require.Equal(t, "Warrant", war.InstrumentType)
+	require.Equal(t, constants.Warrant, war.InstrumentType)
 	require.Equal(t, "XNAS", war.ListedMarket)
 	require.Equal(t, "Nikola Corporation - Warrant expiring 6/3/2025", war.Description)
 	require.False(t, war.IsClosingOnly)
@@ -964,7 +964,7 @@ func TestGetWarrant(t *testing.T) {
 	require.Nil(t, err)
 
 	require.Equal(t, symbol, war.Symbol)
-	require.Equal(t, "Warrant", war.InstrumentType)
+	require.Equal(t, constants.Warrant, war.InstrumentType)
 	require.Equal(t, "XNAS", war.ListedMarket)
 	require.Equal(t, "Nikola Corporation - Warrant expiring 6/3/2025", war.Description)
 	require.False(t, war.IsClosingOnly)
