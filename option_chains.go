@@ -14,7 +14,7 @@ func (c *Client) GetFuturesOptionChains(productCode string) ([]models.FutureOpti
 		return []models.FutureOption{}, &Error{Message: "Session is invalid: Session Token cannot be nil."}
 	}
 
-	reqURL := fmt.Sprintf("%s/futures-option-chains/%s", c.baseURL, productCode)
+	reqURL := fmt.Sprintf("/futures-option-chains/%s", productCode)
 
 	type instrumentResponse struct {
 		Data struct {
@@ -42,7 +42,7 @@ func (c *Client) GetNestedFuturesOptionChains(productCode string) (models.Nested
 		return models.NestedFuturesOptionChains{}, &Error{Message: "Session is invalid: Session Token cannot be nil."}
 	}
 
-	reqURL := fmt.Sprintf("%s/futures-option-chains/%s/nested", c.baseURL, productCode)
+	reqURL := fmt.Sprintf("/futures-option-chains/%s/nested", productCode)
 
 	type instrumentResponse struct {
 		Chains models.NestedFuturesOptionChains `json:"data"`
@@ -68,9 +68,9 @@ func (c *Client) GetEquityOptionChains(symbol string) ([]models.EquityOption, *E
 	}
 
 	// url escape required for instances where "/" exists in symbol i.e. BRK/B
-	symbol = url.QueryEscape(symbol)
+	symbol = url.PathEscape(symbol)
 
-	path := fmt.Sprintf("//%s/option-chains/%s", c.baseHost, symbol)
+	path := fmt.Sprintf("/option-chains/%s", symbol)
 
 	type instrumentResponse struct {
 		Data struct {
@@ -83,7 +83,7 @@ func (c *Client) GetEquityOptionChains(symbol string) ([]models.EquityOption, *E
 	header := http.Header{}
 	header.Add("Authorization", *c.Session.SessionToken)
 
-	// customGet required for instances where "/" exists in symbol i.e. BRK/B
+	// customRequest required for instances where "/" exists in symbol i.e. BRK/B
 	err := c.customRequest(http.MethodGet, path, header, nil, nil, instrumentRes)
 	if err != nil {
 		return []models.EquityOption{}, err
@@ -100,9 +100,9 @@ func (c *Client) GetNestedEquityOptionChains(symbol string) ([]models.NestedOpti
 	}
 
 	// url escape required for instances where "/" exists in symbol i.e. BRK/B
-	symbol = url.QueryEscape(symbol)
+	symbol = url.PathEscape(symbol)
 
-	path := fmt.Sprintf("//%s/option-chains/%s/nested", c.baseHost, symbol)
+	path := fmt.Sprintf("/option-chains/%s/nested", symbol)
 
 	type instrumentResponse struct {
 		Data struct {
@@ -115,7 +115,7 @@ func (c *Client) GetNestedEquityOptionChains(symbol string) ([]models.NestedOpti
 	header := http.Header{}
 	header.Add("Authorization", *c.Session.SessionToken)
 
-	// customGet required for instances where "/" exists in symbol i.e. BRK/B
+	// customRequest required for instances where "/" exists in symbol i.e. BRK/B
 	err := c.customRequest(http.MethodGet, path, header, nil, nil, instrumentRes)
 	if err != nil {
 		return []models.NestedOptionChains{}, err
@@ -132,9 +132,9 @@ func (c *Client) GetCompactEquityOptionChains(symbol string) ([]models.CompactOp
 	}
 
 	// url escape required for instances where "/" exists in symbol i.e. BRK/B
-	symbol = url.QueryEscape(symbol)
+	symbol = url.PathEscape(symbol)
 
-	path := fmt.Sprintf("//%s/option-chains/%s/compact", c.baseHost, symbol)
+	path := fmt.Sprintf("/option-chains/%s/compact", symbol)
 
 	type instrumentResponse struct {
 		Data struct {
@@ -147,7 +147,7 @@ func (c *Client) GetCompactEquityOptionChains(symbol string) ([]models.CompactOp
 	header := http.Header{}
 	header.Add("Authorization", *c.Session.SessionToken)
 
-	// customGet required for instances where "/" exists in symbol i.e. BRK/B
+	// customRequest required for instances where "/" exists in symbol i.e. BRK/B
 	err := c.customRequest(http.MethodGet, path, header, nil, nil, instrumentRes)
 	if err != nil {
 		return []models.CompactOptionChains{}, err

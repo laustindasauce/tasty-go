@@ -26,7 +26,7 @@ func setup() {
 		SessionToken: &sessionToken,
 	}
 	client.baseURL = server.URL
-	// Required for customGet method
+	// Required for customRequest method
 	client.baseHost = strings.Split(server.URL, "/")[2]
 }
 

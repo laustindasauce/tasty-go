@@ -1,7 +1,6 @@
 package tasty
 
 import (
-	"fmt"
 	"net/http"
 )
 
@@ -30,7 +29,7 @@ type sessionResponse struct {
 }
 
 func (c *Client) CreateSession(login LoginInfo) (Session, *Error) {
-	reqURL := fmt.Sprintf("%s/sessions", c.baseURL)
+	path := "/sessions"
 
 	session := new(sessionResponse)
 
@@ -39,7 +38,7 @@ func (c *Client) CreateSession(login LoginInfo) (Session, *Error) {
 		header.Add("X-Tastyworks-OTP", *login.TwoFactorCode)
 	}
 
-	err := c.request(http.MethodPost, reqURL, header, nil, login, session)
+	err := c.request(http.MethodPost, path, header, nil, login, session)
 	if err == nil {
 		(*c).Session = session.Session
 	} else {
@@ -53,14 +52,14 @@ func (c *Client) ValidateSession() (Session, *Error) {
 	if c.Session.SessionToken == nil {
 		return Session{}, &Error{Message: "Session is invalid: Session Token cannot be nil."}
 	}
-	reqURL := fmt.Sprintf("%s/sessions/validate", c.baseURL)
+	path := "/sessions/validate"
 
 	session := new(sessionResponse)
 
 	header := http.Header{}
 	header.Add("Authorization", *c.Session.SessionToken)
 
-	err := c.request(http.MethodPost, reqURL, header, nil, nil, session)
+	err := c.request(http.MethodPost, path, header, nil, nil, session)
 	if err == nil {
 		(*c).Session = session.Session
 	} else {
@@ -74,10 +73,10 @@ func (c *Client) DestroySession() *Error {
 	if c.Session.SessionToken == nil {
 		return &Error{Message: "Session is invalid: Session Token cannot be nil."}
 	}
-	reqURL := fmt.Sprintf("%s/sessions", c.baseURL)
+	path := "/sessions"
 
 	header := http.Header{}
 	header.Add("Authorization", *c.Session.SessionToken)
 
-	return c.request(http.MethodDelete, reqURL, header, nil, nil, nil)
+	return c.request(http.MethodDelete, path, header, nil, nil, nil)
 }

@@ -15,9 +15,9 @@ func (c *Client) SymbolSearch(symbol string) ([]models.SymbolData, *Error) {
 	}
 
 	// url escape required for instances where "/" exists in symbol i.e. BRK/B
-	symbol = url.QueryEscape(symbol)
+	symbol = url.PathEscape(symbol)
 
-	path := fmt.Sprintf("//%s/symbols/search/%s", c.baseHost, symbol)
+	path := fmt.Sprintf("/symbols/search/%s", symbol)
 
 	type symbolResponse struct {
 		Data struct {
@@ -30,7 +30,7 @@ func (c *Client) SymbolSearch(symbol string) ([]models.SymbolData, *Error) {
 	header := http.Header{}
 	header.Add("Authorization", *c.Session.SessionToken)
 
-	// customGet required for instances where "/" exists in symbol i.e. BRK/B
+	// customRequest required for instances where "/" exists in symbol i.e. BRK/B
 	err := c.customRequest(http.MethodGet, path, header, nil, nil, symbolRes)
 	if err != nil {
 		return []models.SymbolData{}, err

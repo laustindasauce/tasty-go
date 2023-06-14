@@ -6,13 +6,14 @@ import (
 
 	"github.com/austinbspencer/tasty-go/constants"
 	"github.com/austinbspencer/tasty-go/models"
+	"github.com/austinbspencer/tasty-go/queries"
 )
 
 func (c *Client) GetMyAccounts() ([]models.Account, *Error) {
 	if c.Session.SessionToken == nil {
 		return []models.Account{}, &Error{Message: "Session is invalid: Session Token cannot be nil."}
 	}
-	reqURL := fmt.Sprintf("%s/customers/me/accounts", c.baseURL)
+	path := "/customers/me/accounts"
 
 	type accountResponse struct {
 		Data struct {
@@ -27,7 +28,7 @@ func (c *Client) GetMyAccounts() ([]models.Account, *Error) {
 	header := http.Header{}
 	header.Add("Authorization", *c.Session.SessionToken)
 
-	err := c.request(http.MethodGet, reqURL, header, nil, nil, accountsRes)
+	err := c.request(http.MethodGet, path, header, nil, nil, accountsRes)
 	if err != nil {
 		return []models.Account{}, err
 	}
@@ -45,7 +46,7 @@ func (c *Client) GetAccountTradingStatus(accountNumber string) (models.AccountTr
 	if c.Session.SessionToken == nil {
 		return models.AccountTradingStatus{}, &Error{Message: "Session is invalid: Session Token cannot be nil."}
 	}
-	reqURL := fmt.Sprintf("%s/accounts/%s/trading-status", c.baseURL, accountNumber)
+	path := fmt.Sprintf("/accounts/%s/trading-status", accountNumber)
 
 	type tradingStatusRes struct {
 		AccountTradingStatus models.AccountTradingStatus `json:"data"`
@@ -55,7 +56,7 @@ func (c *Client) GetAccountTradingStatus(accountNumber string) (models.AccountTr
 	header := http.Header{}
 	header.Add("Authorization", *c.Session.SessionToken)
 
-	err := c.request(http.MethodGet, reqURL, header, nil, nil, accountsRes)
+	err := c.request(http.MethodGet, path, header, nil, nil, accountsRes)
 	if err != nil {
 		return models.AccountTradingStatus{}, err
 	}
@@ -67,7 +68,7 @@ func (c *Client) GetAccountBalances(accountNumber string) (models.AccountBalance
 	if c.Session.SessionToken == nil {
 		return models.AccountBalance{}, &Error{Message: "Session is invalid: Session Token cannot be nil."}
 	}
-	reqURL := fmt.Sprintf("%s/accounts/%s/balances", c.baseURL, accountNumber)
+	path := fmt.Sprintf("/accounts/%s/balances", accountNumber)
 
 	type accountBalanceRes struct {
 		AccountBalance models.AccountBalance `json:"data"`
@@ -77,7 +78,7 @@ func (c *Client) GetAccountBalances(accountNumber string) (models.AccountBalance
 	header := http.Header{}
 	header.Add("Authorization", *c.Session.SessionToken)
 
-	err := c.request(http.MethodGet, reqURL, header, nil, nil, accountsRes)
+	err := c.request(http.MethodGet, path, header, nil, nil, accountsRes)
 	if err != nil {
 		return models.AccountBalance{}, err
 	}
@@ -85,11 +86,11 @@ func (c *Client) GetAccountBalances(accountNumber string) (models.AccountBalance
 	return accountsRes.AccountBalance, nil
 }
 
-func (c *Client) GetAccountPositions(accountNumber string, query models.AccountPositionQuery) ([]models.AccountPosition, *Error) {
+func (c *Client) GetAccountPositions(accountNumber string, query queries.AccountPosition) ([]models.AccountPosition, *Error) {
 	if c.Session.SessionToken == nil {
 		return []models.AccountPosition{}, &Error{Message: "Session is invalid: Session Token cannot be nil."}
 	}
-	reqURL := fmt.Sprintf("%s/accounts/%s/positions", c.baseURL, accountNumber)
+	path := fmt.Sprintf("/accounts/%s/positions", accountNumber)
 
 	type accountResponse struct {
 		Data struct {
@@ -102,7 +103,7 @@ func (c *Client) GetAccountPositions(accountNumber string, query models.AccountP
 	header := http.Header{}
 	header.Add("Authorization", *c.Session.SessionToken)
 
-	err := c.request(http.MethodGet, reqURL, header, query, nil, accountsRes)
+	err := c.request(http.MethodGet, path, header, query, nil, accountsRes)
 	if err != nil {
 		return []models.AccountPosition{}, err
 	}
@@ -110,7 +111,7 @@ func (c *Client) GetAccountPositions(accountNumber string, query models.AccountP
 	return accountsRes.Data.AccountPositions, nil
 }
 
-func (c *Client) GetAccountBalanceSnapshots(accountNumber string, query models.AccountBalanceSnapshotsQuery) ([]models.AccountBalanceSnapshots, *Error) {
+func (c *Client) GetAccountBalanceSnapshots(accountNumber string, query queries.AccountBalanceSnapshots) ([]models.AccountBalanceSnapshots, *Error) {
 	if c.Session.SessionToken == nil {
 		return []models.AccountBalanceSnapshots{}, &Error{Message: "Session is invalid: Session Token cannot be nil."}
 	}
@@ -120,7 +121,7 @@ func (c *Client) GetAccountBalanceSnapshots(accountNumber string, query models.A
 		query.TimeOfDay = constants.EndOfDay
 	}
 
-	reqURL := fmt.Sprintf("%s/accounts/%s/balance-snapshots", c.baseURL, accountNumber)
+	path := fmt.Sprintf("/accounts/%s/balance-snapshots", accountNumber)
 
 	type accountResponse struct {
 		Data struct {
@@ -133,7 +134,7 @@ func (c *Client) GetAccountBalanceSnapshots(accountNumber string, query models.A
 	header := http.Header{}
 	header.Add("Authorization", *c.Session.SessionToken)
 
-	err := c.request(http.MethodGet, reqURL, header, query, nil, accountsRes)
+	err := c.request(http.MethodGet, path, header, query, nil, accountsRes)
 	if err != nil {
 		return []models.AccountBalanceSnapshots{}, err
 	}
@@ -141,12 +142,12 @@ func (c *Client) GetAccountBalanceSnapshots(accountNumber string, query models.A
 	return accountsRes.Data.AccountBalanceSnapshots, nil
 }
 
-func (c *Client) GetAccountNetLiqHistory(accountNumber string, query models.HistoricLiquidityQuery) ([]models.NetLiqOHLC, *Error) {
+func (c *Client) GetAccountNetLiqHistory(accountNumber string, query queries.HistoricLiquidity) ([]models.NetLiqOHLC, *Error) {
 	if c.Session.SessionToken == nil {
 		return []models.NetLiqOHLC{}, &Error{Message: "Session is invalid: Session Token cannot be nil."}
 	}
 
-	reqURL := fmt.Sprintf("%s/accounts/%s/net-liq/history", c.baseURL, accountNumber)
+	path := fmt.Sprintf("/accounts/%s/net-liq/history", accountNumber)
 
 	type accountResponse struct {
 		Data struct {
@@ -159,7 +160,7 @@ func (c *Client) GetAccountNetLiqHistory(accountNumber string, query models.Hist
 	header := http.Header{}
 	header.Add("Authorization", *c.Session.SessionToken)
 
-	err := c.request(http.MethodGet, reqURL, header, query, nil, accountsRes)
+	err := c.request(http.MethodGet, path, header, query, nil, accountsRes)
 	if err != nil {
 		return []models.NetLiqOHLC{}, err
 	}
@@ -173,7 +174,7 @@ func (c *Client) GetAccountPositionLimit(accountNumber string) (models.PositionL
 		return models.PositionLimit{}, &Error{Message: "Session is invalid: Session Token cannot be nil."}
 	}
 
-	path := fmt.Sprintf("%s/accounts/%s/position-limit", c.baseURL, accountNumber)
+	path := fmt.Sprintf("/accounts/%s/position-limit", accountNumber)
 
 	type accountResponse struct {
 		PositionLimit models.PositionLimit `json:"data"`

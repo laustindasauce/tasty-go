@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
+	"io"
 	"net/http"
 	"net/url"
 	"strings"
@@ -109,8 +110,15 @@ func (c *Client) customRequest(method, path string, header http.Header, params, 
 		r.URL = &url.URL{
 			Scheme: strings.Split(c.baseURL, ":")[0],
 			Host:   c.baseHost,
-			Opaque: path,
+			Opaque: fmt.Sprintf("//%s%s", c.baseHost, path),
 		}
+
+		body, err := json.Marshal(payload)
+		if err != nil {
+			return &Error{Message: fmt.Sprintf("Client Side Error: %v", err)}
+		}
+
+		r.Body = io.NopCloser(bytes.NewBuffer(body))
 
 		r.Header = header
 
@@ -129,7 +137,7 @@ func (c *Client) customRequest(method, path string, header http.Header, params, 
 			return &Error{Message: fmt.Sprintf("Client Side Error: %v", err)}
 		}
 
-		// body, err := ioutil.ReadAll(resp.Body)
+		// body, err = ioutil.ReadAll(resp.Body)
 		// if err != nil {
 		// 	return &Error{Message: fmt.Sprintf("Client Side Error: %v", err)}
 		// }
@@ -159,14 +167,16 @@ func (c *Client) customRequest(method, path string, header http.Header, params, 
 }
 
 // request handles any requests for the client
-func (c *Client) request(method, url string, header http.Header, params, payload, result any) *Error {
+func (c *Client) request(method, path string, header http.Header, params, payload, result any) *Error {
 	for {
 		body, err := json.Marshal(payload)
 		if err != nil {
 			return &Error{Message: fmt.Sprintf("Client Side Error: %v", err)}
 		}
 
-		r, err := http.NewRequest(method, url, bytes.NewBuffer(body))
+		fullURL := c.baseURL + path
+
+		r, err := http.NewRequest(method, fullURL, bytes.NewBuffer(body))
 		if err != nil {
 			return &Error{Message: fmt.Sprintf("Client Side Error: %v", err)}
 		}

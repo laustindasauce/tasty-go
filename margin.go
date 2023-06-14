@@ -13,7 +13,7 @@ func (c *Client) GetMarginRequirements(accountNumber string) (models.MarginRequi
 		return models.MarginRequirements{}, &Error{Message: "Session is invalid: Session Token cannot be nil."}
 	}
 
-	reqURL := fmt.Sprintf("%s/margin/accounts/%s/requirements", c.baseURL, accountNumber)
+	path := fmt.Sprintf("/margin/accounts/%s/requirements", accountNumber)
 
 	type accountResponse struct {
 		MarginRequirements models.MarginRequirements `json:"data"`
@@ -24,7 +24,7 @@ func (c *Client) GetMarginRequirements(accountNumber string) (models.MarginRequi
 	header := http.Header{}
 	header.Add("Authorization", *c.Session.SessionToken)
 
-	err := c.request(http.MethodGet, reqURL, header, nil, nil, marginRes)
+	err := c.request(http.MethodGet, path, header, nil, nil, marginRes)
 	if err != nil {
 		return models.MarginRequirements{}, err
 	}
@@ -40,7 +40,7 @@ func (c *Client) marginRequirementsDryRun(accountNumber string, order models.New
 		return nil, &Error{Message: "Session is invalid: Session Token cannot be nil."}
 	}
 
-	reqURL := fmt.Sprintf("%s/margin/accounts/%s/requirements", c.baseURL, accountNumber)
+	path := fmt.Sprintf("/margin/accounts/%s/requirements", accountNumber)
 
 	type accountResponse struct {
 		Response any `json:"data"`
@@ -51,7 +51,7 @@ func (c *Client) marginRequirementsDryRun(accountNumber string, order models.New
 	header := http.Header{}
 	header.Add("Authorization", *c.Session.SessionToken)
 
-	err := c.request(http.MethodPost, reqURL, header, nil, order, marginRes)
+	err := c.request(http.MethodPost, path, header, nil, order, marginRes)
 	if err != nil {
 		return nil, err
 	}
@@ -65,7 +65,7 @@ func (c *Client) GetEffectiveMarginRequirements(accountNumber, underlyingSymbol 
 		return models.EffectiveMarginRequirements{}, &Error{Message: "Session is invalid: Session Token cannot be nil."}
 	}
 
-	path := fmt.Sprintf("%s/accounts/%s/margin-requirements/%s/effective", c.baseURL, accountNumber, underlyingSymbol)
+	path := fmt.Sprintf("/accounts/%s/margin-requirements/%s/effective", accountNumber, underlyingSymbol)
 
 	type accountResponse struct {
 		EffectiveMarginRequirements models.EffectiveMarginRequirements `json:"data"`

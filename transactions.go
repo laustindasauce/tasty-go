@@ -17,7 +17,7 @@ func (c *Client) GetAccountTransactions(accountNumber string, query queries.Tran
 		return []models.Transaction{}, &Error{Message: "Session is invalid: Session Token cannot be nil."}
 	}
 
-	path := fmt.Sprintf("%s/accounts/%s/transactions", c.baseURL, accountNumber)
+	path := fmt.Sprintf("/accounts/%s/transactions", accountNumber)
 
 	type accountResponse struct {
 		Data struct {
@@ -44,7 +44,7 @@ func (c *Client) GetAccountTransaction(accountNumber string, id int) (models.Tra
 		return models.Transaction{}, &Error{Message: "Session is invalid: Session Token cannot be nil."}
 	}
 
-	path := fmt.Sprintf("%s/accounts/%s/transactions/%d", c.baseURL, accountNumber, id)
+	path := fmt.Sprintf("/accounts/%s/transactions/%d", accountNumber, id)
 
 	type accountResponse struct {
 		Transaction models.Transaction `json:"data"`
@@ -70,7 +70,7 @@ func (c *Client) GetAccountTransactionFees(accountNumber string, date *time.Time
 		return models.TransactionFees{}, &Error{Message: "Session is invalid: Session Token cannot be nil."}
 	}
 
-	path := fmt.Sprintf("%s/accounts/%s/transactions/total-fees", c.baseURL, accountNumber)
+	path := fmt.Sprintf("/accounts/%s/transactions/total-fees", accountNumber)
 
 	type accountResponse struct {
 		TransactionFees models.TransactionFees `json:"data"`

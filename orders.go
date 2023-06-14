@@ -14,7 +14,7 @@ func (c *Client) ReconfirmOrder(accountNumber string, id int) (models.Order, *Er
 		return models.Order{}, &Error{Message: "Session is invalid: Session Token cannot be nil."}
 	}
 
-	path := fmt.Sprintf("%s/accounts/%s/orders/%d/reconfirm", c.baseURL, accountNumber, id)
+	path := fmt.Sprintf("/accounts/%s/orders/%d/reconfirm", accountNumber, id)
 
 	type ordersResponse struct {
 		Order models.Order `json:"data"`
@@ -39,7 +39,7 @@ func (c *Client) SubmitOrderDryRun(accountNumber string, order models.NewOrder) 
 		return models.OrderResponse{}, nil, &Error{Message: "Session is invalid: Session Token cannot be nil."}
 	}
 
-	path := fmt.Sprintf("%s/accounts/%s/orders/dry-run", c.baseURL, accountNumber)
+	path := fmt.Sprintf("/accounts/%s/orders/dry-run", accountNumber)
 
 	type ordersResponse struct {
 		OrderResponse models.OrderResponse       `json:"data"`
@@ -65,7 +65,7 @@ func (c *Client) SubmitOrder(accountNumber string, order models.NewOrder) (model
 		return models.OrderResponse{}, nil, &Error{Message: "Session is invalid: Session Token cannot be nil."}
 	}
 
-	path := fmt.Sprintf("%s/accounts/%s/orders", c.baseURL, accountNumber)
+	path := fmt.Sprintf("/accounts/%s/orders", accountNumber)
 
 	type ordersResponse struct {
 		OrderResponse models.OrderResponse       `json:"data"`
@@ -91,7 +91,7 @@ func (c *Client) GetAccountLiveOrders(accountNumber string) ([]models.Order, *Er
 		return []models.Order{}, &Error{Message: "Session is invalid: Session Token cannot be nil."}
 	}
 
-	path := fmt.Sprintf("%s/accounts/%s/orders/live", c.baseURL, accountNumber)
+	path := fmt.Sprintf("/accounts/%s/orders/live", accountNumber)
 
 	type ordersResponse struct {
 		Data struct {
@@ -120,7 +120,7 @@ func (c *Client) GetAccountOrders(accountNumber string, query queries.Orders) ([
 		return []models.Order{}, &Error{Message: "Session is invalid: Session Token cannot be nil."}
 	}
 
-	path := fmt.Sprintf("%s/accounts/%s/orders", c.baseURL, accountNumber)
+	path := fmt.Sprintf("/accounts/%s/orders", accountNumber)
 
 	type ordersResponse struct {
 		Data struct {
@@ -147,7 +147,7 @@ func (c *Client) SubmitOrderECRDryRun(accountNumber string, id int, orderECR mod
 		return models.OrderResponse{}, &Error{Message: "Session is invalid: Session Token cannot be nil."}
 	}
 
-	path := fmt.Sprintf("%s/accounts/%s/orders/%d/dry-run", c.baseURL, accountNumber, id)
+	path := fmt.Sprintf("/accounts/%s/orders/%d/dry-run", accountNumber, id)
 
 	type ordersResponse struct {
 		OrderResponse models.OrderResponse `json:"data"`
@@ -172,7 +172,7 @@ func (c *Client) GetOrder(accountNumber string, id int) (models.Order, *Error) {
 		return models.Order{}, &Error{Message: "Session is invalid: Session Token cannot be nil."}
 	}
 
-	path := fmt.Sprintf("%s/accounts/%s/orders/%d", c.baseURL, accountNumber, id)
+	path := fmt.Sprintf("/accounts/%s/orders/%d", accountNumber, id)
 
 	type ordersResponse struct {
 		Order models.Order `json:"data"`
@@ -197,7 +197,7 @@ func (c *Client) CancelOrder(accountNumber string, id int) (models.Order, *Error
 		return models.Order{}, &Error{Message: "Session is invalid: Session Token cannot be nil."}
 	}
 
-	path := fmt.Sprintf("%s/accounts/%s/orders/%d", c.baseURL, accountNumber, id)
+	path := fmt.Sprintf("/accounts/%s/orders/%d", accountNumber, id)
 
 	type ordersResponse struct {
 		Order models.Order `json:"data"`
@@ -223,7 +223,7 @@ func (c *Client) ReplaceOrder(accountNumber string, id int, orderECR models.NewO
 		return models.Order{}, &Error{Message: "Session is invalid: Session Token cannot be nil."}
 	}
 
-	path := fmt.Sprintf("%s/accounts/%s/orders/%d", c.baseURL, accountNumber, id)
+	path := fmt.Sprintf("/accounts/%s/orders/%d", accountNumber, id)
 
 	type ordersResponse struct {
 		Order models.Order `json:"data"`
@@ -249,7 +249,7 @@ func (c *Client) PatchOrder(accountNumber string, id int, orderECR models.NewOrd
 		return models.Order{}, &Error{Message: "Session is invalid: Session Token cannot be nil."}
 	}
 
-	path := fmt.Sprintf("%s/accounts/%s/orders/%d", c.baseURL, accountNumber, id)
+	path := fmt.Sprintf("/accounts/%s/orders/%d", accountNumber, id)
 
 	type ordersResponse struct {
 		Order models.Order `json:"data"`
@@ -274,7 +274,7 @@ func (c *Client) GetCustomerLiveOrders(customerID string) ([]models.Order, *Erro
 		return []models.Order{}, &Error{Message: "Session is invalid: Session Token cannot be nil."}
 	}
 
-	path := fmt.Sprintf("%s/customers/%s/orders/live", c.baseURL, customerID)
+	path := fmt.Sprintf("/customers/%s/orders/live", customerID)
 
 	type ordersResponse struct {
 		Data struct {
@@ -303,7 +303,7 @@ func (c *Client) GetCustomerOrders(customerID string, query queries.Orders) ([]m
 		return []models.Order{}, &Error{Message: "Session is invalid: Session Token cannot be nil."}
 	}
 
-	path := fmt.Sprintf("%s/customers/%s/orders", c.baseURL, customerID)
+	path := fmt.Sprintf("/customers/%s/orders", customerID)
 
 	type ordersResponse struct {
 		Data struct {

@@ -7,6 +7,7 @@ import (
 
 	"github.com/austinbspencer/tasty-go/constants"
 	"github.com/austinbspencer/tasty-go/models"
+	"github.com/austinbspencer/tasty-go/queries"
 	"github.com/austinbspencer/tasty-go/utils"
 )
 
@@ -15,7 +16,7 @@ func (c *Client) GetCryptocurrencies(symbols []string) ([]models.Cryptocurrency,
 		return []models.Cryptocurrency{}, &Error{Message: "Session is invalid: Session Token cannot be nil."}
 	}
 
-	reqURL := fmt.Sprintf("%s/instruments/cryptocurrencies", c.baseURL)
+	path := "/instruments/cryptocurrencies"
 
 	type instrumentResponse struct {
 		Data struct {
@@ -35,7 +36,7 @@ func (c *Client) GetCryptocurrencies(symbols []string) ([]models.Cryptocurrency,
 	header := http.Header{}
 	header.Add("Authorization", *c.Session.SessionToken)
 
-	err := c.request(http.MethodGet, reqURL, header, query, nil, instrumentRes)
+	err := c.request(http.MethodGet, path, header, query, nil, instrumentRes)
 	if err != nil {
 		return []models.Cryptocurrency{}, err
 	}
@@ -48,9 +49,9 @@ func (c *Client) GetCryptocurrency(symbol constants.Cryptocurrency) (models.Cryp
 		return models.Cryptocurrency{}, &Error{Message: "Session is invalid: Session Token cannot be nil."}
 	}
 
-	symbol += constants.Cryptocurrency(url.QueryEscape("/USD"))
+	symbol += constants.Cryptocurrency(url.PathEscape("/USD"))
 
-	path := fmt.Sprintf("//%s/instruments/cryptocurrencies/%s", c.baseHost, symbol)
+	path := fmt.Sprintf("/instruments/cryptocurrencies/%s", symbol)
 
 	type instrumentResponse struct {
 		Crypto models.Cryptocurrency `json:"data"`
@@ -70,12 +71,12 @@ func (c *Client) GetCryptocurrency(symbol constants.Cryptocurrency) (models.Cryp
 }
 
 // GetActiveEquities returns all active equities in a paginated fashion
-func (c *Client) GetActiveEquities(query models.ActiveEquitiesQuery) ([]models.Equity, models.Pagination, *Error) {
+func (c *Client) GetActiveEquities(query queries.ActiveEquities) ([]models.Equity, models.Pagination, *Error) {
 	if c.Session.SessionToken == nil {
 		return []models.Equity{}, models.Pagination{}, &Error{Message: "Session is invalid: Session Token cannot be nil."}
 	}
 
-	reqURL := fmt.Sprintf("%s/instruments/equities/active", c.baseURL)
+	path := "/instruments/equities/active"
 
 	type instrumentResponse struct {
 		Data struct {
@@ -89,7 +90,7 @@ func (c *Client) GetActiveEquities(query models.ActiveEquitiesQuery) ([]models.E
 	header := http.Header{}
 	header.Add("Authorization", *c.Session.SessionToken)
 
-	err := c.request(http.MethodGet, reqURL, header, query, nil, instrumentRes)
+	err := c.request(http.MethodGet, path, header, query, nil, instrumentRes)
 	if err != nil {
 		return []models.Equity{}, models.Pagination{}, err
 	}
@@ -98,12 +99,12 @@ func (c *Client) GetActiveEquities(query models.ActiveEquitiesQuery) ([]models.E
 }
 
 // GetEquities returns a set of equity definitions given an array of one or more symbols
-func (c *Client) GetEquities(query models.EquitiesQuery) ([]models.Equity, *Error) {
+func (c *Client) GetEquities(query queries.Equities) ([]models.Equity, *Error) {
 	if c.Session.SessionToken == nil {
 		return []models.Equity{}, &Error{Message: "Session is invalid: Session Token cannot be nil."}
 	}
 
-	reqURL := fmt.Sprintf("%s/instruments/equities", c.baseURL)
+	path := "/instruments/equities"
 
 	type instrumentResponse struct {
 		Data struct {
@@ -116,7 +117,7 @@ func (c *Client) GetEquities(query models.EquitiesQuery) ([]models.Equity, *Erro
 	header := http.Header{}
 	header.Add("Authorization", *c.Session.SessionToken)
 
-	err := c.request(http.MethodGet, reqURL, header, query, nil, instrumentRes)
+	err := c.request(http.MethodGet, path, header, query, nil, instrumentRes)
 	if err != nil {
 		return []models.Equity{}, err
 	}
@@ -131,9 +132,7 @@ func (c *Client) GetEquity(symbol string) (models.Equity, *Error) {
 	}
 
 	// url escape required for instances where "/" exists in symbol i.e. BRK/B
-	symbol = url.QueryEscape(symbol)
-
-	path := fmt.Sprintf("//%s/instruments/equities/%s", c.baseHost, symbol)
+	path := fmt.Sprintf("/instruments/equities/%s", url.PathEscape(symbol))
 
 	type instrumentResponse struct {
 		Equity models.Equity `json:"data"`
@@ -144,7 +143,7 @@ func (c *Client) GetEquity(symbol string) (models.Equity, *Error) {
 	header := http.Header{}
 	header.Add("Authorization", *c.Session.SessionToken)
 
-	// customGet required for instances where "/" exists in symbol i.e. BRK/B
+	// customRequest required for instances where "/" exists in symbol i.e. BRK/B
 	err := c.customRequest(http.MethodGet, path, header, nil, nil, instrumentRes)
 	if err != nil {
 		return models.Equity{}, err
@@ -154,12 +153,12 @@ func (c *Client) GetEquity(symbol string) (models.Equity, *Error) {
 }
 
 // GetEquityOptions returns a set of equity options given one or more symbols
-func (c *Client) GetEquityOptions(query models.EquityOptionsQuery) ([]models.EquityOption, *Error) {
+func (c *Client) GetEquityOptions(query queries.EquityOptions) ([]models.EquityOption, *Error) {
 	if c.Session.SessionToken == nil {
 		return []models.EquityOption{}, &Error{Message: "Session is invalid: Session Token cannot be nil."}
 	}
 
-	reqURL := fmt.Sprintf("%s/instruments/equity-options", c.baseURL)
+	path := "/instruments/equity-options"
 
 	type instrumentResponse struct {
 		Data struct {
@@ -172,7 +171,7 @@ func (c *Client) GetEquityOptions(query models.EquityOptionsQuery) ([]models.Equ
 	header := http.Header{}
 	header.Add("Authorization", *c.Session.SessionToken)
 
-	err := c.request(http.MethodGet, reqURL, header, query, nil, instrumentRes)
+	err := c.request(http.MethodGet, path, header, query, nil, instrumentRes)
 	if err != nil {
 		return []models.EquityOption{}, err
 	}
@@ -188,7 +187,7 @@ func (c *Client) GetEquityOption(sym utils.EquityOptionsSymbology, active bool) 
 
 	occSymbol := sym.Build()
 
-	reqURL := fmt.Sprintf("%s/instruments/equity-options/%s", c.baseURL, occSymbol)
+	path := fmt.Sprintf("/instruments/equity-options/%s", occSymbol)
 
 	type instrumentResponse struct {
 		EquityOption models.EquityOption `json:"data"`
@@ -206,7 +205,7 @@ func (c *Client) GetEquityOption(sym utils.EquityOptionsSymbology, active bool) 
 	header := http.Header{}
 	header.Add("Authorization", *c.Session.SessionToken)
 
-	err := c.request(http.MethodGet, reqURL, header, query, nil, instrumentRes)
+	err := c.request(http.MethodGet, path, header, query, nil, instrumentRes)
 	if err != nil {
 		return models.EquityOption{}, err
 	}
@@ -215,12 +214,12 @@ func (c *Client) GetEquityOption(sym utils.EquityOptionsSymbology, active bool) 
 }
 
 // GetFutures returns a set of outright futures given an array of one or more symbols.
-func (c *Client) GetFutures(query models.FuturesQuery) ([]models.Future, *Error) {
+func (c *Client) GetFutures(query queries.Futures) ([]models.Future, *Error) {
 	if c.Session.SessionToken == nil {
 		return []models.Future{}, &Error{Message: "Session is invalid: Session Token cannot be nil."}
 	}
 
-	reqURL := fmt.Sprintf("%s/instruments/futures", c.baseURL)
+	path := "/instruments/futures"
 
 	type instrumentResponse struct {
 		Data struct {
@@ -233,7 +232,7 @@ func (c *Client) GetFutures(query models.FuturesQuery) ([]models.Future, *Error)
 	header := http.Header{}
 	header.Add("Authorization", *c.Session.SessionToken)
 
-	err := c.request(http.MethodGet, reqURL, header, query, nil, instrumentRes)
+	err := c.request(http.MethodGet, path, header, query, nil, instrumentRes)
 	if err != nil {
 		return []models.Future{}, err
 	}
@@ -247,7 +246,7 @@ func (c *Client) GetFuture(symbol string) (models.Future, *Error) {
 		return models.Future{}, &Error{Message: "Session is invalid: Session Token cannot be nil."}
 	}
 
-	reqURL := fmt.Sprintf("%s/instruments/futures/%s", c.baseURL, symbol)
+	path := fmt.Sprintf("/instruments/futures/%s", symbol)
 
 	type instrumentResponse struct {
 		Future models.Future `json:"data"`
@@ -258,7 +257,7 @@ func (c *Client) GetFuture(symbol string) (models.Future, *Error) {
 	header := http.Header{}
 	header.Add("Authorization", *c.Session.SessionToken)
 
-	err := c.request(http.MethodGet, reqURL, header, nil, nil, instrumentRes)
+	err := c.request(http.MethodGet, path, header, nil, nil, instrumentRes)
 	if err != nil {
 		return models.Future{}, err
 	}
@@ -272,7 +271,7 @@ func (c *Client) GetFutureOptionProducts() ([]models.FutureOptionProduct, *Error
 		return []models.FutureOptionProduct{}, &Error{Message: "Session is invalid: Session Token cannot be nil."}
 	}
 
-	reqURL := fmt.Sprintf("%s/instruments/future-option-products", c.baseURL)
+	path := "/instruments/future-option-products"
 
 	type instrumentResponse struct {
 		Data struct {
@@ -285,7 +284,7 @@ func (c *Client) GetFutureOptionProducts() ([]models.FutureOptionProduct, *Error
 	header := http.Header{}
 	header.Add("Authorization", *c.Session.SessionToken)
 
-	err := c.request(http.MethodGet, reqURL, header, nil, nil, instrumentRes)
+	err := c.request(http.MethodGet, path, header, nil, nil, instrumentRes)
 	if err != nil {
 		return []models.FutureOptionProduct{}, err
 	}
@@ -299,7 +298,7 @@ func (c *Client) GetFutureOptionProduct(exchange, rootSymbol string) (models.Fut
 		return models.FutureOptionProduct{}, &Error{Message: "Session is invalid: Session Token cannot be nil."}
 	}
 
-	reqURL := fmt.Sprintf("%s/instruments/future-option-products/%s/%s", c.baseURL, exchange, rootSymbol)
+	path := fmt.Sprintf("/instruments/future-option-products/%s/%s", exchange, rootSymbol)
 
 	type instrumentResponse struct {
 		FutureOptionProduct models.FutureOptionProduct `json:"data"`
@@ -310,7 +309,7 @@ func (c *Client) GetFutureOptionProduct(exchange, rootSymbol string) (models.Fut
 	header := http.Header{}
 	header.Add("Authorization", *c.Session.SessionToken)
 
-	err := c.request(http.MethodGet, reqURL, header, nil, nil, instrumentRes)
+	err := c.request(http.MethodGet, path, header, nil, nil, instrumentRes)
 	if err != nil {
 		return models.FutureOptionProduct{}, err
 	}
@@ -319,12 +318,12 @@ func (c *Client) GetFutureOptionProduct(exchange, rootSymbol string) (models.Fut
 }
 
 // GetFutures returns metadata for all supported future option products
-func (c *Client) GetFutureOptions(query models.FutureOptionsQuery) ([]models.FutureOption, *Error) {
+func (c *Client) GetFutureOptions(query queries.FutureOptions) ([]models.FutureOption, *Error) {
 	if c.Session.SessionToken == nil {
 		return []models.FutureOption{}, &Error{Message: "Session is invalid: Session Token cannot be nil."}
 	}
 
-	reqURL := fmt.Sprintf("%s/instruments/future-options", c.baseURL)
+	path := "/instruments/future-options"
 
 	type instrumentResponse struct {
 		Data struct {
@@ -337,7 +336,7 @@ func (c *Client) GetFutureOptions(query models.FutureOptionsQuery) ([]models.Fut
 	header := http.Header{}
 	header.Add("Authorization", *c.Session.SessionToken)
 
-	err := c.request(http.MethodGet, reqURL, header, query, nil, instrumentRes)
+	err := c.request(http.MethodGet, path, header, query, nil, instrumentRes)
 	if err != nil {
 		fmt.Println(err)
 		return []models.FutureOption{}, err
@@ -352,7 +351,7 @@ func (c *Client) GetFutureOption(symbol string) (models.FutureOption, *Error) {
 		return models.FutureOption{}, &Error{Message: "Session is invalid: Session Token cannot be nil."}
 	}
 
-	reqURL := fmt.Sprintf("%s/instruments/future-options/%s", c.baseURL, symbol)
+	path := fmt.Sprintf("/instruments/future-options/%s", symbol)
 
 	type instrumentResponse struct {
 		FutureOption models.FutureOption `json:"data"`
@@ -364,7 +363,7 @@ func (c *Client) GetFutureOption(symbol string) (models.FutureOption, *Error) {
 	header := http.Header{}
 	header.Add("Authorization", *c.Session.SessionToken)
 
-	err := c.request(http.MethodGet, reqURL, header, nil, nil, instrumentRes)
+	err := c.request(http.MethodGet, path, header, nil, nil, instrumentRes)
 	if err != nil {
 		return models.FutureOption{}, err
 	}
@@ -380,7 +379,7 @@ func (c *Client) GetFutureProducts() ([]models.FutureProduct, *Error) {
 		return []models.FutureProduct{}, &Error{Message: "Session is invalid: Session Token cannot be nil."}
 	}
 
-	reqURL := fmt.Sprintf("%s/instruments/future-products", c.baseURL)
+	path := "/instruments/future-products"
 
 	type instrumentResponse struct {
 		Data struct {
@@ -393,7 +392,7 @@ func (c *Client) GetFutureProducts() ([]models.FutureProduct, *Error) {
 	header := http.Header{}
 	header.Add("Authorization", *c.Session.SessionToken)
 
-	err := c.request(http.MethodGet, reqURL, header, nil, nil, instrumentRes)
+	err := c.request(http.MethodGet, path, header, nil, nil, instrumentRes)
 	if err != nil {
 		fmt.Println(err)
 		return []models.FutureProduct{}, err
@@ -408,7 +407,7 @@ func (c *Client) GetFutureProduct(exchange constants.Exchange, productCode strin
 		return models.FutureProduct{}, &Error{Message: "Session is invalid: Session Token cannot be nil."}
 	}
 
-	reqURL := fmt.Sprintf("%s/instruments/future-products/%s/%s", c.baseURL, exchange, productCode)
+	path := fmt.Sprintf("/instruments/future-products/%s/%s", exchange, productCode)
 
 	type instrumentResponse struct {
 		FutureProduct models.FutureProduct `json:"data"`
@@ -419,7 +418,7 @@ func (c *Client) GetFutureProduct(exchange constants.Exchange, productCode strin
 	header := http.Header{}
 	header.Add("Authorization", *c.Session.SessionToken)
 
-	err := c.request(http.MethodGet, reqURL, header, nil, nil, instrumentRes)
+	err := c.request(http.MethodGet, path, header, nil, nil, instrumentRes)
 	if err != nil {
 		return models.FutureProduct{}, err
 	}
@@ -433,7 +432,7 @@ func (c *Client) GetQuantityDecimalPrecisions() ([]models.QuantityDecimalPrecisi
 		return []models.QuantityDecimalPrecision{}, &Error{Message: "Session is invalid: Session Token cannot be nil."}
 	}
 
-	reqURL := fmt.Sprintf("%s/instruments/quantity-decimal-precisions", c.baseURL)
+	path := "/instruments/quantity-decimal-precisions"
 
 	type instrumentResponse struct {
 		Data struct {
@@ -446,7 +445,7 @@ func (c *Client) GetQuantityDecimalPrecisions() ([]models.QuantityDecimalPrecisi
 	header := http.Header{}
 	header.Add("Authorization", *c.Session.SessionToken)
 
-	err := c.request(http.MethodGet, reqURL, header, nil, nil, instrumentRes)
+	err := c.request(http.MethodGet, path, header, nil, nil, instrumentRes)
 	if err != nil {
 		return []models.QuantityDecimalPrecision{}, err
 	}
@@ -460,7 +459,7 @@ func (c *Client) GetWarrants(symbols []string) ([]models.Warrant, *Error) {
 		return []models.Warrant{}, &Error{Message: "Session is invalid: Session Token cannot be nil."}
 	}
 
-	reqURL := fmt.Sprintf("%s/instruments/warrants", c.baseURL)
+	path := "/instruments/warrants"
 
 	type instrumentResponse struct {
 		Data struct {
@@ -480,7 +479,7 @@ func (c *Client) GetWarrants(symbols []string) ([]models.Warrant, *Error) {
 	header := http.Header{}
 	header.Add("Authorization", *c.Session.SessionToken)
 
-	err := c.request(http.MethodGet, reqURL, header, query, nil, instrumentRes)
+	err := c.request(http.MethodGet, path, header, query, nil, instrumentRes)
 	if err != nil {
 		return []models.Warrant{}, err
 	}
@@ -494,7 +493,7 @@ func (c *Client) GetWarrant(symbol string) (models.Warrant, *Error) {
 		return models.Warrant{}, &Error{Message: "Session is invalid: Session Token cannot be nil."}
 	}
 
-	reqURL := fmt.Sprintf("%s/instruments/warrants/%s", c.baseURL, symbol)
+	path := fmt.Sprintf("/instruments/warrants/%s", symbol)
 
 	type instrumentResponse struct {
 		Warrant models.Warrant `json:"data"`
@@ -505,7 +504,7 @@ func (c *Client) GetWarrant(symbol string) (models.Warrant, *Error) {
 	header := http.Header{}
 	header.Add("Authorization", *c.Session.SessionToken)
 
-	err := c.request(http.MethodGet, reqURL, header, nil, nil, instrumentRes)
+	err := c.request(http.MethodGet, path, header, nil, nil, instrumentRes)
 	if err != nil {
 		return models.Warrant{}, err
 	}
