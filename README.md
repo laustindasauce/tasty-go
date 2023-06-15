@@ -1,6 +1,7 @@
 # tasty-go
 
 [![Go Reference](https://pkg.go.dev/badge/github.com/austinbspencer/tasty-go.svg)](https://pkg.go.dev/github.com/austinbspencer/tasty-go)
+[![Go Report Card](https://goreportcard.com/badge/github.com/austinbspencer/tasty-go)](https://goreportcard.com/report/github.com/austinbspencer/tasty-go)
 
 This library provides unofficial Go clients for [TastyTrade API](https://tastytrade.com).
 
@@ -40,17 +41,17 @@ func main() {
 		log.Fatal(err)
 	}
 
-  res, err := Client.GetMyAccounts()
+	res, err := Client.GetMyAccounts()
+		if err != nil {
+			log.Fatal(err)
+		}
+
+	balances, err := Client.GetAccountBalances()
 	if err != nil {
 		log.Fatal(err)
 	}
 
-  balances, err := Client.GetAccountBalances()
-  if err != nil {
-    log.Fatal(err)
-  }
-
-  fmt.Println(balances.CashBalance)
+	fmt.Println(balances.CashBalance)
 }
 
 ```
