@@ -49,7 +49,7 @@ type PublicWatchlist struct {
 	WatchlistEntryCount *int                   `json:"watchlist-entry-count"`
 }
 
-// Something weird here in the api where instrument_type instead of instrument-type
+// Something weird here in the api where instrument_type instead of instrument-type.
 type PublicWatchlistEntry struct {
 	Symbol         string                   `json:"symbol"`
 	InstrumentType constants.InstrumentType `json:"instrument_type"`

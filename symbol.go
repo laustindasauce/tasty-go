@@ -8,7 +8,7 @@ import (
 	"github.com/austinbspencer/tasty-go/models"
 )
 
-// Get the position limit
+// Returns an array of symbol data.
 func (c *Client) SymbolSearch(symbol string) ([]models.SymbolData, *Error) {
 	if c.Session.SessionToken == nil {
 		return []models.SymbolData{}, &Error{Message: "Session is invalid: Session Token cannot be nil."}

@@ -7,7 +7,7 @@ import (
 	"github.com/austinbspencer/tasty-go/models"
 )
 
-// Fetch current margin/capital requirements report for an account
+// Fetch current margin/capital requirements report for an account.
 func (c *Client) GetMarginRequirements(accountNumber string) (models.MarginRequirements, *Error) {
 	if c.Session.SessionToken == nil {
 		return models.MarginRequirements{}, &Error{Message: "Session is invalid: Session Token cannot be nil."}
@@ -60,7 +60,7 @@ func (c *Client) MarginRequirementsDryRun(accountNumber string, order models.New
 	return marginRes.Response, nil
 }
 
-// Get effective margin requirements for account
+// Get effective margin requirements for account.
 func (c *Client) GetEffectiveMarginRequirements(accountNumber, underlyingSymbol string) (models.EffectiveMarginRequirements, *Error) {
 	if c.Session.SessionToken == nil {
 		return models.EffectiveMarginRequirements{}, &Error{Message: "Session is invalid: Session Token cannot be nil."}

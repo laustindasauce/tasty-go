@@ -6,7 +6,7 @@ import (
 	"github.com/austinbspencer/tasty-go/constants"
 )
 
-// Transactions is the query for account transactions
+// Transactions is the query for account transactions.
 type Transactions struct {
 	// Default value 250
 	PerPage int `url:"per-page,omitempty"`

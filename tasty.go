@@ -16,7 +16,7 @@ import (
 const (
 	apiBaseURL      = "https://api.tastyworks.com"
 	apiBaseHost     = "api.tastyworks.com"
-	apiCertBaseUrl  = "https://api.cert.tastyworks.com"
+	apiCertBaseURL  = "https://api.cert.tastyworks.com"
 	apiCertBaseHost = "api.cert.tastyworks.com"
 )
 
@@ -24,6 +24,7 @@ var (
 	errorStatusCodes = []int{400, 401, 403, 404, 415, 422, 500}
 )
 
+// Client for the tasty api wrapper.
 type Client struct {
 	httpClient *http.Client
 	baseURL    string
@@ -46,14 +47,15 @@ func NewClient(httpClient *http.Client) (*Client, error) {
 func NewCertClient(httpClient *http.Client) (*Client, error) {
 	c := &Client{
 		httpClient: httpClient,
-		baseURL:    apiCertBaseUrl,
+		baseURL:    apiCertBaseURL,
 		baseHost:   apiCertBaseHost,
 	}
 
 	return c, nil
 }
 
-type TastyError struct {
+// Error reasoning given by TastyTrade.
+type ErrorResponse struct {
 	Domain string `json:"domain"`
 	Reason string `json:"reason"`
 }
@@ -65,7 +67,7 @@ type Error struct {
 	// A short description of the error.
 	Message string `json:"message"`
 	// Slice of errors
-	Errors []TastyError `json:"errors"`
+	Errors []ErrorResponse `json:"errors"`
 	// The HTTP status code.
 	StatusCode int `json:"error,omitempty"`
 }
@@ -100,7 +102,7 @@ func (c *Client) decodeError(resp *http.Response) *Error {
 	return e
 }
 
-// customRequest handles any requests for the client with unique paths
+// customRequest handles any requests for the client with unique paths.
 func (c *Client) customRequest(method, path string, header http.Header, params, payload, result any) *Error {
 	r := new(http.Request)
 
@@ -124,8 +126,8 @@ func (c *Client) customRequest(method, path string, header http.Header, params, 
 	r.Header.Add("Content-Type", "application/json")
 
 	if params != nil {
-		queryString, err := query.Values(params)
-		if err != nil {
+		queryString, queryErr := query.Values(params)
+		if queryErr != nil {
 			return &Error{Message: fmt.Sprintf("Client Side Error: %v", err)}
 		}
 		r.URL.RawQuery = queryString.Encode()
@@ -162,7 +164,7 @@ func (c *Client) customRequest(method, path string, header http.Header, params, 
 	return nil
 }
 
-// request handles any requests for the client
+// request handles any requests for the client.
 func (c *Client) request(method, path string, header http.Header, params, payload, result any) *Error {
 	body, err := json.Marshal(payload)
 	if err != nil {
@@ -181,8 +183,8 @@ func (c *Client) request(method, path string, header http.Header, params, payloa
 	r.Header.Add("Content-Type", "application/json")
 
 	if params != nil {
-		queryString, err := query.Values(params)
-		if err != nil {
+		queryString, queryErr := query.Values(params)
+		if queryErr != nil {
 			return &Error{Message: fmt.Sprintf("Client Side Error: %v", err)}
 		}
 		r.URL.RawQuery = queryString.Encode()

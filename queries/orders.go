@@ -6,7 +6,7 @@ import (
 	"github.com/austinbspencer/tasty-go/constants"
 )
 
-// Orders is the query for account orders
+// Orders is the query for account orders.
 type Orders struct {
 	// Default value 10
 	PerPage int `url:"per-page,omitempty"`

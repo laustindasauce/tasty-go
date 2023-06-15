@@ -1,4 +1,4 @@
-package tasty
+package tasty //nolint:testpackage // testing private field
 
 import (
 	"log"

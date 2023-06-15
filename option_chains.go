@@ -8,7 +8,7 @@ import (
 	"github.com/austinbspencer/tasty-go/models"
 )
 
-// Returns a futures option chain given a futures product code, i.e. ES
+// Returns a futures option chain given a futures product code, i.e. ES.
 func (c *Client) GetFuturesOptionChains(productCode string) ([]models.FutureOption, *Error) {
 	if c.Session.SessionToken == nil {
 		return []models.FutureOption{}, &Error{Message: "Session is invalid: Session Token cannot be nil."}
@@ -36,7 +36,7 @@ func (c *Client) GetFuturesOptionChains(productCode string) ([]models.FutureOpti
 }
 
 // Returns a futures option chain given a futures product code in a nested form to minimize
-// redundant processing
+// redundant processing.
 func (c *Client) GetNestedFuturesOptionChains(productCode string) (models.NestedFuturesOptionChains, *Error) {
 	if c.Session.SessionToken == nil {
 		return models.NestedFuturesOptionChains{}, &Error{Message: "Session is invalid: Session Token cannot be nil."}
@@ -61,7 +61,7 @@ func (c *Client) GetNestedFuturesOptionChains(productCode string) (models.Nested
 	return instrumentRes.Chains, nil
 }
 
-// Returns an option chain given an underlying symbol, i.e. AAPL
+// Returns an option chain given an underlying symbol, i.e. AAPL.
 func (c *Client) GetEquityOptionChains(symbol string) ([]models.EquityOption, *Error) {
 	if c.Session.SessionToken == nil {
 		return []models.EquityOption{}, &Error{Message: "Session is invalid: Session Token cannot be nil."}
@@ -93,7 +93,7 @@ func (c *Client) GetEquityOptionChains(symbol string) ([]models.EquityOption, *E
 }
 
 // Returns an option chain given an underlying symbol,
-// i.e. AAPL in a nested form to minimize redundant processing
+// i.e. AAPL in a nested form to minimize redundant processing.
 func (c *Client) GetNestedEquityOptionChains(symbol string) ([]models.NestedOptionChains, *Error) {
 	if c.Session.SessionToken == nil {
 		return []models.NestedOptionChains{}, &Error{Message: "Session is invalid: Session Token cannot be nil."}
@@ -125,7 +125,7 @@ func (c *Client) GetNestedEquityOptionChains(symbol string) ([]models.NestedOpti
 }
 
 // Returns an option chain given an underlying symbol,
-// i.e. AAPL in a compact form to minimize content size
+// i.e. AAPL in a compact form to minimize content size.
 func (c *Client) GetCompactEquityOptionChains(symbol string) ([]models.CompactOptionChains, *Error) {
 	if c.Session.SessionToken == nil {
 		return []models.CompactOptionChains{}, &Error{Message: "Session is invalid: Session Token cannot be nil."}

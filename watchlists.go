@@ -8,7 +8,7 @@ import (
 	"github.com/austinbspencer/tasty-go/models"
 )
 
-// Returns a list of all watchlists for the given account
+// Returns a list of all watchlists for the given account.
 func (c *Client) GetMyWatchlists() ([]models.Watchlist, *Error) {
 	if c.Session.SessionToken == nil {
 		return []models.Watchlist{}, &Error{Message: "Session is invalid: Session Token cannot be nil."}
@@ -35,7 +35,7 @@ func (c *Client) GetMyWatchlists() ([]models.Watchlist, *Error) {
 	return watchlistsRes.Data.Watchlists, nil
 }
 
-// Returns a requested account watchlist
+// Returns a requested account watchlist.
 func (c *Client) GetMyWatchlist(name string) (models.Watchlist, *Error) {
 	if c.Session.SessionToken == nil {
 		return models.Watchlist{}, &Error{Message: "Session is invalid: Session Token cannot be nil."}
@@ -61,7 +61,7 @@ func (c *Client) GetMyWatchlist(name string) (models.Watchlist, *Error) {
 	return watchlistsRes.Watchlist, nil
 }
 
-// Create an account watchlist
+// Create an account watchlist.
 func (c *Client) CreateWatchlist(watchlist models.NewWatchlist) (models.Watchlist, *Error) {
 	if c.Session.SessionToken == nil {
 		return models.Watchlist{}, &Error{Message: "Session is invalid: Session Token cannot be nil."}
@@ -86,7 +86,7 @@ func (c *Client) CreateWatchlist(watchlist models.NewWatchlist) (models.Watchlis
 	return watchlistsRes.Watchlist, nil
 }
 
-// Replace all properties of an account watchlist
+// Replace all properties of an account watchlist.
 func (c *Client) EditWatchlist(name string, watchlist models.NewWatchlist) (models.Watchlist, *Error) {
 	if c.Session.SessionToken == nil {
 		return models.Watchlist{}, &Error{Message: "Session is invalid: Session Token cannot be nil."}
@@ -112,7 +112,7 @@ func (c *Client) EditWatchlist(name string, watchlist models.NewWatchlist) (mode
 	return watchlistsRes.Watchlist, nil
 }
 
-// Delete a watchlist for the given account
+// Delete a watchlist for the given account.
 func (c *Client) DeleteWatchlist(name string) (models.RemovedWatchlist, *Error) {
 	if c.Session.SessionToken == nil {
 		return models.RemovedWatchlist{}, &Error{Message: "Session is invalid: Session Token cannot be nil."}
@@ -134,7 +134,7 @@ func (c *Client) DeleteWatchlist(name string) (models.RemovedWatchlist, *Error) 
 	return *removedWatchlist, nil
 }
 
-// Returns a list of all tastyworks pairs watchlists
+// Returns a list of all tastyworks pairs watchlists.
 func (c *Client) GetPairsWatchlists() ([]models.PairsWatchlist, *Error) {
 	if c.Session.SessionToken == nil {
 		return []models.PairsWatchlist{}, &Error{Message: "Session is invalid: Session Token cannot be nil."}
@@ -161,7 +161,7 @@ func (c *Client) GetPairsWatchlists() ([]models.PairsWatchlist, *Error) {
 	return watchlistsRes.Data.Watchlists, nil
 }
 
-// Returns a requested tastyworks pairs watchlist
+// Returns a requested tastyworks pairs watchlist.
 func (c *Client) GetPairsWatchlist(name string) (models.PairsWatchlist, *Error) {
 	if c.Session.SessionToken == nil {
 		return models.PairsWatchlist{}, &Error{Message: "Session is invalid: Session Token cannot be nil."}
@@ -187,7 +187,7 @@ func (c *Client) GetPairsWatchlist(name string) (models.PairsWatchlist, *Error) 
 	return watchlistsRes.Watchlist, nil
 }
 
-// Returns a list of all tastyworks watchlists
+// Returns a list of all tastyworks watchlists.
 func (c *Client) GetPublicWatchlists(countsOnly bool) ([]models.PublicWatchlist, *Error) {
 	if c.Session.SessionToken == nil {
 		return []models.PublicWatchlist{}, &Error{Message: "Session is invalid: Session Token cannot be nil."}
@@ -220,7 +220,7 @@ func (c *Client) GetPublicWatchlists(countsOnly bool) ([]models.PublicWatchlist,
 	return watchlistsRes.Data.Watchlists, nil
 }
 
-// Returns a requested tastyworks watchlist
+// Returns a requested tastyworks watchlist.
 func (c *Client) GetPublicWatchlist(name string) (models.Watchlist, *Error) {
 	if c.Session.SessionToken == nil {
 		return models.Watchlist{}, &Error{Message: "Session is invalid: Session Token cannot be nil."}

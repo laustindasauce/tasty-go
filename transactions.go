@@ -38,7 +38,7 @@ func (c *Client) GetAccountTransactions(accountNumber string, query queries.Tran
 	return transactionsRes.Data.Transactions, nil
 }
 
-// Retrieve a transaction by account number and ID
+// Retrieve a transaction by account number and ID.
 func (c *Client) GetAccountTransaction(accountNumber string, id int) (models.Transaction, *Error) {
 	if c.Session.SessionToken == nil {
 		return models.Transaction{}, &Error{Message: "Session is invalid: Session Token cannot be nil."}
@@ -64,7 +64,7 @@ func (c *Client) GetAccountTransaction(accountNumber string, id int) (models.Tra
 }
 
 // Return the total fees for an account for a given day
-// the day will default to today
+// the day will default to today.
 func (c *Client) GetAccountTransactionFees(accountNumber string, date *time.Time) (models.TransactionFees, *Error) {
 	if c.Session.SessionToken == nil {
 		return models.TransactionFees{}, &Error{Message: "Session is invalid: Session Token cannot be nil."}

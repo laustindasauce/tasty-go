@@ -9,7 +9,7 @@ import (
 
 type StringToFloat32 float32
 
-// UnmarshalJSON is the custom unmarshaler interface
+// UnmarshalJSON is the custom unmarshaler interface.
 func (foe *StringToFloat32) UnmarshalJSON(data []byte) error {
 	if string(data) == "\"\"" {
 		if foe != nil {
@@ -35,14 +35,14 @@ func (foe *StringToFloat32) UnmarshalJSON(data []byte) error {
 	return nil
 }
 
-// MarshalJSON is the custom marshaler interface
+// MarshalJSON is the custom marshaler interface.
 func (foe StringToFloat32) MarshalJSON() ([]byte, error) {
 	return json.Marshal(float32(foe))
 }
 
 type SimpleDate time.Time
 
-// UnmarshalJSON is the custom unmarshaler interface
+// UnmarshalJSON is the custom unmarshaler interface.
 func (j *SimpleDate) UnmarshalJSON(b []byte) error {
 	s := strings.Trim(string(b), "\"")
 	t, err := time.Parse("2006-01-02", s)
@@ -53,7 +53,7 @@ func (j *SimpleDate) UnmarshalJSON(b []byte) error {
 	return nil
 }
 
-// MarshalJSON is the custom marshaler interface
+// MarshalJSON is the custom marshaler interface.
 func (j SimpleDate) MarshalJSON() ([]byte, error) {
 	return json.Marshal(time.Time(j))
 }

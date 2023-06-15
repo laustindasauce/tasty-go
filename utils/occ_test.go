@@ -1,4 +1,4 @@
-package utils
+package utils //nolint:testpackage // testing private field
 
 import (
 	"testing"

@@ -6,7 +6,7 @@ import (
 	"github.com/austinbspencer/tasty-go/constants"
 )
 
-// AccountPosition is the optional filtering available for position endpoint
+// Optional filtering available for position endpoint.
 type AccountPosition struct {
 	// UnderlyingSymbol An array of Underlying symbol(s) for positions
 	UnderlyingSymbol []string `url:"underlying-symbol[],omitempty"`
@@ -29,7 +29,7 @@ type AccountPosition struct {
 	IncludeMarks bool `url:"include-marks,omitempty"`
 }
 
-// AccountBalanceSnapshots is the filtering for the account balance snapshots endpoint
+// Filtering for the account balance snapshots endpoint.
 type AccountBalanceSnapshots struct {
 	// SnapshotDate The day of the balance snapshot to retrieve
 	SnapshotDate time.Time `layout:"2006-01-02" url:"snapshot-date,omitempty"`

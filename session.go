@@ -28,6 +28,7 @@ type sessionResponse struct {
 	Context string  `json:"context"`
 }
 
+// Create a new user session.
 func (c *Client) CreateSession(login LoginInfo) (Session, *Error) {
 	path := "/sessions"
 
@@ -40,14 +41,15 @@ func (c *Client) CreateSession(login LoginInfo) (Session, *Error) {
 
 	err := c.request(http.MethodPost, path, header, nil, login, session)
 	if err == nil {
-		(*c).Session = session.Session
+		c.Session = session.Session
 	} else {
 		return Session{}, err
 	}
 
-	return session.Session, err
+	return session.Session, nil
 }
 
+// Validate the user session.
 func (c *Client) ValidateSession() (Session, *Error) {
 	if c.Session.SessionToken == nil {
 		return Session{}, &Error{Message: "Session is invalid: Session Token cannot be nil."}
@@ -61,7 +63,7 @@ func (c *Client) ValidateSession() (Session, *Error) {
 
 	err := c.request(http.MethodPost, path, header, nil, nil, session)
 	if err == nil {
-		(*c).Session = session.Session
+		c.Session = session.Session
 	} else {
 		return Session{}, err
 	}
@@ -69,6 +71,7 @@ func (c *Client) ValidateSession() (Session, *Error) {
 	return session.Session, nil
 }
 
+// Destroy the user session and invalidate the token.
 func (c *Client) DestroySession() *Error {
 	if c.Session.SessionToken == nil {
 		return &Error{Message: "Session is invalid: Session Token cannot be nil."}

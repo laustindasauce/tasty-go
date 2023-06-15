@@ -23,7 +23,7 @@ type SortOrder string
 type OrderStatus string
 
 const (
-	// InstrumentType
+	// InstrumentType.
 	Bond           InstrumentType = "Bond"
 	Crypto         InstrumentType = "Cryptocurrency"
 	CurrencyPair   InstrumentType = "Currency Pair"
@@ -35,46 +35,46 @@ const (
 	Index          InstrumentType = "Index"
 	Unknown        InstrumentType = "Unknown"
 	Warrant        InstrumentType = "Warrant"
-	// TimeOfDay
+	// TimeOfDay.
 	EndOfDay       TimeOfDay = "EOD"
 	BeginningOfDay TimeOfDay = "BOD"
-	// TimeInForce
+	// TimeInForce.
 	Day    TimeInForce = "Day"
 	GTC    TimeInForce = "GTC"
 	GTD    TimeInForce = "GTD"
 	Ext    TimeInForce = "Ext"
 	GTCExt TimeInForce = "GTC Ext"
 	IOC    TimeInForce = "IOC"
-	// OrderType
+	// OrderType.
 	Limit           OrderType = "Limit"
 	Market          OrderType = "Market"
 	MarketableLimit OrderType = "Marketable Limit"
 	Stop            OrderType = "Stop"
 	StopLimit       OrderType = "Stop Limit"
 	NotionalMarket  OrderType = "Notional Market"
-	// PriceEffect
+	// PriceEffect.
 	Credit PriceEffect = "Credit"
 	Debit  PriceEffect = "Debit"
 	None   PriceEffect = "None"
-	// OrderAction
+	// OrderAction.
 	STO  OrderAction = "Sell to Open"
 	STC  OrderAction = "Sell to Close"
 	BTO  OrderAction = "Buy to Open"
 	BTC  OrderAction = "Buy to Close"
 	Sell OrderAction = "Sell"
 	Buy  OrderAction = "Buy"
-	// Direction
+	// Direction.
 	Long  Direction = "Long"
 	Short Direction = "Short"
-	// Indicator
+	// Indicator.
 	Last Indicator = "last"
-	// Comparator
+	// Comparator.
 	GTE Comparator = "gte"
 	LTE Comparator = "lte"
-	// OrderRuleAction
+	// OrderRuleAction.
 	Route  OrderRuleAction = "route"
 	Cancel OrderRuleAction = "cancel"
-	// TimeBack
+	// TimeBack.
 	OneDay      TimeBack = "1d"
 	OneWeek     TimeBack = "1w"
 	OneMonth    TimeBack = "1m"
@@ -82,7 +82,7 @@ const (
 	SixMonths   TimeBack = "6m"
 	OneYear     TimeBack = "1y"
 	All         TimeBack = "all"
-	// Cryptocurrency
+	// Cryptocurrency.
 	Cardano     Cryptocurrency = "ADA"
 	Bitcoin     Cryptocurrency = "BTC"
 	BitcoinCash Cryptocurrency = "BCH"
@@ -91,14 +91,14 @@ const (
 	Ethereum    Cryptocurrency = "ETH"
 	Litecoin    Cryptocurrency = "LTC"
 	Solana      Cryptocurrency = "SOL"
-	// Lendability
+	// Lendability.
 	EasyToBorrow   Lendability = "Easy To Borrow"
 	LocateRequired Lendability = "Locate Required"
 	Preborrow      Lendability = "Preborrow"
-	// OptionType
+	// OptionType.
 	Call OptionType = "C"
 	Put  OptionType = "P"
-	// MonthCode
+	// MonthCode.
 	January   MonthCode = "F"
 	February  MonthCode = "G"
 	March     MonthCode = "H"
@@ -111,20 +111,20 @@ const (
 	October   MonthCode = "V"
 	November  MonthCode = "X"
 	December  MonthCode = "Z"
-	// Exchange
+	// Exchange.
 	CME    Exchange = "CME"
 	SMALLS Exchange = "SMALLS"
 	CFE    Exchange = "CFE"
 	CBOED  Exchange = "CBOED"
-	// OrderStatus
+	// OrderStatus.
 
-	// Initial order state
+	// Initial order state.
 	Received OrderStatus = "Received"
-	// Order is on its way out of Tastytrade's system
+	// Order is on its way out of Tastytrade's system.
 	Routed OrderStatus = "Routed"
-	// Order is en route to the exchange
+	// Order is en route to the exchange.
 	InFlight OrderStatus = "In Flight"
-	// Order is live at the exchange
+	// Order is live at the exchange.
 	Live OrderStatus = "Live"
 	// Customer has requested to cancel the order.
 	// Awaiting a 'cancelled' message from the exchange.
@@ -135,9 +135,9 @@ const (
 	// This pertains to replacement orders. It means the replacement order
 	// is awaiting a 'cancelled' message for the order it is replacing.
 	Contingent OrderStatus = "Contingent"
-	// Order has been fully filled
+	// Order has been fully filled.
 	Filled OrderStatus = "Filled"
-	// Order is cancelled
+	// Order is cancelled.
 	Cancelled OrderStatus = "Cancelled"
 	// Order has expired. Usually applies to an option order.
 	Expired OrderStatus = "Expired"
@@ -147,7 +147,7 @@ const (
 	Removed OrderStatus = "Removed"
 	// Administrator has manually removed part of this order from customer account.
 	PartiallyRemoved OrderStatus = "Partially Removed"
-	// SortOrder
+	// SortOrder.
 	Asc  SortOrder = "Asc"
 	Desc SortOrder = "Desc"
 )

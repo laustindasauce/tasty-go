@@ -18,6 +18,7 @@ type EquityOptionsSymbology struct {
 	Expiration time.Time
 }
 
+// Builds the equity option into correct symbology.
 func (sym EquityOptionsSymbology) Build() string {
 	expiryString := sym.Expiration.Format("060102")
 	strikeString := getStrikeWithPadding(sym.Strike)
@@ -25,6 +26,7 @@ func (sym EquityOptionsSymbology) Build() string {
 	return fmt.Sprintf("%s%s%s%s", symbol, expiryString, sym.OptionType, strikeString)
 }
 
+// convert the strike into a string with correct padding.
 func getStrikeWithPadding(strike float32) string {
 	strikeString := fmt.Sprintf("%d", int(strike*1000))
 	for len(strikeString) < 8 {
@@ -33,6 +35,7 @@ func getStrikeWithPadding(strike float32) string {
 	return strikeString
 }
 
+// convert the symbol into a string with correct padding.
 func getSymbolWithPadding(symbol string) string {
 	for len(symbol) < 6 {
 		symbol += " "

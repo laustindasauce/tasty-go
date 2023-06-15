@@ -1,6 +1,6 @@
 package models
 
-// SymbolData model
+// SymbolData model.
 type SymbolData struct {
 	// Symbol is the stock ticker symbol
 	Symbol string `json:"symbol"`

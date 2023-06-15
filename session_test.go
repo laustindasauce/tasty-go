@@ -1,4 +1,4 @@
-package tasty
+package tasty //nolint:testpackage // testing private field
 
 import (
 	"fmt"
@@ -23,7 +23,7 @@ func TestCreateSession(t *testing.T) {
 	require.Equal(t, "default", resp.User.Username)
 	require.Equal(t, "U0001563674", resp.User.ExternalID)
 	require.NotNil(t, resp.SessionToken)
-	require.Equal(t, "gwYY_cUTvG3ESb9Sio6f9cX-SA-9GpIyXqFZ4Wx_pL_lnwD_6yQPty+C", *resp.SessionToken)
+	require.Equal(t, "example-session-token+C", *resp.SessionToken)
 	require.Nil(t, resp.RememberToken)
 }
 
@@ -42,7 +42,7 @@ func TestValidateSession(t *testing.T) {
 	require.Equal(t, "default", resp.User.Username)
 	require.Equal(t, "U0001563674", resp.User.ExternalID)
 	require.NotNil(t, resp.SessionToken)
-	require.Equal(t, "gwYY_cUTvG3ESb9Sio6f9cX-SA-9GpIyXqFZ4Wx_pL_lnwD_6yQPty+C", *resp.SessionToken)
+	require.Equal(t, "example-session-token+C", *resp.SessionToken)
 	require.Nil(t, resp.RememberToken)
 }
 
@@ -65,7 +65,7 @@ const sessionResp = `{
       "username": "default",
       "external-id": "U0001563674"
     },
-    "session-token": "gwYY_cUTvG3ESb9Sio6f9cX-SA-9GpIyXqFZ4Wx_pL_lnwD_6yQPty+C"
+    "session-token": "example-session-token+C"
   },
   "context": "/sessions"
 }`

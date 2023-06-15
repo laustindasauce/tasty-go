@@ -7,7 +7,7 @@ import (
 	"github.com/austinbspencer/tasty-go/models"
 )
 
-// Get authenticated customer
+// Get authenticated customer.
 func (c *Client) GetMyCustomerInfo() (models.Customer, *Error) {
 	if c.Session.SessionToken == nil {
 		return models.Customer{}, &Error{Message: "Session is invalid: Session Token cannot be nil."}
@@ -55,7 +55,7 @@ func (c *Client) GetCustomer(customerID string) (models.Customer, *Error) {
 	return customersRes.Customer, nil
 }
 
-// Get a full customer resource.
+// Get a list of all the customer account resources attached to the current customer.
 func (c *Client) GetCustomerAccounts(customerID string) ([]models.Account, *Error) {
 	if c.Session.SessionToken == nil {
 		return []models.Account{}, &Error{Message: "Session is invalid: Session Token cannot be nil."}
@@ -89,7 +89,55 @@ func (c *Client) GetCustomerAccounts(customerID string) ([]models.Account, *Erro
 	return accounts, nil
 }
 
-// Returns the appropriate quote streamer endpoint, level and identification token
+// Get a full customer account resource.
+func (c *Client) GetCustomerAccount(customerID, accountNumber string) (models.Account, *Error) {
+	if c.Session.SessionToken == nil {
+		return models.Account{}, &Error{Message: "Session is invalid: Session Token cannot be nil."}
+	}
+	path := fmt.Sprintf("/customers/%s/accounts/%s", customerID, accountNumber)
+
+	type customerResponse struct {
+		Account models.Account `json:"data"`
+	}
+
+	customersRes := new(customerResponse)
+
+	header := http.Header{}
+	header.Add("Authorization", *c.Session.SessionToken)
+
+	err := c.request(http.MethodGet, path, header, nil, nil, customersRes)
+	if err != nil {
+		return models.Account{}, err
+	}
+
+	return customersRes.Account, nil
+}
+
+// Get authenticated user's full account resource.
+func (c *Client) GetMyAccount(accountNumber string) (models.Account, *Error) {
+	if c.Session.SessionToken == nil {
+		return models.Account{}, &Error{Message: "Session is invalid: Session Token cannot be nil."}
+	}
+	path := fmt.Sprintf("/customers/me/accounts/%s", accountNumber)
+
+	type customerResponse struct {
+		Account models.Account `json:"data"`
+	}
+
+	customersRes := new(customerResponse)
+
+	header := http.Header{}
+	header.Add("Authorization", *c.Session.SessionToken)
+
+	err := c.request(http.MethodGet, path, header, nil, nil, customersRes)
+	if err != nil {
+		return models.Account{}, err
+	}
+
+	return customersRes.Account, nil
+}
+
+// Returns the appropriate quote streamer endpoint, level and identification token.
 // for the current customer to receive market data.
 func (c *Client) GetQuoteStreamerTokens() (models.QuoteStreamerTokenAuthResult, *Error) {
 	if c.Session.SessionToken == nil {

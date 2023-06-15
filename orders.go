@@ -9,7 +9,7 @@ import (
 )
 
 // Reconfirm an order
-// ** This is currently untested
+// ** This is currently untested.
 func (c *Client) ReconfirmOrder(accountNumber string, id int) (models.Order, *Error) {
 	if c.Session.SessionToken == nil {
 		return models.Order{}, &Error{Message: "Session is invalid: Session Token cannot be nil."}
@@ -86,7 +86,7 @@ func (c *Client) SubmitOrder(accountNumber string, order models.NewOrder) (model
 	return ordersRes.OrderResponse, ordersRes.OrderError, nil
 }
 
-// Returns a list of live orders for the resource
+// Returns a list of live orders for the resource.
 func (c *Client) GetAccountLiveOrders(accountNumber string) ([]models.Order, *Error) {
 	if c.Session.SessionToken == nil {
 		return []models.Order{}, &Error{Message: "Session is invalid: Session Token cannot be nil."}
@@ -142,7 +142,7 @@ func (c *Client) GetAccountOrders(accountNumber string, query queries.Orders) ([
 	return ordersRes.Data.Orders, nil
 }
 
-// Runs through preflights for cancel-replace and edit without routing
+// Runs through preflights for cancel-replace and edit without routing.
 func (c *Client) SubmitOrderECRDryRun(accountNumber string, id int, orderECR models.NewOrderECR) (models.OrderResponse, *Error) {
 	if c.Session.SessionToken == nil {
 		return models.OrderResponse{}, &Error{Message: "Session is invalid: Session Token cannot be nil."}
@@ -167,7 +167,7 @@ func (c *Client) SubmitOrderECRDryRun(accountNumber string, id int, orderECR mod
 	return ordersRes.OrderResponse, nil
 }
 
-// Returns a single order based on the id
+// Returns a single order based on the id.
 func (c *Client) GetOrder(accountNumber string, id int) (models.Order, *Error) {
 	if c.Session.SessionToken == nil {
 		return models.Order{}, &Error{Message: "Session is invalid: Session Token cannot be nil."}
@@ -192,7 +192,7 @@ func (c *Client) GetOrder(accountNumber string, id int) (models.Order, *Error) {
 	return ordersRes.Order, nil
 }
 
-// Returns a single order based on the id
+// Requests order cancellation.
 func (c *Client) CancelOrder(accountNumber string, id int) (models.Order, *Error) {
 	if c.Session.SessionToken == nil {
 		return models.Order{}, &Error{Message: "Session is invalid: Session Token cannot be nil."}
@@ -269,7 +269,7 @@ func (c *Client) PatchOrder(accountNumber string, id int, orderECR models.NewOrd
 	return ordersRes.Order, nil
 }
 
-// Returns a list of live orders for the resource
+// Returns a list of live orders for the resource.
 func (c *Client) GetCustomerLiveOrders(customerID string) ([]models.Order, *Error) {
 	if c.Session.SessionToken == nil {
 		return []models.Order{}, &Error{Message: "Session is invalid: Session Token cannot be nil."}

@@ -2,7 +2,7 @@ package models
 
 // NetLiqOHLC Represents the open, high, low, close values for a time interval.
 // The close value is the value at time. Also includes pending cash values and
-// a sum of the two for convenience
+// a sum of the two for convenience.
 type NetLiqOHLC struct {
 	Open             StringToFloat32 `json:"open"`
 	High             StringToFloat32 `json:"high"`

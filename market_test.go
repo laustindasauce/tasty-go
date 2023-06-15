@@ -1,4 +1,4 @@
-package tasty
+package tasty //nolint:testpackage // testing private field
 
 import (
 	"fmt"
@@ -32,16 +32,16 @@ func TestGetMarketMetrics(t *testing.T) {
 	require.Equal(t, models.StringToFloat32(0.02231313), aapl.ImpliedVolatilityIndexRank)
 	require.Equal(t, models.StringToFloat32(0.02231313), aapl.TosImpliedVolatilityIndexRank)
 	require.Equal(t, models.StringToFloat32(0.037374278), aapl.TwImpliedVolatilityIndexRank)
-	require.Equal(t, time.Time(time.Date(2023, time.June, 7, 19, 55, 22, 151000000, time.UTC)), aapl.TosImpliedVolatilityIndexRankUpdatedAt)
+	require.Equal(t, time.Date(2023, time.June, 7, 19, 55, 22, 151000000, time.UTC), aapl.TosImpliedVolatilityIndexRankUpdatedAt)
 	require.Equal(t, "tos", aapl.ImpliedVolatilityIndexRankSource)
 	require.Equal(t, models.StringToFloat32(0.031249801), aapl.ImpliedVolatilityPercentile)
-	require.Equal(t, time.Time(time.Date(2023, time.June, 7, 19, 55, 22, 110000000, time.UTC)), aapl.ImpliedVolatilityUpdatedAt)
+	require.Equal(t, time.Date(2023, time.June, 7, 19, 55, 22, 110000000, time.UTC), aapl.ImpliedVolatilityUpdatedAt)
 	require.Equal(t, models.StringToFloat32(899091.420242437), aapl.LiquidityValue)
 	require.Equal(t, models.StringToFloat32(1.516319123), aapl.LiquidityRank)
 	require.Equal(t, 4, aapl.LiquidityRating)
-	require.Equal(t, time.Time(time.Date(2023, time.June, 7, 19, 55, 23, 376000000, time.UTC)), aapl.UpdatedAt)
+	require.Equal(t, time.Date(2023, time.June, 7, 19, 55, 23, 376000000, time.UTC), aapl.UpdatedAt)
 	require.Equal(t, models.StringToFloat32(1.265634436), aapl.Beta)
-	require.Equal(t, time.Time(time.Date(2023, time.June, 4, 17, 0, 35, 805000000, time.UTC)), aapl.BetaUpdatedAt)
+	require.Equal(t, time.Date(2023, time.June, 4, 17, 0, 35, 805000000, time.UTC), aapl.BetaUpdatedAt)
 	require.Equal(t, models.StringToFloat32(0.79), aapl.CorrSpy3month)
 	require.Equal(t, models.StringToFloat32(0.24), aapl.DividendRatePerShare)
 	require.Equal(t, models.StringToFloat32(0.0), aapl.AnnualDividendPerShare)
@@ -49,7 +49,7 @@ func TestGetMarketMetrics(t *testing.T) {
 	require.Equal(t, "2023-05-12", aapl.DividendExDate)
 	require.Equal(t, "2022-08-05", aapl.DividendNextDate)
 	require.Equal(t, "2023-05-18", aapl.DividendPayDate)
-	require.Equal(t, time.Time(time.Date(2023, time.May, 8, 0, 16, 36, 676000000, time.UTC)), aapl.DividendUpdatedAt)
+	require.Equal(t, time.Date(2023, time.May, 8, 0, 16, 36, 676000000, time.UTC), aapl.DividendUpdatedAt)
 	require.Equal(t, "XNAS", aapl.ListedMarket)
 	require.Equal(t, "Easy To Borrow", aapl.Lendability)
 	require.Equal(t, models.StringToFloat32(0.0), aapl.BorrowRate)
@@ -76,8 +76,8 @@ func TestGetMarketMetrics(t *testing.T) {
 
 	require.Equal(t, models.StringToFloat32(38347762.009590656), liquidityRunningState.Sum)
 	require.Equal(t, 48, liquidityRunningState.Count)
-	require.Equal(t, time.Time(time.Date(2023, time.June, 3, 10, 0, 10, 347000000, time.UTC)), liquidityRunningState.StartedAt)
-	require.Equal(t, time.Time(time.Date(2023, time.June, 7, 19, 55, 22, 110000000, time.UTC)), liquidityRunningState.UpdatedAt)
+	require.Equal(t, time.Date(2023, time.June, 3, 10, 0, 10, 347000000, time.UTC), liquidityRunningState.StartedAt)
+	require.Equal(t, time.Date(2023, time.June, 7, 19, 55, 22, 110000000, time.UTC), liquidityRunningState.UpdatedAt)
 
 	// Earnings
 	earnings := aapl.Earnings

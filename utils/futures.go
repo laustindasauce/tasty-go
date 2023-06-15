@@ -19,6 +19,7 @@ type FutureSymbology struct {
 	YearDigit   int
 }
 
+// Builds the future symbol into correct symbology.
 func (fcc FutureSymbology) Build() string {
 	return fmt.Sprintf("/%s%s%d", fcc.ProductCode, fcc.MonthCode, fcc.YearDigit)
 }
@@ -36,6 +37,7 @@ type FutureOptionsSymbology struct {
 	Expiration         time.Time
 }
 
+// Builds the future option into correct symbology.
 func (foSym FutureOptionsSymbology) Build() string {
 	codes := fmt.Sprintf(".%s %s", foSym.FutureContractCode, foSym.OptionContractCode)
 	expiryString := foSym.Expiration.Format("060102")

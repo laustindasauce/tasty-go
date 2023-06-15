@@ -1,4 +1,4 @@
-package tasty
+package tasty //nolint:testpackage // testing private field
 
 import (
 	"fmt"
@@ -261,6 +261,67 @@ func TestGetCustomerAccounts(t *testing.T) {
 	require.Equal(t, "2022-10-27T20:49:52.793Z", roth.CreatedAt.Format(time.RFC3339Nano))
 }
 
+func TestGetCustomerAccount(t *testing.T) {
+	setup()
+	defer teardown()
+
+	customerID := "me"
+	accountNumber := "5WV48989"
+
+	mux.HandleFunc(fmt.Sprintf("/customers/%s/accounts/%s", customerID, accountNumber), func(writer http.ResponseWriter, request *http.Request) {
+		fmt.Fprint(writer, getCustomerAccountResp)
+	})
+
+	resp, err := client.GetCustomerAccount(customerID, accountNumber)
+	require.Nil(t, err)
+
+	require.Equal(t, "5WV48989", resp.AccountNumber)
+	require.Equal(t, "2023-06-13T23:00:29.903Z", resp.OpenedAt.Format(time.RFC3339Nano))
+	require.Equal(t, "Individual", resp.Nickname)
+	require.Equal(t, "Individual", resp.AccountTypeName)
+	require.False(t, resp.DayTraderStatus)
+	require.False(t, resp.IsClosed)
+	require.False(t, resp.IsFirmError)
+	require.False(t, resp.IsFirmProprietary)
+	require.False(t, resp.IsFuturesApproved)
+	require.False(t, resp.IsTestDrive)
+	require.Equal(t, "Margin", resp.MarginOrCash)
+	require.False(t, resp.IsForeign)
+	require.Equal(t, "SPECULATION", resp.InvestmentObjective)
+	require.Equal(t, "No Restrictions", resp.SuitableOptionsLevel)
+	require.Equal(t, "2023-06-13T23:00:29.903Z", resp.CreatedAt.Format(time.RFC3339Nano))
+}
+
+func TestGetMyAccount(t *testing.T) {
+	setup()
+	defer teardown()
+
+	accountNumber := "5WV48989"
+
+	mux.HandleFunc(fmt.Sprintf("/customers/me/accounts/%s", accountNumber), func(writer http.ResponseWriter, request *http.Request) {
+		fmt.Fprint(writer, getCustomerAccountResp)
+	})
+
+	resp, err := client.GetMyAccount(accountNumber)
+	require.Nil(t, err)
+
+	require.Equal(t, "5WV48989", resp.AccountNumber)
+	require.Equal(t, "2023-06-13T23:00:29.903Z", resp.OpenedAt.Format(time.RFC3339Nano))
+	require.Equal(t, "Individual", resp.Nickname)
+	require.Equal(t, "Individual", resp.AccountTypeName)
+	require.False(t, resp.DayTraderStatus)
+	require.False(t, resp.IsClosed)
+	require.False(t, resp.IsFirmError)
+	require.False(t, resp.IsFirmProprietary)
+	require.False(t, resp.IsFuturesApproved)
+	require.False(t, resp.IsTestDrive)
+	require.Equal(t, "Margin", resp.MarginOrCash)
+	require.False(t, resp.IsForeign)
+	require.Equal(t, "SPECULATION", resp.InvestmentObjective)
+	require.Equal(t, "No Restrictions", resp.SuitableOptionsLevel)
+	require.Equal(t, "2023-06-13T23:00:29.903Z", resp.CreatedAt.Format(time.RFC3339Nano))
+}
+
 func TestGetQuoteStreamerTokens(t *testing.T) {
 	setup()
 	defer teardown()
@@ -272,9 +333,9 @@ func TestGetQuoteStreamerTokens(t *testing.T) {
 	resp, err := client.GetQuoteStreamerTokens()
 	require.Nil(t, err)
 
-	require.Equal(t, "dGFzdHksbGl2ZSwsMTY4Njk0OTEzNiwxNjg2ODYyNzM2LFUwMDAxMjM2NTgw.vQk_LGOd3diXA46JV0vubmtnOTTLn6XLSUhpqelYfNU", resp.Token)
-	require.Equal(t, "tasty-live.dxfeed.com:7301", resp.StreamerUrl)
-	require.Equal(t, "https://tasty-live-web.dxfeed.com/live", resp.WebsocketUrl)
+	require.Equal(t, "example-token-here", resp.Token)
+	require.Equal(t, "tasty-live.dxfeed.com:7301", resp.StreamerURL)
+	require.Equal(t, "https://tasty-live-web.dxfeed.com/live", resp.WebsocketURL)
 	require.Equal(t, "live", resp.Level)
 }
 
@@ -423,10 +484,31 @@ const getCustomerResp = `{
 
 const quoteStreamerTokensResp = `{
   "data": {
-    "token": "dGFzdHksbGl2ZSwsMTY4Njk0OTEzNiwxNjg2ODYyNzM2LFUwMDAxMjM2NTgw.vQk_LGOd3diXA46JV0vubmtnOTTLn6XLSUhpqelYfNU",
+    "token": "example-token-here",
     "streamer-url": "tasty-live.dxfeed.com:7301",
     "websocket-url": "https://tasty-live-web.dxfeed.com/live",
     "level": "live"
   },
   "context": "/quote-streamer-tokens"
+}`
+
+const getCustomerAccountResp = `{
+  "data": {
+    "account-number": "5WV48989",
+    "opened-at": "2023-06-13T23:00:29.903+00:00",
+    "nickname": "Individual",
+    "account-type-name": "Individual",
+    "day-trader-status": false,
+    "is-closed": false,
+    "is-firm-error": false,
+    "is-firm-proprietary": false,
+    "is-futures-approved": false,
+    "is-test-drive": false,
+    "margin-or-cash": "Margin",
+    "is-foreign": false,
+    "investment-objective": "SPECULATION",
+    "suitable-options-level": "No Restrictions",
+    "created-at": "2023-06-13T23:00:29.903+00:00"
+  },
+  "context": "/customers/me/accounts/5WV48989"
 }`

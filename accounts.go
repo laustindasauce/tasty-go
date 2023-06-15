@@ -9,6 +9,7 @@ import (
 	"github.com/austinbspencer/tasty-go/queries"
 )
 
+// Get the accounts for the authenticated client.
 func (c *Client) GetMyAccounts() ([]models.Account, *Error) {
 	if c.Session.SessionToken == nil {
 		return []models.Account{}, &Error{Message: "Session is invalid: Session Token cannot be nil."}
@@ -42,6 +43,7 @@ func (c *Client) GetMyAccounts() ([]models.Account, *Error) {
 	return accounts, nil
 }
 
+// Returns current trading status for an account.
 func (c *Client) GetAccountTradingStatus(accountNumber string) (models.AccountTradingStatus, *Error) {
 	if c.Session.SessionToken == nil {
 		return models.AccountTradingStatus{}, &Error{Message: "Session is invalid: Session Token cannot be nil."}
@@ -64,6 +66,7 @@ func (c *Client) GetAccountTradingStatus(accountNumber string) (models.AccountTr
 	return accountsRes.AccountTradingStatus, nil
 }
 
+// Returns the current balance values for an account.
 func (c *Client) GetAccountBalances(accountNumber string) (models.AccountBalance, *Error) {
 	if c.Session.SessionToken == nil {
 		return models.AccountBalance{}, &Error{Message: "Session is invalid: Session Token cannot be nil."}
@@ -86,6 +89,8 @@ func (c *Client) GetAccountBalances(accountNumber string) (models.AccountBalance
 	return accountsRes.AccountBalance, nil
 }
 
+// Returns a list of the account's positions.
+// Can be filtered by symbol, underlying_symbol.
 func (c *Client) GetAccountPositions(accountNumber string, query queries.AccountPosition) ([]models.AccountPosition, *Error) {
 	if c.Session.SessionToken == nil {
 		return []models.AccountPosition{}, &Error{Message: "Session is invalid: Session Token cannot be nil."}
@@ -111,6 +116,7 @@ func (c *Client) GetAccountPositions(accountNumber string, query queries.Account
 	return accountsRes.Data.AccountPositions, nil
 }
 
+// Returns most recent snapshot and current balance for an account.
 func (c *Client) GetAccountBalanceSnapshots(accountNumber string, query queries.AccountBalanceSnapshots) ([]models.AccountBalanceSnapshots, *Error) {
 	if c.Session.SessionToken == nil {
 		return []models.AccountBalanceSnapshots{}, &Error{Message: "Session is invalid: Session Token cannot be nil."}
@@ -142,6 +148,7 @@ func (c *Client) GetAccountBalanceSnapshots(accountNumber string, query queries.
 	return accountsRes.Data.AccountBalanceSnapshots, nil
 }
 
+// Returns a list of account net liquidating value snapshots.
 func (c *Client) GetAccountNetLiqHistory(accountNumber string, query queries.HistoricLiquidity) ([]models.NetLiqOHLC, *Error) {
 	if c.Session.SessionToken == nil {
 		return []models.NetLiqOHLC{}, &Error{Message: "Session is invalid: Session Token cannot be nil."}
@@ -168,7 +175,7 @@ func (c *Client) GetAccountNetLiqHistory(accountNumber string, query queries.His
 	return accountsRes.Data.HistoricLiquidity, nil
 }
 
-// Get the position limit
+// Get the position limit.
 func (c *Client) GetAccountPositionLimit(accountNumber string) (models.PositionLimit, *Error) {
 	if c.Session.SessionToken == nil {
 		return models.PositionLimit{}, &Error{Message: "Session is invalid: Session Token cannot be nil."}

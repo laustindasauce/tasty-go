@@ -174,7 +174,7 @@ type EntityOfficer struct {
 
 type QuoteStreamerTokenAuthResult struct {
 	Token        string `json:"token"`
-	StreamerUrl  string `json:"streamer-url"`
-	WebsocketUrl string `json:"websocket-url"`
+	StreamerURL  string `json:"streamer-url"`
+	WebsocketURL string `json:"websocket-url"`
 	Level        string `json:"level"`
 }

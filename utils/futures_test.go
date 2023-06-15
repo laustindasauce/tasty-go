@@ -1,17 +1,18 @@
-package utils
+package utils_test
 
 import (
 	"testing"
 	"time"
 
 	"github.com/austinbspencer/tasty-go/constants"
+	"github.com/austinbspencer/tasty-go/utils"
 	"github.com/stretchr/testify/require"
 )
 
 func TestFutureSymbology(t *testing.T) {
-	future := FutureSymbology{ProductCode: "ES", MonthCode: constants.December, YearDigit: 9}
+	future := utils.FutureSymbology{ProductCode: "ES", MonthCode: constants.December, YearDigit: 9}
 
-	fcc := FutureOptionsSymbology{
+	fcc := utils.FutureOptionsSymbology{
 		OptionContractCode: "EW4U9",
 		FutureContractCode: future.Build(),
 		OptionType:         constants.Put,

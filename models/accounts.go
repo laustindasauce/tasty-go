@@ -205,7 +205,7 @@ type AccountBalanceSnapshots struct {
 	UpdatedAt                          time.Time       `json:"updated-at"`
 }
 
-// PositionLimit model
+// PositionLimit model.
 type PositionLimit struct {
 	ID                          int    `json:"id"`
 	AccountNumber               string `json:"account-number"`
