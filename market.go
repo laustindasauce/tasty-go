@@ -9,6 +9,7 @@ import (
 	"github.com/austinbspencer/tasty-go/models"
 )
 
+// Returns an array of volatility data for given symbols.
 func (c *Client) GetMarketMetrics(symbols []string) ([]models.MarketMetricVolatility, *Error) {
 	if c.Session.SessionToken == nil {
 		return []models.MarketMetricVolatility{}, &Error{Message: "Session is invalid: Session Token cannot be nil."}
@@ -42,6 +43,7 @@ func (c *Client) GetMarketMetrics(symbols []string) ([]models.MarketMetricVolati
 	return marketMetricsRes.Data.MarketMetrics, nil
 }
 
+// Get historical dividend data.
 func (c *Client) GetHistoricDividends(symbol string) ([]models.DividendInfo, *Error) {
 	if c.Session.SessionToken == nil {
 		return []models.DividendInfo{}, &Error{Message: "Session is invalid: Session Token cannot be nil."}
@@ -69,6 +71,7 @@ func (c *Client) GetHistoricDividends(symbol string) ([]models.DividendInfo, *Er
 	return marketMetricsRes.Data.HistoricDividends, nil
 }
 
+// Get historical earnings data.
 func (c *Client) GetHistoricEarnings(symbol string, startDate time.Time) ([]models.EarningsInfo, *Error) {
 	if c.Session.SessionToken == nil {
 		return []models.EarningsInfo{}, &Error{Message: "Session is invalid: Session Token cannot be nil."}
