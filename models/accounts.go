@@ -219,3 +219,17 @@ type PositionLimit struct {
 	FuturePositionSize          int    `json:"future-position-size"`
 	FutureOptionPositionSize    int    `json:"future-option-position-size"`
 }
+
+type AccountAuthorityDecorator struct {
+	Account        Account `json:"account"`
+	AuthorityLevel string  `json:"authority-level"`
+}
+
+type AccountType struct {
+	Name                string       `json:"name"`
+	Description         string       `json:"description"`
+	IsTaxAdvantaged     bool         `json:"is-tax-advantaged"`
+	HasMultipleOwners   bool         `json:"has-multiple-owners"`
+	IsPubliclyAvailable bool         `json:"is-publicly-available"`
+	MarginTypes         []MarginType `json:"margin-types"`
+}

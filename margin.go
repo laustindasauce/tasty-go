@@ -35,7 +35,8 @@ func (c *Client) GetMarginRequirements(accountNumber string) (models.MarginRequi
 // Estimate margin requirements for an order given an account
 // This is not functional at the moment
 // Need more understanding on the expected payload
-func (c *Client) marginRequirementsDryRun(accountNumber string, order models.NewOrder) (any, *Error) {
+// https://developer.tastytrade.com/open-api-spec/margin-requirements
+func (c *Client) MarginRequirementsDryRun(accountNumber string, order models.NewOrder) (any, *Error) {
 	if c.Session.SessionToken == nil {
 		return nil, &Error{Message: "Session is invalid: Session Token cannot be nil."}
 	}

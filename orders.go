@@ -9,6 +9,7 @@ import (
 )
 
 // Reconfirm an order
+// ** This is currently untested
 func (c *Client) ReconfirmOrder(accountNumber string, id int) (models.Order, *Error) {
 	if c.Session.SessionToken == nil {
 		return models.Order{}, &Error{Message: "Session is invalid: Session Token cannot be nil."}

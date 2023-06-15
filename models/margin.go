@@ -88,3 +88,8 @@ type EffectiveMarginRequirements struct {
 	ClearingIDentifier     string          `json:"clearing-identifier"`
 	IsDeleted              bool            `json:"is-deleted"`
 }
+
+type MarginType struct {
+	Name     string `json:"name"`
+	IsMargin bool   `json:"is-margin"`
+}
