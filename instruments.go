@@ -4,24 +4,19 @@ import (
 	"fmt"
 	"net/http"
 	"net/url"
-
-	"github.com/austinbspencer/tasty-go/constants"
-	"github.com/austinbspencer/tasty-go/models"
-	"github.com/austinbspencer/tasty-go/queries"
-	"github.com/austinbspencer/tasty-go/utils"
 )
 
 // Retrieve a set of cryptocurrencies given an array of one or more symbols.
-func (c *Client) GetCryptocurrencies(symbols []string) ([]models.Cryptocurrency, *Error) {
+func (c *Client) GetCryptocurrencies(symbols []string) ([]CryptocurrencyInfo, *Error) {
 	if c.Session.SessionToken == nil {
-		return []models.Cryptocurrency{}, &Error{Message: "Session is invalid: Session Token cannot be nil."}
+		return []CryptocurrencyInfo{}, &Error{Message: "Session is invalid: Session Token cannot be nil."}
 	}
 
 	path := "/instruments/cryptocurrencies"
 
 	type instrumentResponse struct {
 		Data struct {
-			Cryptocurrencies []models.Cryptocurrency `json:"items"`
+			Cryptocurrencies []CryptocurrencyInfo `json:"items"`
 		} `json:"data"`
 	}
 
@@ -39,24 +34,24 @@ func (c *Client) GetCryptocurrencies(symbols []string) ([]models.Cryptocurrency,
 
 	err := c.request(http.MethodGet, path, header, query, nil, instrumentRes)
 	if err != nil {
-		return []models.Cryptocurrency{}, err
+		return []CryptocurrencyInfo{}, err
 	}
 
 	return instrumentRes.Data.Cryptocurrencies, nil
 }
 
 // Retrieve a cryptocurrency given a symbol.
-func (c *Client) GetCryptocurrency(symbol constants.Cryptocurrency) (models.Cryptocurrency, *Error) {
+func (c *Client) GetCryptocurrency(symbol Cryptocurrency) (CryptocurrencyInfo, *Error) {
 	if c.Session.SessionToken == nil {
-		return models.Cryptocurrency{}, &Error{Message: "Session is invalid: Session Token cannot be nil."}
+		return CryptocurrencyInfo{}, &Error{Message: "Session is invalid: Session Token cannot be nil."}
 	}
 
-	symbol += constants.Cryptocurrency(url.PathEscape("/USD"))
+	symbol += Cryptocurrency(url.PathEscape("/USD"))
 
 	path := fmt.Sprintf("/instruments/cryptocurrencies/%s", symbol)
 
 	type instrumentResponse struct {
-		Crypto models.Cryptocurrency `json:"data"`
+		Crypto CryptocurrencyInfo `json:"data"`
 	}
 
 	instrumentRes := new(instrumentResponse)
@@ -66,25 +61,25 @@ func (c *Client) GetCryptocurrency(symbol constants.Cryptocurrency) (models.Cryp
 
 	err := c.customRequest(http.MethodGet, path, header, nil, nil, instrumentRes)
 	if err != nil {
-		return models.Cryptocurrency{}, err
+		return CryptocurrencyInfo{}, err
 	}
 
 	return instrumentRes.Crypto, nil
 }
 
 // Returns all active equities in a paginated fashion.
-func (c *Client) GetActiveEquities(query queries.ActiveEquities) ([]models.Equity, models.Pagination, *Error) {
+func (c *Client) GetActiveEquities(query ActiveEquitiesQuery) ([]Equity, Pagination, *Error) {
 	if c.Session.SessionToken == nil {
-		return []models.Equity{}, models.Pagination{}, &Error{Message: "Session is invalid: Session Token cannot be nil."}
+		return []Equity{}, Pagination{}, &Error{Message: "Session is invalid: Session Token cannot be nil."}
 	}
 
 	path := "/instruments/equities/active"
 
 	type instrumentResponse struct {
 		Data struct {
-			ActiveEquities []models.Equity `json:"items"`
+			ActiveEquities []Equity `json:"items"`
 		} `json:"data"`
-		Pagination models.Pagination `json:"pagination"`
+		Pagination Pagination `json:"pagination"`
 	}
 
 	instrumentRes := new(instrumentResponse)
@@ -94,23 +89,23 @@ func (c *Client) GetActiveEquities(query queries.ActiveEquities) ([]models.Equit
 
 	err := c.request(http.MethodGet, path, header, query, nil, instrumentRes)
 	if err != nil {
-		return []models.Equity{}, models.Pagination{}, err
+		return []Equity{}, Pagination{}, err
 	}
 
 	return instrumentRes.Data.ActiveEquities, instrumentRes.Pagination, nil
 }
 
 // Returns a set of equity definitions given an array of one or more symbols.
-func (c *Client) GetEquities(query queries.Equities) ([]models.Equity, *Error) {
+func (c *Client) GetEquities(query EquitiesQuery) ([]Equity, *Error) {
 	if c.Session.SessionToken == nil {
-		return []models.Equity{}, &Error{Message: "Session is invalid: Session Token cannot be nil."}
+		return []Equity{}, &Error{Message: "Session is invalid: Session Token cannot be nil."}
 	}
 
 	path := "/instruments/equities"
 
 	type instrumentResponse struct {
 		Data struct {
-			Equities []models.Equity `json:"items"`
+			Equities []Equity `json:"items"`
 		} `json:"data"`
 	}
 
@@ -121,23 +116,23 @@ func (c *Client) GetEquities(query queries.Equities) ([]models.Equity, *Error) {
 
 	err := c.request(http.MethodGet, path, header, query, nil, instrumentRes)
 	if err != nil {
-		return []models.Equity{}, err
+		return []Equity{}, err
 	}
 
 	return instrumentRes.Data.Equities, nil
 }
 
 // Returns a single equity definition for the provided symbol.
-func (c *Client) GetEquity(symbol string) (models.Equity, *Error) {
+func (c *Client) GetEquity(symbol string) (Equity, *Error) {
 	if c.Session.SessionToken == nil {
-		return models.Equity{}, &Error{Message: "Session is invalid: Session Token cannot be nil."}
+		return Equity{}, &Error{Message: "Session is invalid: Session Token cannot be nil."}
 	}
 
 	// url escape required for instances where "/" exists in symbol i.e. BRK/B
 	path := fmt.Sprintf("/instruments/equities/%s", url.PathEscape(symbol))
 
 	type instrumentResponse struct {
-		Equity models.Equity `json:"data"`
+		Equity Equity `json:"data"`
 	}
 
 	instrumentRes := new(instrumentResponse)
@@ -148,23 +143,23 @@ func (c *Client) GetEquity(symbol string) (models.Equity, *Error) {
 	// customRequest required for instances where "/" exists in symbol i.e. BRK/B
 	err := c.customRequest(http.MethodGet, path, header, nil, nil, instrumentRes)
 	if err != nil {
-		return models.Equity{}, err
+		return Equity{}, err
 	}
 
 	return instrumentRes.Equity, nil
 }
 
 // Returns a set of equity options given one or more symbols.
-func (c *Client) GetEquityOptions(query queries.EquityOptions) ([]models.EquityOption, *Error) {
+func (c *Client) GetEquityOptions(query EquityOptionsQuery) ([]EquityOption, *Error) {
 	if c.Session.SessionToken == nil {
-		return []models.EquityOption{}, &Error{Message: "Session is invalid: Session Token cannot be nil."}
+		return []EquityOption{}, &Error{Message: "Session is invalid: Session Token cannot be nil."}
 	}
 
 	path := "/instruments/equity-options"
 
 	type instrumentResponse struct {
 		Data struct {
-			EquityOptions []models.EquityOption `json:"items"`
+			EquityOptions []EquityOption `json:"items"`
 		} `json:"data"`
 	}
 
@@ -175,16 +170,16 @@ func (c *Client) GetEquityOptions(query queries.EquityOptions) ([]models.EquityO
 
 	err := c.request(http.MethodGet, path, header, query, nil, instrumentRes)
 	if err != nil {
-		return []models.EquityOption{}, err
+		return []EquityOption{}, err
 	}
 
 	return instrumentRes.Data.EquityOptions, nil
 }
 
 // Returns a set of equity options given one or more symbols.
-func (c *Client) GetEquityOption(sym utils.EquityOptionsSymbology, active bool) (models.EquityOption, *Error) {
+func (c *Client) GetEquityOption(sym EquityOptionsSymbology, active bool) (EquityOption, *Error) {
 	if c.Session.SessionToken == nil {
-		return models.EquityOption{}, &Error{Message: "Session is invalid: Session Token cannot be nil."}
+		return EquityOption{}, &Error{Message: "Session is invalid: Session Token cannot be nil."}
 	}
 
 	occSymbol := sym.Build()
@@ -192,7 +187,7 @@ func (c *Client) GetEquityOption(sym utils.EquityOptionsSymbology, active bool) 
 	path := fmt.Sprintf("/instruments/equity-options/%s", occSymbol)
 
 	type instrumentResponse struct {
-		EquityOption models.EquityOption `json:"data"`
+		EquityOption EquityOption `json:"data"`
 	}
 
 	type activeQuery struct {
@@ -209,23 +204,23 @@ func (c *Client) GetEquityOption(sym utils.EquityOptionsSymbology, active bool) 
 
 	err := c.request(http.MethodGet, path, header, query, nil, instrumentRes)
 	if err != nil {
-		return models.EquityOption{}, err
+		return EquityOption{}, err
 	}
 
 	return instrumentRes.EquityOption, nil
 }
 
 // Returns a set of outright futures given an array of one or more symbols.
-func (c *Client) GetFutures(query queries.Futures) ([]models.Future, *Error) {
+func (c *Client) GetFutures(query FuturesQuery) ([]Future, *Error) {
 	if c.Session.SessionToken == nil {
-		return []models.Future{}, &Error{Message: "Session is invalid: Session Token cannot be nil."}
+		return []Future{}, &Error{Message: "Session is invalid: Session Token cannot be nil."}
 	}
 
 	path := "/instruments/futures"
 
 	type instrumentResponse struct {
 		Data struct {
-			Futures []models.Future `json:"items"`
+			Futures []Future `json:"items"`
 		} `json:"data"`
 	}
 
@@ -236,22 +231,22 @@ func (c *Client) GetFutures(query queries.Futures) ([]models.Future, *Error) {
 
 	err := c.request(http.MethodGet, path, header, query, nil, instrumentRes)
 	if err != nil {
-		return []models.Future{}, err
+		return []Future{}, err
 	}
 
 	return instrumentRes.Data.Futures, nil
 }
 
 // Returns an outright future given a symbol.
-func (c *Client) GetFuture(symbol string) (models.Future, *Error) {
+func (c *Client) GetFuture(symbol string) (Future, *Error) {
 	if c.Session.SessionToken == nil {
-		return models.Future{}, &Error{Message: "Session is invalid: Session Token cannot be nil."}
+		return Future{}, &Error{Message: "Session is invalid: Session Token cannot be nil."}
 	}
 
 	path := fmt.Sprintf("/instruments/futures/%s", symbol)
 
 	type instrumentResponse struct {
-		Future models.Future `json:"data"`
+		Future Future `json:"data"`
 	}
 
 	instrumentRes := new(instrumentResponse)
@@ -261,23 +256,23 @@ func (c *Client) GetFuture(symbol string) (models.Future, *Error) {
 
 	err := c.request(http.MethodGet, path, header, nil, nil, instrumentRes)
 	if err != nil {
-		return models.Future{}, err
+		return Future{}, err
 	}
 
 	return instrumentRes.Future, nil
 }
 
 // Returns metadata for all supported future option products.
-func (c *Client) GetFutureOptionProducts() ([]models.FutureOptionProduct, *Error) {
+func (c *Client) GetFutureOptionProducts() ([]FutureOptionProduct, *Error) {
 	if c.Session.SessionToken == nil {
-		return []models.FutureOptionProduct{}, &Error{Message: "Session is invalid: Session Token cannot be nil."}
+		return []FutureOptionProduct{}, &Error{Message: "Session is invalid: Session Token cannot be nil."}
 	}
 
 	path := "/instruments/future-option-products"
 
 	type instrumentResponse struct {
 		Data struct {
-			FutureOptionProducts []models.FutureOptionProduct `json:"items"`
+			FutureOptionProducts []FutureOptionProduct `json:"items"`
 		} `json:"data"`
 	}
 
@@ -288,22 +283,22 @@ func (c *Client) GetFutureOptionProducts() ([]models.FutureOptionProduct, *Error
 
 	err := c.request(http.MethodGet, path, header, nil, nil, instrumentRes)
 	if err != nil {
-		return []models.FutureOptionProduct{}, err
+		return []FutureOptionProduct{}, err
 	}
 
 	return instrumentRes.Data.FutureOptionProducts, nil
 }
 
 // Get a future option product by exchange and root symbol.
-func (c *Client) GetFutureOptionProduct(exchange, rootSymbol string) (models.FutureOptionProduct, *Error) {
+func (c *Client) GetFutureOptionProduct(exchange, rootSymbol string) (FutureOptionProduct, *Error) {
 	if c.Session.SessionToken == nil {
-		return models.FutureOptionProduct{}, &Error{Message: "Session is invalid: Session Token cannot be nil."}
+		return FutureOptionProduct{}, &Error{Message: "Session is invalid: Session Token cannot be nil."}
 	}
 
 	path := fmt.Sprintf("/instruments/future-option-products/%s/%s", exchange, rootSymbol)
 
 	type instrumentResponse struct {
-		FutureOptionProduct models.FutureOptionProduct `json:"data"`
+		FutureOptionProduct FutureOptionProduct `json:"data"`
 	}
 
 	instrumentRes := new(instrumentResponse)
@@ -313,7 +308,7 @@ func (c *Client) GetFutureOptionProduct(exchange, rootSymbol string) (models.Fut
 
 	err := c.request(http.MethodGet, path, header, nil, nil, instrumentRes)
 	if err != nil {
-		return models.FutureOptionProduct{}, err
+		return FutureOptionProduct{}, err
 	}
 
 	return instrumentRes.FutureOptionProduct, nil
@@ -321,16 +316,16 @@ func (c *Client) GetFutureOptionProduct(exchange, rootSymbol string) (models.Fut
 
 // Returns a set of future option(s) given an array of one or more symbols.
 // Uses TW symbology: [./ESZ9 EW4U9 190927P2975].
-func (c *Client) GetFutureOptions(query queries.FutureOptions) ([]models.FutureOption, *Error) {
+func (c *Client) GetFutureOptions(query FutureOptionsQuery) ([]FutureOption, *Error) {
 	if c.Session.SessionToken == nil {
-		return []models.FutureOption{}, &Error{Message: "Session is invalid: Session Token cannot be nil."}
+		return []FutureOption{}, &Error{Message: "Session is invalid: Session Token cannot be nil."}
 	}
 
 	path := "/instruments/future-options"
 
 	type instrumentResponse struct {
 		Data struct {
-			FutureOptions []models.FutureOption `json:"items"`
+			FutureOptions []FutureOption `json:"items"`
 		} `json:"data"`
 	}
 
@@ -341,23 +336,23 @@ func (c *Client) GetFutureOptions(query queries.FutureOptions) ([]models.FutureO
 
 	err := c.request(http.MethodGet, path, header, query, nil, instrumentRes)
 	if err != nil {
-		return []models.FutureOption{}, err
+		return []FutureOption{}, err
 	}
 
 	return instrumentRes.Data.FutureOptions, nil
 }
 
 // Returns a future option given a symbol. Uses TW symbology: ./ESZ9 EW4U9 190927P2975.
-func (c *Client) GetFutureOption(symbol string) (models.FutureOption, *Error) {
+func (c *Client) GetFutureOption(symbol string) (FutureOption, *Error) {
 	if c.Session.SessionToken == nil {
-		return models.FutureOption{}, &Error{Message: "Session is invalid: Session Token cannot be nil."}
+		return FutureOption{}, &Error{Message: "Session is invalid: Session Token cannot be nil."}
 	}
 
 	path := fmt.Sprintf("/instruments/future-options/%s", symbol)
 
 	type instrumentResponse struct {
-		FutureOption models.FutureOption `json:"data"`
-		Context      string              `json:"context"`
+		FutureOption FutureOption `json:"data"`
+		Context      string       `json:"context"`
 	}
 
 	instrumentRes := new(instrumentResponse)
@@ -367,23 +362,23 @@ func (c *Client) GetFutureOption(symbol string) (models.FutureOption, *Error) {
 
 	err := c.request(http.MethodGet, path, header, nil, nil, instrumentRes)
 	if err != nil {
-		return models.FutureOption{}, err
+		return FutureOption{}, err
 	}
 
 	return instrumentRes.FutureOption, nil
 }
 
 // Returns metadata for all supported futures products.
-func (c *Client) GetFutureProducts() ([]models.FutureProduct, *Error) {
+func (c *Client) GetFutureProducts() ([]FutureProduct, *Error) {
 	if c.Session.SessionToken == nil {
-		return []models.FutureProduct{}, &Error{Message: "Session is invalid: Session Token cannot be nil."}
+		return []FutureProduct{}, &Error{Message: "Session is invalid: Session Token cannot be nil."}
 	}
 
 	path := "/instruments/future-products"
 
 	type instrumentResponse struct {
 		Data struct {
-			FutureProducts []models.FutureProduct `json:"items"`
+			FutureProducts []FutureProduct `json:"items"`
 		} `json:"data"`
 	}
 
@@ -394,22 +389,22 @@ func (c *Client) GetFutureProducts() ([]models.FutureProduct, *Error) {
 
 	err := c.request(http.MethodGet, path, header, nil, nil, instrumentRes)
 	if err != nil {
-		return []models.FutureProduct{}, err
+		return []FutureProduct{}, err
 	}
 
 	return instrumentRes.Data.FutureProducts, nil
 }
 
 // Get future product from exchange and product code.
-func (c *Client) GetFutureProduct(exchange constants.Exchange, productCode string) (models.FutureProduct, *Error) {
+func (c *Client) GetFutureProduct(exchange Exchange, productCode string) (FutureProduct, *Error) {
 	if c.Session.SessionToken == nil {
-		return models.FutureProduct{}, &Error{Message: "Session is invalid: Session Token cannot be nil."}
+		return FutureProduct{}, &Error{Message: "Session is invalid: Session Token cannot be nil."}
 	}
 
 	path := fmt.Sprintf("/instruments/future-products/%s/%s", exchange, productCode)
 
 	type instrumentResponse struct {
-		FutureProduct models.FutureProduct `json:"data"`
+		FutureProduct FutureProduct `json:"data"`
 	}
 
 	instrumentRes := new(instrumentResponse)
@@ -419,23 +414,23 @@ func (c *Client) GetFutureProduct(exchange constants.Exchange, productCode strin
 
 	err := c.request(http.MethodGet, path, header, nil, nil, instrumentRes)
 	if err != nil {
-		return models.FutureProduct{}, err
+		return FutureProduct{}, err
 	}
 
 	return instrumentRes.FutureProduct, nil
 }
 
 // Retrieve all quantity decimal precisions.
-func (c *Client) GetQuantityDecimalPrecisions() ([]models.QuantityDecimalPrecision, *Error) {
+func (c *Client) GetQuantityDecimalPrecisions() ([]QuantityDecimalPrecision, *Error) {
 	if c.Session.SessionToken == nil {
-		return []models.QuantityDecimalPrecision{}, &Error{Message: "Session is invalid: Session Token cannot be nil."}
+		return []QuantityDecimalPrecision{}, &Error{Message: "Session is invalid: Session Token cannot be nil."}
 	}
 
 	path := "/instruments/quantity-decimal-precisions"
 
 	type instrumentResponse struct {
 		Data struct {
-			QuantityDecimalPrecisions []models.QuantityDecimalPrecision `json:"items"`
+			QuantityDecimalPrecisions []QuantityDecimalPrecision `json:"items"`
 		} `json:"data"`
 	}
 
@@ -446,23 +441,23 @@ func (c *Client) GetQuantityDecimalPrecisions() ([]models.QuantityDecimalPrecisi
 
 	err := c.request(http.MethodGet, path, header, nil, nil, instrumentRes)
 	if err != nil {
-		return []models.QuantityDecimalPrecision{}, err
+		return []QuantityDecimalPrecision{}, err
 	}
 
 	return instrumentRes.Data.QuantityDecimalPrecisions, nil
 }
 
 // Returns a set of warrant definitions that can be filtered by parameters.
-func (c *Client) GetWarrants(symbols []string) ([]models.Warrant, *Error) {
+func (c *Client) GetWarrants(symbols []string) ([]Warrant, *Error) {
 	if c.Session.SessionToken == nil {
-		return []models.Warrant{}, &Error{Message: "Session is invalid: Session Token cannot be nil."}
+		return []Warrant{}, &Error{Message: "Session is invalid: Session Token cannot be nil."}
 	}
 
 	path := "/instruments/warrants"
 
 	type instrumentResponse struct {
 		Data struct {
-			Warrants []models.Warrant `json:"items"`
+			Warrants []Warrant `json:"items"`
 		} `json:"data"`
 	}
 
@@ -480,22 +475,22 @@ func (c *Client) GetWarrants(symbols []string) ([]models.Warrant, *Error) {
 
 	err := c.request(http.MethodGet, path, header, query, nil, instrumentRes)
 	if err != nil {
-		return []models.Warrant{}, err
+		return []Warrant{}, err
 	}
 
 	return instrumentRes.Data.Warrants, nil
 }
 
 // Returns a single warrant definition for the provided symbol.
-func (c *Client) GetWarrant(symbol string) (models.Warrant, *Error) {
+func (c *Client) GetWarrant(symbol string) (Warrant, *Error) {
 	if c.Session.SessionToken == nil {
-		return models.Warrant{}, &Error{Message: "Session is invalid: Session Token cannot be nil."}
+		return Warrant{}, &Error{Message: "Session is invalid: Session Token cannot be nil."}
 	}
 
 	path := fmt.Sprintf("/instruments/warrants/%s", symbol)
 
 	type instrumentResponse struct {
-		Warrant models.Warrant `json:"data"`
+		Warrant Warrant `json:"data"`
 	}
 
 	instrumentRes := new(instrumentResponse)
@@ -505,7 +500,7 @@ func (c *Client) GetWarrant(symbol string) (models.Warrant, *Error) {
 
 	err := c.request(http.MethodGet, path, header, nil, nil, instrumentRes)
 	if err != nil {
-		return models.Warrant{}, err
+		return Warrant{}, err
 	}
 
 	return instrumentRes.Warrant, nil

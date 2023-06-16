@@ -4,39 +4,20 @@ import (
 	"net/http"
 )
 
-type LoginInfo struct {
-	Login         string `json:"login"`
-	Password      string `json:"password"`
-	TwoFactorCode *string
-	RememberMe    bool
-}
-
-type User struct {
-	Email      string `json:"email"`
-	Username   string `json:"username"`
-	ExternalID string `json:"external-id"`
-}
-
-type Session struct {
-	User          User    `json:"user"`
-	SessionToken  *string `json:"session-token"`
-	RememberToken *string `json:"remember-token"`
-}
-
 type sessionResponse struct {
 	Session Session `json:"data"`
-	Context string  `json:"context"`
 }
 
 // Create a new user session.
-func (c *Client) CreateSession(login LoginInfo) (Session, *Error) {
+func (c *Client) CreateSession(login LoginInfo, twoFactorCode *string) (Session, *Error) {
 	path := "/sessions"
 
 	session := new(sessionResponse)
 
 	header := http.Header{}
-	if login.TwoFactorCode != nil {
-		header.Add("X-Tastyworks-OTP", *login.TwoFactorCode)
+
+	if twoFactorCode != nil {
+		header.Add("X-Tastyworks-OTP", *twoFactorCode)
 	}
 
 	err := c.request(http.MethodPost, path, header, nil, login, session)
@@ -62,11 +43,11 @@ func (c *Client) ValidateSession() (Session, *Error) {
 	header.Add("Authorization", *c.Session.SessionToken)
 
 	err := c.request(http.MethodPost, path, header, nil, nil, session)
-	if err == nil {
-		c.Session = session.Session
-	} else {
+	if err != nil {
 		return Session{}, err
 	}
+
+	c.Session = session.Session
 
 	return session.Session, nil
 }

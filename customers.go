@@ -3,19 +3,17 @@ package tasty
 import (
 	"fmt"
 	"net/http"
-
-	"github.com/austinbspencer/tasty-go/models"
 )
 
 // Get authenticated customer.
-func (c *Client) GetMyCustomerInfo() (models.Customer, *Error) {
+func (c *Client) GetMyCustomerInfo() (Customer, *Error) {
 	if c.Session.SessionToken == nil {
-		return models.Customer{}, &Error{Message: "Session is invalid: Session Token cannot be nil."}
+		return Customer{}, &Error{Message: "Session is invalid: Session Token cannot be nil."}
 	}
 	path := "/customers/me"
 
 	type customerResponse struct {
-		Customer models.Customer `json:"data"`
+		Customer Customer `json:"data"`
 	}
 
 	customersRes := new(customerResponse)
@@ -25,21 +23,21 @@ func (c *Client) GetMyCustomerInfo() (models.Customer, *Error) {
 
 	err := c.request(http.MethodGet, path, header, nil, nil, customersRes)
 	if err != nil {
-		return models.Customer{}, err
+		return Customer{}, err
 	}
 
 	return customersRes.Customer, nil
 }
 
 // Get a full customer resource.
-func (c *Client) GetCustomer(customerID string) (models.Customer, *Error) {
+func (c *Client) GetCustomer(customerID string) (Customer, *Error) {
 	if c.Session.SessionToken == nil {
-		return models.Customer{}, &Error{Message: "Session is invalid: Session Token cannot be nil."}
+		return Customer{}, &Error{Message: "Session is invalid: Session Token cannot be nil."}
 	}
 	path := fmt.Sprintf("/customers/%s", customerID)
 
 	type customerResponse struct {
-		Customer models.Customer `json:"data"`
+		Customer Customer `json:"data"`
 	}
 
 	customersRes := new(customerResponse)
@@ -49,23 +47,23 @@ func (c *Client) GetCustomer(customerID string) (models.Customer, *Error) {
 
 	err := c.request(http.MethodGet, path, header, nil, nil, customersRes)
 	if err != nil {
-		return models.Customer{}, err
+		return Customer{}, err
 	}
 
 	return customersRes.Customer, nil
 }
 
 // Get a list of all the customer account resources attached to the current customer.
-func (c *Client) GetCustomerAccounts(customerID string) ([]models.Account, *Error) {
+func (c *Client) GetCustomerAccounts(customerID string) ([]Account, *Error) {
 	if c.Session.SessionToken == nil {
-		return []models.Account{}, &Error{Message: "Session is invalid: Session Token cannot be nil."}
+		return []Account{}, &Error{Message: "Session is invalid: Session Token cannot be nil."}
 	}
 	path := fmt.Sprintf("/customers/%s/accounts", customerID)
 
 	type customerResponse struct {
 		Data struct {
 			Items []struct {
-				Account models.Account `json:"account"`
+				Account Account `json:"account"`
 			} `json:"items"`
 		} `json:"data"`
 	}
@@ -77,10 +75,10 @@ func (c *Client) GetCustomerAccounts(customerID string) ([]models.Account, *Erro
 
 	err := c.request(http.MethodGet, path, header, nil, nil, customersRes)
 	if err != nil {
-		return []models.Account{}, err
+		return []Account{}, err
 	}
 
-	var accounts []models.Account
+	var accounts []Account
 
 	for _, acct := range customersRes.Data.Items {
 		accounts = append(accounts, acct.Account)
@@ -90,14 +88,14 @@ func (c *Client) GetCustomerAccounts(customerID string) ([]models.Account, *Erro
 }
 
 // Get a full customer account resource.
-func (c *Client) GetCustomerAccount(customerID, accountNumber string) (models.Account, *Error) {
+func (c *Client) GetCustomerAccount(customerID, accountNumber string) (Account, *Error) {
 	if c.Session.SessionToken == nil {
-		return models.Account{}, &Error{Message: "Session is invalid: Session Token cannot be nil."}
+		return Account{}, &Error{Message: "Session is invalid: Session Token cannot be nil."}
 	}
 	path := fmt.Sprintf("/customers/%s/accounts/%s", customerID, accountNumber)
 
 	type customerResponse struct {
-		Account models.Account `json:"data"`
+		Account Account `json:"data"`
 	}
 
 	customersRes := new(customerResponse)
@@ -107,21 +105,21 @@ func (c *Client) GetCustomerAccount(customerID, accountNumber string) (models.Ac
 
 	err := c.request(http.MethodGet, path, header, nil, nil, customersRes)
 	if err != nil {
-		return models.Account{}, err
+		return Account{}, err
 	}
 
 	return customersRes.Account, nil
 }
 
 // Get authenticated user's full account resource.
-func (c *Client) GetMyAccount(accountNumber string) (models.Account, *Error) {
+func (c *Client) GetMyAccount(accountNumber string) (Account, *Error) {
 	if c.Session.SessionToken == nil {
-		return models.Account{}, &Error{Message: "Session is invalid: Session Token cannot be nil."}
+		return Account{}, &Error{Message: "Session is invalid: Session Token cannot be nil."}
 	}
 	path := fmt.Sprintf("/customers/me/accounts/%s", accountNumber)
 
 	type customerResponse struct {
-		Account models.Account `json:"data"`
+		Account Account `json:"data"`
 	}
 
 	customersRes := new(customerResponse)
@@ -131,7 +129,7 @@ func (c *Client) GetMyAccount(accountNumber string) (models.Account, *Error) {
 
 	err := c.request(http.MethodGet, path, header, nil, nil, customersRes)
 	if err != nil {
-		return models.Account{}, err
+		return Account{}, err
 	}
 
 	return customersRes.Account, nil
@@ -139,14 +137,14 @@ func (c *Client) GetMyAccount(accountNumber string) (models.Account, *Error) {
 
 // Returns the appropriate quote streamer endpoint, level and identification token.
 // for the current customer to receive market data.
-func (c *Client) GetQuoteStreamerTokens() (models.QuoteStreamerTokenAuthResult, *Error) {
+func (c *Client) GetQuoteStreamerTokens() (QuoteStreamerTokenAuthResult, *Error) {
 	if c.Session.SessionToken == nil {
-		return models.QuoteStreamerTokenAuthResult{}, &Error{Message: "Session is invalid: Session Token cannot be nil."}
+		return QuoteStreamerTokenAuthResult{}, &Error{Message: "Session is invalid: Session Token cannot be nil."}
 	}
 	path := "/quote-streamer-tokens"
 
 	type customerResponse struct {
-		Streamer models.QuoteStreamerTokenAuthResult `json:"data"`
+		Streamer QuoteStreamerTokenAuthResult `json:"data"`
 	}
 
 	customersRes := new(customerResponse)
@@ -156,7 +154,7 @@ func (c *Client) GetQuoteStreamerTokens() (models.QuoteStreamerTokenAuthResult, 
 
 	err := c.request(http.MethodGet, path, header, nil, nil, customersRes)
 	if err != nil {
-		return models.QuoteStreamerTokenAuthResult{}, err
+		return QuoteStreamerTokenAuthResult{}, err
 	}
 
 	return customersRes.Streamer, nil

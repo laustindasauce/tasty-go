@@ -1,4 +1,4 @@
-package models
+package tasty
 
 // SymbolData model.
 type SymbolData struct {

@@ -1,10 +1,8 @@
-package utils
+package tasty
 
 import (
 	"fmt"
 	"time"
-
-	"github.com/austinbspencer/tasty-go/constants"
 )
 
 // FutureSymbology is a struct to help build future contract codes
@@ -15,7 +13,7 @@ import (
 type FutureSymbology struct {
 	// Don't include the / in the symbol i.e. ES
 	ProductCode string
-	MonthCode   constants.MonthCode
+	MonthCode   MonthCode
 	YearDigit   int
 }
 
@@ -32,7 +30,7 @@ type FutureOptionsSymbology struct {
 	OptionContractCode string
 	// Should start with / (You can use the FutureSymbology struct's Build method)
 	FutureContractCode string
-	OptionType         constants.OptionType
+	OptionType         OptionType
 	Strike             int
 	Expiration         time.Time
 }
@@ -42,4 +40,51 @@ func (foSym FutureOptionsSymbology) Build() string {
 	codes := fmt.Sprintf(".%s %s", foSym.FutureContractCode, foSym.OptionContractCode)
 	expiryString := foSym.Expiration.Format("060102")
 	return fmt.Sprintf("%s %s%s%d", codes, expiryString, foSym.OptionType, foSym.Strike)
+}
+
+// ContainsInt returns whether or not the int exists in the slice.
+func ContainsInt(s []int, e int) bool {
+	for _, a := range s {
+		if a == e {
+			return true
+		}
+	}
+	return false
+}
+
+// EquityOptionsSymbology is a struct to help build option symbol in correct OCC Symbology
+// Root symbol of the underlying stock or ETF, padded with spaces to 6 characters.
+// Expiration date, 6 digits in the format yymmdd. Option type, either P or C, for
+// put or call.
+type EquityOptionsSymbology struct {
+	Symbol     string
+	OptionType OptionType
+	Strike     float32
+	Expiration time.Time
+}
+
+// Builds the equity option into correct symbology.
+func (sym EquityOptionsSymbology) Build() string {
+	expiryString := sym.Expiration.Format("060102")
+	strikeString := getStrikeWithPadding(sym.Strike)
+	symbol := getSymbolWithPadding(sym.Symbol)
+	return fmt.Sprintf("%s%s%s%s", symbol, expiryString, sym.OptionType, strikeString)
+}
+
+// convert the strike into a string with correct padding.
+func getStrikeWithPadding(strike float32) string {
+	strikeString := fmt.Sprintf("%d", int(strike*1000))
+	for len(strikeString) < 8 {
+		strikeString = "0" + strikeString
+	}
+	return strikeString
+}
+
+// convert the symbol into a string with correct padding.
+func getSymbolWithPadding(symbol string) string {
+	for len(symbol) < 6 {
+		symbol += " "
+	}
+
+	return symbol
 }

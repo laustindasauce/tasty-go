@@ -5,8 +5,6 @@ import (
 	"net/http"
 	"testing"
 
-	"github.com/austinbspencer/tasty-go/constants"
-	"github.com/austinbspencer/tasty-go/models"
 	"github.com/stretchr/testify/require"
 )
 
@@ -27,20 +25,20 @@ func TestGetMarginRequirements(t *testing.T) {
 	require.Equal(t, "Total", resp.Description)
 	require.Equal(t, "IRA Margin", resp.MarginCalculationType)
 	require.Equal(t, "Defined Risk Spreads", resp.OptionLevel)
-	require.Equal(t, models.StringToFloat32(432457.79), resp.MarginRequirement)
-	require.Equal(t, constants.Debit, resp.MarginRequirementEffect)
-	require.Equal(t, models.StringToFloat32(432457.79), resp.InitialRequirement)
-	require.Equal(t, constants.Debit, resp.InitialRequirementEffect)
-	require.Equal(t, models.StringToFloat32(432457.79), resp.MaintenanceRequirement)
-	require.Equal(t, constants.Debit, resp.MaintenanceRequirementEffect)
-	require.Equal(t, models.StringToFloat32(452578.552), resp.MarginEquity)
-	require.Equal(t, constants.Credit, resp.MarginEquityEffect)
-	require.Equal(t, models.StringToFloat32(12900.762), resp.OptionBuyingPower)
-	require.Equal(t, constants.Credit, resp.OptionBuyingPowerEffect)
-	require.Equal(t, models.StringToFloat32(432457.79), resp.RegTMarginRequirement)
-	require.Equal(t, constants.Debit, resp.RegTMarginRequirementEffect)
-	require.Equal(t, models.StringToFloat32(12900.762), resp.RegTOptionBuyingPower)
-	require.Equal(t, constants.Credit, resp.RegTOptionBuyingPowerEffect)
+	require.Equal(t, StringToFloat32(432457.79), resp.MarginRequirement)
+	require.Equal(t, Debit, resp.MarginRequirementEffect)
+	require.Equal(t, StringToFloat32(432457.79), resp.InitialRequirement)
+	require.Equal(t, Debit, resp.InitialRequirementEffect)
+	require.Equal(t, StringToFloat32(432457.79), resp.MaintenanceRequirement)
+	require.Equal(t, Debit, resp.MaintenanceRequirementEffect)
+	require.Equal(t, StringToFloat32(452578.552), resp.MarginEquity)
+	require.Equal(t, Credit, resp.MarginEquityEffect)
+	require.Equal(t, StringToFloat32(12900.762), resp.OptionBuyingPower)
+	require.Equal(t, Credit, resp.OptionBuyingPowerEffect)
+	require.Equal(t, StringToFloat32(432457.79), resp.RegTMarginRequirement)
+	require.Equal(t, Debit, resp.RegTMarginRequirementEffect)
+	require.Equal(t, StringToFloat32(12900.762), resp.RegTOptionBuyingPower)
+	require.Equal(t, Credit, resp.RegTOptionBuyingPowerEffect)
 	require.Equal(t, 1686135853860, resp.LastStateTimestamp)
 
 	// Groups
@@ -54,20 +52,20 @@ func TestGetMarginRequirements(t *testing.T) {
 	require.Equal(t, "AMD", amd.Code)
 	require.Equal(t, "AMD", amd.UnderlyingSymbol)
 	require.Equal(t, "Equity", amd.UnderlyingType)
-	require.Equal(t, models.StringToFloat32(0.3), amd.ExpectedPriceRangeUpPercent)
-	require.Equal(t, models.StringToFloat32(0.3), amd.ExpectedPriceRangeDownPercent)
-	require.Equal(t, models.StringToFloat32(1.01), amd.PointOfNoReturnPercent)
+	require.Equal(t, StringToFloat32(0.3), amd.ExpectedPriceRangeUpPercent)
+	require.Equal(t, StringToFloat32(0.3), amd.ExpectedPriceRangeDownPercent)
+	require.Equal(t, StringToFloat32(1.01), amd.PointOfNoReturnPercent)
 	require.Equal(t, "IRA Margin", amd.MarginCalculationType)
-	require.Equal(t, models.StringToFloat32(39653.49), amd.MarginRequirement)
-	require.Equal(t, constants.Debit, amd.MarginRequirementEffect)
-	require.Equal(t, models.StringToFloat32(39653.49), amd.InitialRequirement)
-	require.Equal(t, constants.Debit, amd.InitialRequirementEffect)
-	require.Equal(t, models.StringToFloat32(39653.49), amd.MaintenanceRequirement)
-	require.Equal(t, constants.Debit, amd.MaintenanceRequirementEffect)
-	require.Equal(t, models.StringToFloat32(39653.49), amd.BuyingPower)
-	require.Equal(t, constants.Credit, amd.BuyingPowerEffect)
-	require.Equal(t, models.StringToFloat32(1.0), amd.PriceIncreasePercent)
-	require.Equal(t, models.StringToFloat32(-1.0), amd.PriceDecreasePercent)
+	require.Equal(t, StringToFloat32(39653.49), amd.MarginRequirement)
+	require.Equal(t, Debit, amd.MarginRequirementEffect)
+	require.Equal(t, StringToFloat32(39653.49), amd.InitialRequirement)
+	require.Equal(t, Debit, amd.InitialRequirementEffect)
+	require.Equal(t, StringToFloat32(39653.49), amd.MaintenanceRequirement)
+	require.Equal(t, Debit, amd.MaintenanceRequirementEffect)
+	require.Equal(t, StringToFloat32(39653.49), amd.BuyingPower)
+	require.Equal(t, Credit, amd.BuyingPowerEffect)
+	require.Equal(t, StringToFloat32(1.0), amd.PriceIncreasePercent)
+	require.Equal(t, StringToFloat32(-1.0), amd.PriceDecreasePercent)
 
 	// AMD Holdings
 	holdings := amd.Holdings
@@ -77,13 +75,13 @@ func TestGetMarginRequirements(t *testing.T) {
 	holding := holdings[0]
 
 	require.Equal(t, "LONG_UNDERLYING", holding.Description)
-	require.Equal(t, models.StringToFloat32(39653.49), holding.MarginRequirement)
-	require.Equal(t, constants.Debit, holding.MarginRequirementEffect)
-	require.Equal(t, models.StringToFloat32(39653.49), holding.InitialRequirement)
-	require.Equal(t, constants.Debit, holding.InitialRequirementEffect)
+	require.Equal(t, StringToFloat32(39653.49), holding.MarginRequirement)
+	require.Equal(t, Debit, holding.MarginRequirementEffect)
+	require.Equal(t, StringToFloat32(39653.49), holding.InitialRequirement)
+	require.Equal(t, Debit, holding.InitialRequirementEffect)
 	require.False(t, holding.IncludesWorkingOrder)
-	require.Equal(t, models.StringToFloat32(39653.49), holding.BuyingPower)
-	require.Equal(t, constants.Credit, holding.BuyingPowerEffect)
+	require.Equal(t, StringToFloat32(39653.49), holding.BuyingPower)
+	require.Equal(t, Credit, holding.BuyingPowerEffect)
 
 	// AMD Holding Position Entries
 	entries := holding.PositionEntries
@@ -93,11 +91,11 @@ func TestGetMarginRequirements(t *testing.T) {
 	entry := entries[0]
 
 	require.Equal(t, "AMD", entry.InstrumentSymbol)
-	require.Equal(t, constants.Equity, entry.InstrumentType)
-	require.Equal(t, models.StringToFloat32(336.446), entry.Quantity)
-	require.Equal(t, models.StringToFloat32(0.0), entry.AverageOpenPrice)
-	require.Equal(t, models.StringToFloat32(117.86), entry.ClosePrice)
-	require.Equal(t, models.StringToFloat32(0.0), entry.FixingPrice)
+	require.Equal(t, EquityIT, entry.InstrumentType)
+	require.Equal(t, StringToFloat32(336.446), entry.Quantity)
+	require.Equal(t, StringToFloat32(0.0), entry.AverageOpenPrice)
+	require.Equal(t, StringToFloat32(117.86), entry.ClosePrice)
+	require.Equal(t, StringToFloat32(0.0), entry.FixingPrice)
 
 	rivn := groups[1]
 
@@ -105,20 +103,20 @@ func TestGetMarginRequirements(t *testing.T) {
 	require.Equal(t, "RIVN", rivn.Code)
 	require.Equal(t, "RIVN", rivn.UnderlyingSymbol)
 	require.Equal(t, "Equity", rivn.UnderlyingType)
-	require.Equal(t, models.StringToFloat32(0.5), rivn.ExpectedPriceRangeUpPercent)
-	require.Equal(t, models.StringToFloat32(0.5), rivn.ExpectedPriceRangeDownPercent)
-	require.Equal(t, models.StringToFloat32(1.01), rivn.PointOfNoReturnPercent)
+	require.Equal(t, StringToFloat32(0.5), rivn.ExpectedPriceRangeUpPercent)
+	require.Equal(t, StringToFloat32(0.5), rivn.ExpectedPriceRangeDownPercent)
+	require.Equal(t, StringToFloat32(1.01), rivn.PointOfNoReturnPercent)
 	require.Equal(t, "IRA Margin", rivn.MarginCalculationType)
-	require.Equal(t, models.StringToFloat32(56000), rivn.MarginRequirement)
-	require.Equal(t, constants.Debit, rivn.MarginRequirementEffect)
-	require.Equal(t, models.StringToFloat32(56000), rivn.InitialRequirement)
-	require.Equal(t, constants.Debit, rivn.InitialRequirementEffect)
-	require.Equal(t, models.StringToFloat32(56000), rivn.MaintenanceRequirement)
-	require.Equal(t, constants.Debit, rivn.MaintenanceRequirementEffect)
-	require.Equal(t, models.StringToFloat32(54440), rivn.BuyingPower)
-	require.Equal(t, constants.Credit, rivn.BuyingPowerEffect)
-	require.Equal(t, models.StringToFloat32(1.0), rivn.PriceIncreasePercent)
-	require.Equal(t, models.StringToFloat32(-1.0), rivn.PriceDecreasePercent)
+	require.Equal(t, StringToFloat32(56000), rivn.MarginRequirement)
+	require.Equal(t, Debit, rivn.MarginRequirementEffect)
+	require.Equal(t, StringToFloat32(56000), rivn.InitialRequirement)
+	require.Equal(t, Debit, rivn.InitialRequirementEffect)
+	require.Equal(t, StringToFloat32(56000), rivn.MaintenanceRequirement)
+	require.Equal(t, Debit, rivn.MaintenanceRequirementEffect)
+	require.Equal(t, StringToFloat32(54440), rivn.BuyingPower)
+	require.Equal(t, Credit, rivn.BuyingPowerEffect)
+	require.Equal(t, StringToFloat32(1.0), rivn.PriceIncreasePercent)
+	require.Equal(t, StringToFloat32(-1.0), rivn.PriceDecreasePercent)
 
 	// RIVN Holdings
 	holdings = rivn.Holdings
@@ -128,13 +126,13 @@ func TestGetMarginRequirements(t *testing.T) {
 	holding = holdings[0]
 
 	require.Equal(t, "NAKED_OPTION", holding.Description)
-	require.Equal(t, models.StringToFloat32(56000), holding.MarginRequirement)
-	require.Equal(t, constants.Debit, holding.MarginRequirementEffect)
-	require.Equal(t, models.StringToFloat32(56000), holding.InitialRequirement)
-	require.Equal(t, constants.Debit, holding.InitialRequirementEffect)
+	require.Equal(t, StringToFloat32(56000), holding.MarginRequirement)
+	require.Equal(t, Debit, holding.MarginRequirementEffect)
+	require.Equal(t, StringToFloat32(56000), holding.InitialRequirement)
+	require.Equal(t, Debit, holding.InitialRequirementEffect)
 	require.False(t, holding.IncludesWorkingOrder)
-	require.Equal(t, models.StringToFloat32(54440), holding.BuyingPower)
-	require.Equal(t, constants.Credit, holding.BuyingPowerEffect)
+	require.Equal(t, StringToFloat32(54440), holding.BuyingPower)
+	require.Equal(t, Credit, holding.BuyingPowerEffect)
 
 	// RIVN Holding Position Entries
 	entries = holding.PositionEntries
@@ -144,14 +142,14 @@ func TestGetMarginRequirements(t *testing.T) {
 	entry = entries[0]
 
 	require.Equal(t, "RIVN  230609P00014000", entry.InstrumentSymbol)
-	require.Equal(t, constants.EquityOption, entry.InstrumentType)
-	require.Equal(t, models.StringToFloat32(-40.0), entry.Quantity)
-	require.Equal(t, models.StringToFloat32(0.0), entry.AverageOpenPrice)
-	require.Equal(t, models.StringToFloat32(0.32), entry.ClosePrice)
-	require.Equal(t, models.StringToFloat32(0.0), entry.FixingPrice)
-	require.Equal(t, models.StringToFloat32(14), entry.StrikePrice)
-	require.Equal(t, constants.Put, entry.OptionType)
-	require.Equal(t, models.StringToFloat32(4000), entry.DeliverableQuantity)
+	require.Equal(t, EquityOptionIT, entry.InstrumentType)
+	require.Equal(t, StringToFloat32(-40.0), entry.Quantity)
+	require.Equal(t, StringToFloat32(0.0), entry.AverageOpenPrice)
+	require.Equal(t, StringToFloat32(0.32), entry.ClosePrice)
+	require.Equal(t, StringToFloat32(0.0), entry.FixingPrice)
+	require.Equal(t, StringToFloat32(14), entry.StrikePrice)
+	require.Equal(t, Put, entry.OptionType)
+	require.Equal(t, StringToFloat32(4000), entry.DeliverableQuantity)
 	require.Equal(t, "2023-06-09", entry.ExpirationDate)
 }
 
@@ -170,13 +168,13 @@ func TestGetEffectiveMarginRequirements(t *testing.T) {
 	require.Nil(t, err)
 
 	require.Equal(t, underlyingSymbol, resp.UnderlyingSymbol)
-	require.Equal(t, models.StringToFloat32(.5), resp.LongEquityInitial)
-	require.Equal(t, models.StringToFloat32(.5), resp.ShortEquityInitial)
-	require.Equal(t, models.StringToFloat32(.25), resp.LongEquityMaintenance)
-	require.Equal(t, models.StringToFloat32(.3), resp.ShortEquityMaintenance)
-	require.Equal(t, models.StringToFloat32(.2), resp.NakedOptionStandard)
-	require.Equal(t, models.StringToFloat32(.1), resp.NakedOptionMinimum)
-	require.Equal(t, models.StringToFloat32(250), resp.NakedOptionFloor)
+	require.Equal(t, StringToFloat32(.5), resp.LongEquityInitial)
+	require.Equal(t, StringToFloat32(.5), resp.ShortEquityInitial)
+	require.Equal(t, StringToFloat32(.25), resp.LongEquityMaintenance)
+	require.Equal(t, StringToFloat32(.3), resp.ShortEquityMaintenance)
+	require.Equal(t, StringToFloat32(.2), resp.NakedOptionStandard)
+	require.Equal(t, StringToFloat32(.1), resp.NakedOptionMinimum)
+	require.Equal(t, StringToFloat32(250), resp.NakedOptionFloor)
 }
 
 const marginReqResp = `{

@@ -1,9 +1,7 @@
-package models
+package tasty
 
 import (
 	"time"
-
-	"github.com/austinbspencer/tasty-go/constants"
 )
 
 type Account struct {
@@ -102,12 +100,12 @@ type AccountBalance struct {
 	CashAvailableToWithdraw            StringToFloat32 `json:"cash-available-to-withdraw"`
 	DayTradeExcess                     StringToFloat32 `json:"day-trade-excess"`
 	PendingCash                        StringToFloat32 `json:"pending-cash"`
-	PendingCashEffect                  string          `json:"pending-cash-effect"`
+	PendingCashEffect                  PriceEffect     `json:"pending-cash-effect"`
 	LongCryptocurrencyValue            StringToFloat32 `json:"long-cryptocurrency-value"`
 	ShortCryptocurrencyValue           StringToFloat32 `json:"short-cryptocurrency-value"`
 	CryptocurrencyMarginRequirement    StringToFloat32 `json:"cryptocurrency-margin-requirement"`
 	UnsettledCryptocurrencyFiatAmount  StringToFloat32 `json:"unsettled-cryptocurrency-fiat-amount"`
-	UnsettledCryptocurrencyFiatEffect  string          `json:"unsettled-cryptocurrency-fiat-effect"`
+	UnsettledCryptocurrencyFiatEffect  PriceEffect     `json:"unsettled-cryptocurrency-fiat-effect"`
 	ClosedLoopAvailableBalance         StringToFloat32 `json:"closed-loop-available-balance"`
 	EquityOfferingMarginRequirement    StringToFloat32 `json:"equity-offering-margin-requirement"`
 	LongBondValue                      StringToFloat32 `json:"long-bond-value"`
@@ -121,40 +119,40 @@ type AccountBalance struct {
 	PendingMarginInterest              StringToFloat32 `json:"pending-margin-interest"`
 	ApexStartingDayMarginEquity        StringToFloat32 `json:"apex-starting-day-margin-equity"`
 	BuyingPowerAdjustment              StringToFloat32 `json:"buying-power-adjustment"`
-	BuyingPowerAdjustmentEffect        string          `json:"buying-power-adjustment-effect"`
+	BuyingPowerAdjustmentEffect        PriceEffect     `json:"buying-power-adjustment-effect"`
 	EffectiveCryptocurrencyBuyingPower StringToFloat32 `json:"effective-cryptocurrency-buying-power"`
 	UpdatedAt                          time.Time       `json:"updated-at"`
 }
 
 type AccountPosition struct {
-	AccountNumber                 string                   `json:"account-number"`
-	Symbol                        string                   `json:"symbol"`
-	InstrumentType                constants.InstrumentType `json:"instrument-type"`
-	UnderlyingSymbol              string                   `json:"underlying-symbol"`
-	Quantity                      int                      `json:"quantity"`
-	QuantityDirection             constants.Direction      `json:"quantity-direction"`
-	ClosePrice                    StringToFloat32          `json:"close-price"`
-	AverageOpenPrice              StringToFloat32          `json:"average-open-price"`
-	AverageYearlyMarketClosePrice StringToFloat32          `json:"average-yearly-market-close-price"`
-	AverageDailyMarketClosePrice  StringToFloat32          `json:"average-daily-market-close-price"`
-	Mark                          StringToFloat32          `json:"mark"`
-	MarkPrice                     StringToFloat32          `json:"mark-price"`
-	Multiplier                    int                      `json:"multiplier"`
-	CostEffect                    string                   `json:"cost-effect"`
-	IsSuppressed                  bool                     `json:"is-suppressed"`
-	IsFrozen                      bool                     `json:"is-frozen"`
-	RestrictedQuantity            int                      `json:"restricted-quantity"`
-	ExpiresAt                     time.Time                `json:"expires-at"`
-	FixingPrice                   StringToFloat32          `json:"fixing-price"`
-	DeliverableType               string                   `json:"deliverable-type"`
-	RealizedDayGain               StringToFloat32          `json:"realized-day-gain"`
-	RealizedDayGainEffect         string                   `json:"realized-day-gain-effect"`
-	RealizedDayGainDate           string                   `json:"realized-day-gain-date"`
-	RealizedToday                 StringToFloat32          `json:"realized-today"`
-	RealizedTodayEffect           string                   `json:"realized-today-effect"`
-	RealizedTodayDate             string                   `json:"realized-today-date"`
-	CreatedAt                     time.Time                `json:"created-at"`
-	UpdatedAt                     time.Time                `json:"updated-at"`
+	AccountNumber                 string          `json:"account-number"`
+	Symbol                        string          `json:"symbol"`
+	InstrumentType                InstrumentType  `json:"instrument-type"`
+	UnderlyingSymbol              string          `json:"underlying-symbol"`
+	Quantity                      int             `json:"quantity"`
+	QuantityDirection             Direction       `json:"quantity-direction"`
+	ClosePrice                    StringToFloat32 `json:"close-price"`
+	AverageOpenPrice              StringToFloat32 `json:"average-open-price"`
+	AverageYearlyMarketClosePrice StringToFloat32 `json:"average-yearly-market-close-price"`
+	AverageDailyMarketClosePrice  StringToFloat32 `json:"average-daily-market-close-price"`
+	Mark                          StringToFloat32 `json:"mark"`
+	MarkPrice                     StringToFloat32 `json:"mark-price"`
+	Multiplier                    int             `json:"multiplier"`
+	CostEffect                    PriceEffect     `json:"cost-effect"`
+	IsSuppressed                  bool            `json:"is-suppressed"`
+	IsFrozen                      bool            `json:"is-frozen"`
+	RestrictedQuantity            int             `json:"restricted-quantity"`
+	ExpiresAt                     time.Time       `json:"expires-at"`
+	FixingPrice                   StringToFloat32 `json:"fixing-price"`
+	DeliverableType               string          `json:"deliverable-type"`
+	RealizedDayGain               StringToFloat32 `json:"realized-day-gain"`
+	RealizedDayGainEffect         PriceEffect     `json:"realized-day-gain-effect"`
+	RealizedDayGainDate           string          `json:"realized-day-gain-date"`
+	RealizedToday                 StringToFloat32 `json:"realized-today"`
+	RealizedTodayEffect           PriceEffect     `json:"realized-today-effect"`
+	RealizedTodayDate             string          `json:"realized-today-date"`
+	CreatedAt                     time.Time       `json:"created-at"`
+	UpdatedAt                     time.Time       `json:"updated-at"`
 }
 
 type AccountBalanceSnapshots struct {
@@ -185,12 +183,12 @@ type AccountBalanceSnapshots struct {
 	CashAvailableToWithdraw            StringToFloat32 `json:"cash-available-to-withdraw"`
 	DayTradeExcess                     StringToFloat32 `json:"day-trade-excess"`
 	PendingCash                        StringToFloat32 `json:"pending-cash"`
-	PendingCashEffect                  string          `json:"pending-cash-effect"`
+	PendingCashEffect                  PriceEffect     `json:"pending-cash-effect"`
 	LongCryptocurrencyValue            StringToFloat32 `json:"long-cryptocurrency-value"`
 	ShortCryptocurrencyValue           StringToFloat32 `json:"short-cryptocurrency-value"`
 	CryptocurrencyMarginRequirement    StringToFloat32 `json:"cryptocurrency-margin-requirement"`
 	UnsettledCryptocurrencyFiatAmount  StringToFloat32 `json:"unsettled-cryptocurrency-fiat-amount"`
-	UnsettledCryptocurrencyFiatEffect  string          `json:"unsettled-cryptocurrency-fiat-effect"`
+	UnsettledCryptocurrencyFiatEffect  PriceEffect     `json:"unsettled-cryptocurrency-fiat-effect"`
 	ClosedLoopAvailableBalance         StringToFloat32 `json:"closed-loop-available-balance"`
 	EquityOfferingMarginRequirement    StringToFloat32 `json:"equity-offering-margin-requirement"`
 	LongBondValue                      StringToFloat32 `json:"long-bond-value"`
@@ -232,4 +230,36 @@ type AccountType struct {
 	HasMultipleOwners   bool         `json:"has-multiple-owners"`
 	IsPubliclyAvailable bool         `json:"is-publicly-available"`
 	MarginTypes         []MarginType `json:"margin-types"`
+}
+
+// Optional filtering available for position endpoint.
+type AccountPositionQuery struct {
+	// UnderlyingSymbol An array of Underlying symbol(s) for positions
+	UnderlyingSymbol []string `url:"underlying-symbol[],omitempty"`
+	// Symbol A single symbol. Stock Ticker Symbol AAPL,
+	// OCC Option Symbol AAPL 191004P00275000,
+	// TW Future Symbol /ESZ9, or
+	// TW Future Option Symbol ./ESZ9 EW4U9 190927P2975
+	Symbol string `url:"symbol,omitempty"`
+	// InstrumentType The type of Instrument
+	InstrumentType InstrumentType `url:"instrument-type,omitempty"`
+	// IncludeClosedPositions If closed positions should be included in the query
+	IncludeClosedPositions bool `url:"include-closed-positions,omitempty"`
+	// UnderlyingProductCode The underlying Future's Product code. i.e ES
+	UnderlyingProductCode string `url:"underlying-product-code,omitempty"`
+	// PartitionKeys Account partition keys
+	PartitionKeys []string `url:"partition-keys[],omitempty"`
+	// NetPositions Returns net positions grouped by instrument type and symbol
+	NetPositions bool `url:"net-positions,omitempty"`
+	// IncludeMarks Include current quote mark (note: can decrease performance)
+	IncludeMarks bool `url:"include-marks,omitempty"`
+}
+
+// Filtering for the account balance snapshots endpoint.
+type AccountBalanceSnapshotsQuery struct {
+	// SnapshotDate The day of the balance snapshot to retrieve
+	SnapshotDate time.Time `layout:"2006-01-02" url:"snapshot-date,omitempty"`
+	// TimeOfDay The abbreviation for the time of day. Default value: EOD
+	// Available values: EOD, BOD.
+	TimeOfDay TimeOfDay `url:"time-of-day"`
 }

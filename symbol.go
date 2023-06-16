@@ -4,14 +4,12 @@ import (
 	"fmt"
 	"net/http"
 	"net/url"
-
-	"github.com/austinbspencer/tasty-go/models"
 )
 
 // Returns an array of symbol data.
-func (c *Client) SymbolSearch(symbol string) ([]models.SymbolData, *Error) {
+func (c *Client) SymbolSearch(symbol string) ([]SymbolData, *Error) {
 	if c.Session.SessionToken == nil {
-		return []models.SymbolData{}, &Error{Message: "Session is invalid: Session Token cannot be nil."}
+		return []SymbolData{}, &Error{Message: "Session is invalid: Session Token cannot be nil."}
 	}
 
 	// url escape required for instances where "/" exists in symbol i.e. BRK/B
@@ -21,7 +19,7 @@ func (c *Client) SymbolSearch(symbol string) ([]models.SymbolData, *Error) {
 
 	type symbolResponse struct {
 		Data struct {
-			SymbolData []models.SymbolData `json:"items"`
+			SymbolData []SymbolData `json:"items"`
 		} `json:"data"`
 	}
 
@@ -33,7 +31,7 @@ func (c *Client) SymbolSearch(symbol string) ([]models.SymbolData, *Error) {
 	// customRequest required for instances where "/" exists in symbol i.e. BRK/B
 	err := c.customRequest(http.MethodGet, path, header, nil, nil, symbolRes)
 	if err != nil {
-		return []models.SymbolData{}, err
+		return []SymbolData{}, err
 	}
 
 	return symbolRes.Data.SymbolData, nil

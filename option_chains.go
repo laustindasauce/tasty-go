@@ -4,21 +4,19 @@ import (
 	"fmt"
 	"net/http"
 	"net/url"
-
-	"github.com/austinbspencer/tasty-go/models"
 )
 
 // Returns a futures option chain given a futures product code, i.e. ES.
-func (c *Client) GetFuturesOptionChains(productCode string) ([]models.FutureOption, *Error) {
+func (c *Client) GetFuturesOptionChains(productCode string) ([]FutureOption, *Error) {
 	if c.Session.SessionToken == nil {
-		return []models.FutureOption{}, &Error{Message: "Session is invalid: Session Token cannot be nil."}
+		return []FutureOption{}, &Error{Message: "Session is invalid: Session Token cannot be nil."}
 	}
 
 	reqURL := fmt.Sprintf("/futures-option-chains/%s", productCode)
 
 	type instrumentResponse struct {
 		Data struct {
-			FutureOptions []models.FutureOption `json:"items"`
+			FutureOptions []FutureOption `json:"items"`
 		} `json:"data"`
 	}
 
@@ -29,7 +27,7 @@ func (c *Client) GetFuturesOptionChains(productCode string) ([]models.FutureOpti
 
 	err := c.request(http.MethodGet, reqURL, header, nil, nil, instrumentRes)
 	if err != nil {
-		return []models.FutureOption{}, err
+		return []FutureOption{}, err
 	}
 
 	return instrumentRes.Data.FutureOptions, nil
@@ -37,15 +35,15 @@ func (c *Client) GetFuturesOptionChains(productCode string) ([]models.FutureOpti
 
 // Returns a futures option chain given a futures product code in a nested form to minimize
 // redundant processing.
-func (c *Client) GetNestedFuturesOptionChains(productCode string) (models.NestedFuturesOptionChains, *Error) {
+func (c *Client) GetNestedFuturesOptionChains(productCode string) (NestedFuturesOptionChains, *Error) {
 	if c.Session.SessionToken == nil {
-		return models.NestedFuturesOptionChains{}, &Error{Message: "Session is invalid: Session Token cannot be nil."}
+		return NestedFuturesOptionChains{}, &Error{Message: "Session is invalid: Session Token cannot be nil."}
 	}
 
 	reqURL := fmt.Sprintf("/futures-option-chains/%s/nested", productCode)
 
 	type instrumentResponse struct {
-		Chains models.NestedFuturesOptionChains `json:"data"`
+		Chains NestedFuturesOptionChains `json:"data"`
 	}
 
 	instrumentRes := new(instrumentResponse)
@@ -55,16 +53,16 @@ func (c *Client) GetNestedFuturesOptionChains(productCode string) (models.Nested
 
 	err := c.request(http.MethodGet, reqURL, header, nil, nil, instrumentRes)
 	if err != nil {
-		return models.NestedFuturesOptionChains{}, err
+		return NestedFuturesOptionChains{}, err
 	}
 
 	return instrumentRes.Chains, nil
 }
 
 // Returns an option chain given an underlying symbol, i.e. AAPL.
-func (c *Client) GetEquityOptionChains(symbol string) ([]models.EquityOption, *Error) {
+func (c *Client) GetEquityOptionChains(symbol string) ([]EquityOption, *Error) {
 	if c.Session.SessionToken == nil {
-		return []models.EquityOption{}, &Error{Message: "Session is invalid: Session Token cannot be nil."}
+		return []EquityOption{}, &Error{Message: "Session is invalid: Session Token cannot be nil."}
 	}
 
 	// url escape required for instances where "/" exists in symbol i.e. BRK/B
@@ -74,7 +72,7 @@ func (c *Client) GetEquityOptionChains(symbol string) ([]models.EquityOption, *E
 
 	type instrumentResponse struct {
 		Data struct {
-			EquityOptions []models.EquityOption `json:"items"`
+			EquityOptions []EquityOption `json:"items"`
 		} `json:"data"`
 	}
 
@@ -86,7 +84,7 @@ func (c *Client) GetEquityOptionChains(symbol string) ([]models.EquityOption, *E
 	// customRequest required for instances where "/" exists in symbol i.e. BRK/B
 	err := c.customRequest(http.MethodGet, path, header, nil, nil, instrumentRes)
 	if err != nil {
-		return []models.EquityOption{}, err
+		return []EquityOption{}, err
 	}
 
 	return instrumentRes.Data.EquityOptions, nil
@@ -94,9 +92,9 @@ func (c *Client) GetEquityOptionChains(symbol string) ([]models.EquityOption, *E
 
 // Returns an option chain given an underlying symbol,
 // i.e. AAPL in a nested form to minimize redundant processing.
-func (c *Client) GetNestedEquityOptionChains(symbol string) ([]models.NestedOptionChains, *Error) {
+func (c *Client) GetNestedEquityOptionChains(symbol string) ([]NestedOptionChains, *Error) {
 	if c.Session.SessionToken == nil {
-		return []models.NestedOptionChains{}, &Error{Message: "Session is invalid: Session Token cannot be nil."}
+		return []NestedOptionChains{}, &Error{Message: "Session is invalid: Session Token cannot be nil."}
 	}
 
 	// url escape required for instances where "/" exists in symbol i.e. BRK/B
@@ -106,7 +104,7 @@ func (c *Client) GetNestedEquityOptionChains(symbol string) ([]models.NestedOpti
 
 	type instrumentResponse struct {
 		Data struct {
-			Chains []models.NestedOptionChains `json:"items"`
+			Chains []NestedOptionChains `json:"items"`
 		} `json:"data"`
 	}
 
@@ -118,7 +116,7 @@ func (c *Client) GetNestedEquityOptionChains(symbol string) ([]models.NestedOpti
 	// customRequest required for instances where "/" exists in symbol i.e. BRK/B
 	err := c.customRequest(http.MethodGet, path, header, nil, nil, instrumentRes)
 	if err != nil {
-		return []models.NestedOptionChains{}, err
+		return []NestedOptionChains{}, err
 	}
 
 	return instrumentRes.Data.Chains, nil
@@ -126,9 +124,9 @@ func (c *Client) GetNestedEquityOptionChains(symbol string) ([]models.NestedOpti
 
 // Returns an option chain given an underlying symbol,
 // i.e. AAPL in a compact form to minimize content size.
-func (c *Client) GetCompactEquityOptionChains(symbol string) ([]models.CompactOptionChains, *Error) {
+func (c *Client) GetCompactEquityOptionChains(symbol string) ([]CompactOptionChains, *Error) {
 	if c.Session.SessionToken == nil {
-		return []models.CompactOptionChains{}, &Error{Message: "Session is invalid: Session Token cannot be nil."}
+		return []CompactOptionChains{}, &Error{Message: "Session is invalid: Session Token cannot be nil."}
 	}
 
 	// url escape required for instances where "/" exists in symbol i.e. BRK/B
@@ -138,7 +136,7 @@ func (c *Client) GetCompactEquityOptionChains(symbol string) ([]models.CompactOp
 
 	type instrumentResponse struct {
 		Data struct {
-			Chains []models.CompactOptionChains `json:"items"`
+			Chains []CompactOptionChains `json:"items"`
 		} `json:"data"`
 	}
 
@@ -150,7 +148,7 @@ func (c *Client) GetCompactEquityOptionChains(symbol string) ([]models.CompactOp
 	// customRequest required for instances where "/" exists in symbol i.e. BRK/B
 	err := c.customRequest(http.MethodGet, path, header, nil, nil, instrumentRes)
 	if err != nil {
-		return []models.CompactOptionChains{}, err
+		return []CompactOptionChains{}, err
 	}
 
 	return instrumentRes.Data.Chains, nil

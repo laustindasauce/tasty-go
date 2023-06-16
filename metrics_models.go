@@ -1,4 +1,4 @@
-package models
+package tasty
 
 import "time"
 

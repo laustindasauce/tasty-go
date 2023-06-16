@@ -5,10 +5,14 @@
 
 This library provides unofficial Go clients for [TastyTrade API](https://tastytrade.com).
 
+> You will need to opt into TastyTrade's API [here](https://developer.tastytrade.com)
+
 ## TO-DO
 
 - Separate instruments.go into multiple files
-- Reconfirm order is untested as-well-as customers endpoints
+- Untested endpoints
+  - Margin requirements dry-run
+  - Order reconfirm
 
 ## Installation
 
@@ -18,35 +22,42 @@ go get github.com/austinbspencer.com/tasty-go
 
 ## Example Usage
 
-Check tests for other example usages.
+Simple usage to get you started.
 
 ```go
+package main
+
 import (
 	"fmt"
 	"log"
 	"net/http"
+	"os"
 	"time"
 
 	"github.com/austinbspencer/tasty-go"
+	_ "github.com/joho/godotenv/autoload" // load .env file automatically
 )
 
 var (
-	hClient http.Client = http.Client{Timeout: time.Duration(30) * time.Second}
+	hClient = http.Client{Timeout: time.Duration(30) * time.Second}
+	client  *tasty.Client
 )
 
+var certCreds = tasty.LoginInfo{Login: os.Getenv("certUsername"), Password: os.Getenv("certPassword")}
+
 func main() {
-	client, err := tasty.NewCertClient(&hClient)
-	_, err := Client.CreateSession(tasty.LoginInfo{Login: "username", Password: "password"})
+	client, _ = tasty.NewCertClient(&hClient)
+	_, err := client.CreateSession(certCreds, nil)
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	res, err := Client.GetMyAccounts()
-		if err != nil {
-			log.Fatal(err)
-		}
+	accounts, err := client.GetMyAccounts()
+	if err != nil {
+		log.Fatal(err)
+	}
 
-	balances, err := Client.GetAccountBalances()
+	balances, err := client.GetAccountBalances(accounts[0].AccountNumber)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -54,4 +65,14 @@ func main() {
 	fmt.Println(balances.CashBalance)
 }
 
+```
+
+## Basic Usage:
+
+<details>
+<summary>Auth Patterns (Token, session lifetime)</summary>
+
+Check out TastyTrade's [documentation](https://developer.tastytrade.com/#auth-patterns-token-session-lifetime)
+
+</details>
 ```
