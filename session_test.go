@@ -5,6 +5,7 @@ import (
 	"net/http"
 	"testing"
 
+	"github.com/austinbspencer/tasty-go/models"
 	"github.com/stretchr/testify/require"
 )
 
@@ -16,7 +17,7 @@ func TestCreateSession(t *testing.T) {
 		fmt.Fprint(writer, sessionResp)
 	})
 
-	resp, err := client.CreateSession(LoginInfo{Login: "default", Password: "Password"})
+	resp, err := client.CreateSession(models.LoginInfo{Login: "default", Password: "Password"}, nil)
 	require.Nil(t, err)
 
 	require.Equal(t, "default@gmail.com", resp.User.Email)

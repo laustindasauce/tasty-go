@@ -9,6 +9,7 @@ import (
 	"net/url"
 	"strings"
 
+	"github.com/austinbspencer/tasty-go/models"
 	"github.com/austinbspencer/tasty-go/utils"
 	"github.com/google/go-querystring/query"
 )
@@ -29,7 +30,7 @@ type Client struct {
 	httpClient *http.Client
 	baseURL    string
 	baseHost   string
-	Session    Session
+	Session    models.Session
 }
 
 // NewClient creates a new Tasty Client.
