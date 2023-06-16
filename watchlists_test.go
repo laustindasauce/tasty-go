@@ -6,34 +6,32 @@ import (
 	"testing"
 	"time"
 
-	"github.com/austinbspencer/tasty-go/constants"
-	"github.com/austinbspencer/tasty-go/models"
 	"github.com/stretchr/testify/require"
 )
 
 var (
-	watchlist = models.NewWatchlist{
+	watchlist = NewWatchlist{
 		Name: "testing with / - odd chars",
-		WatchlistEntries: []models.WatchlistEntry{
+		WatchlistEntries: []WatchlistEntry{
 			{
 				Symbol:         "AAPL",
-				InstrumentType: constants.Equity,
+				InstrumentType: EquityIT,
 			},
 		},
 		GroupName:  "test",
 		OrderIndex: 1,
 	}
 
-	newWatchlist = models.NewWatchlist{
+	newWatchlist = NewWatchlist{
 		Name: "edited watchlist",
-		WatchlistEntries: []models.WatchlistEntry{
+		WatchlistEntries: []WatchlistEntry{
 			{
 				Symbol:         "TSLA",
-				InstrumentType: constants.Equity,
+				InstrumentType: EquityIT,
 			},
 			{
 				Symbol:         "AMZN",
-				InstrumentType: constants.Equity,
+				InstrumentType: EquityIT,
 			},
 		},
 		GroupName:  "test",
@@ -218,7 +216,7 @@ func TestGetPublicWatchlists(t *testing.T) {
 	require.Equal(t, "CRE Hospitality Price Return Index", w.Name)
 	require.Equal(t, 2, len(w.WatchlistEntries))
 	require.Equal(t, "GLPI", pe.Symbol)
-	require.Equal(t, constants.Equity, pe.InstrumentType)
+	require.Equal(t, EquityIT, pe.InstrumentType)
 	require.Equal(t, "Market Indices", w.GroupName)
 	require.Equal(t, 100, w.OrderIndex)
 }
@@ -263,7 +261,7 @@ func TestGetPublicWatchlist(t *testing.T) {
 	require.Equal(t, name, w.Name)
 	require.Equal(t, 2, len(w.WatchlistEntries))
 	require.Equal(t, "SPY", pe.Symbol)
-	require.Equal(t, constants.Equity, pe.InstrumentType)
+	require.Equal(t, EquityIT, pe.InstrumentType)
 	require.Equal(t, "Liquidity", w.GroupName)
 	require.Equal(t, 100, w.OrderIndex)
 }

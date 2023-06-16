@@ -3,23 +3,19 @@ package tasty
 import (
 	"fmt"
 	"net/http"
-
-	"github.com/austinbspencer/tasty-go/constants"
-	"github.com/austinbspencer/tasty-go/models"
-	"github.com/austinbspencer/tasty-go/queries"
 )
 
 // Get the accounts for the authenticated client.
-func (c *Client) GetMyAccounts() ([]models.Account, *Error) {
+func (c *Client) GetMyAccounts() ([]Account, *Error) {
 	if c.Session.SessionToken == nil {
-		return []models.Account{}, &Error{Message: "Session is invalid: Session Token cannot be nil."}
+		return []Account{}, &Error{Message: "Session is invalid: Session Token cannot be nil."}
 	}
 	path := "/customers/me/accounts"
 
 	type accountResponse struct {
 		Data struct {
 			Items []struct {
-				Account models.Account `json:"account"`
+				Account Account `json:"account"`
 			} `json:"items"`
 		} `json:"data"`
 	}
@@ -31,10 +27,10 @@ func (c *Client) GetMyAccounts() ([]models.Account, *Error) {
 
 	err := c.request(http.MethodGet, path, header, nil, nil, accountsRes)
 	if err != nil {
-		return []models.Account{}, err
+		return []Account{}, err
 	}
 
-	var accounts []models.Account
+	var accounts []Account
 
 	for _, acct := range accountsRes.Data.Items {
 		accounts = append(accounts, acct.Account)
@@ -44,14 +40,14 @@ func (c *Client) GetMyAccounts() ([]models.Account, *Error) {
 }
 
 // Returns current trading status for an account.
-func (c *Client) GetAccountTradingStatus(accountNumber string) (models.AccountTradingStatus, *Error) {
+func (c *Client) GetAccountTradingStatus(accountNumber string) (AccountTradingStatus, *Error) {
 	if c.Session.SessionToken == nil {
-		return models.AccountTradingStatus{}, &Error{Message: "Session is invalid: Session Token cannot be nil."}
+		return AccountTradingStatus{}, &Error{Message: "Session is invalid: Session Token cannot be nil."}
 	}
 	path := fmt.Sprintf("/accounts/%s/trading-status", accountNumber)
 
 	type tradingStatusRes struct {
-		AccountTradingStatus models.AccountTradingStatus `json:"data"`
+		AccountTradingStatus AccountTradingStatus `json:"data"`
 	}
 	accountsRes := new(tradingStatusRes)
 
@@ -60,21 +56,21 @@ func (c *Client) GetAccountTradingStatus(accountNumber string) (models.AccountTr
 
 	err := c.request(http.MethodGet, path, header, nil, nil, accountsRes)
 	if err != nil {
-		return models.AccountTradingStatus{}, err
+		return AccountTradingStatus{}, err
 	}
 
 	return accountsRes.AccountTradingStatus, nil
 }
 
 // Returns the current balance values for an account.
-func (c *Client) GetAccountBalances(accountNumber string) (models.AccountBalance, *Error) {
+func (c *Client) GetAccountBalances(accountNumber string) (AccountBalance, *Error) {
 	if c.Session.SessionToken == nil {
-		return models.AccountBalance{}, &Error{Message: "Session is invalid: Session Token cannot be nil."}
+		return AccountBalance{}, &Error{Message: "Session is invalid: Session Token cannot be nil."}
 	}
 	path := fmt.Sprintf("/accounts/%s/balances", accountNumber)
 
 	type accountBalanceRes struct {
-		AccountBalance models.AccountBalance `json:"data"`
+		AccountBalance AccountBalance `json:"data"`
 	}
 	accountsRes := new(accountBalanceRes)
 
@@ -83,7 +79,7 @@ func (c *Client) GetAccountBalances(accountNumber string) (models.AccountBalance
 
 	err := c.request(http.MethodGet, path, header, nil, nil, accountsRes)
 	if err != nil {
-		return models.AccountBalance{}, err
+		return AccountBalance{}, err
 	}
 
 	return accountsRes.AccountBalance, nil
@@ -91,15 +87,15 @@ func (c *Client) GetAccountBalances(accountNumber string) (models.AccountBalance
 
 // Returns a list of the account's positions.
 // Can be filtered by symbol, underlying_symbol.
-func (c *Client) GetAccountPositions(accountNumber string, query queries.AccountPosition) ([]models.AccountPosition, *Error) {
+func (c *Client) GetAccountPositions(accountNumber string, query AccountPositionQuery) ([]AccountPosition, *Error) {
 	if c.Session.SessionToken == nil {
-		return []models.AccountPosition{}, &Error{Message: "Session is invalid: Session Token cannot be nil."}
+		return []AccountPosition{}, &Error{Message: "Session is invalid: Session Token cannot be nil."}
 	}
 	path := fmt.Sprintf("/accounts/%s/positions", accountNumber)
 
 	type accountResponse struct {
 		Data struct {
-			AccountPositions []models.AccountPosition `json:"items"`
+			AccountPositions []AccountPosition `json:"items"`
 		} `json:"data"`
 	}
 
@@ -110,28 +106,28 @@ func (c *Client) GetAccountPositions(accountNumber string, query queries.Account
 
 	err := c.request(http.MethodGet, path, header, query, nil, accountsRes)
 	if err != nil {
-		return []models.AccountPosition{}, err
+		return []AccountPosition{}, err
 	}
 
 	return accountsRes.Data.AccountPositions, nil
 }
 
 // Returns most recent snapshot and current balance for an account.
-func (c *Client) GetAccountBalanceSnapshots(accountNumber string, query queries.AccountBalanceSnapshots) ([]models.AccountBalanceSnapshots, *Error) {
+func (c *Client) GetAccountBalanceSnapshots(accountNumber string, query AccountBalanceSnapshotsQuery) ([]AccountBalanceSnapshots, *Error) {
 	if c.Session.SessionToken == nil {
-		return []models.AccountBalanceSnapshots{}, &Error{Message: "Session is invalid: Session Token cannot be nil."}
+		return []AccountBalanceSnapshots{}, &Error{Message: "Session is invalid: Session Token cannot be nil."}
 	}
 
 	// Default to EOD
 	if query.TimeOfDay == "" {
-		query.TimeOfDay = constants.EndOfDay
+		query.TimeOfDay = EndOfDay
 	}
 
 	path := fmt.Sprintf("/accounts/%s/balance-snapshots", accountNumber)
 
 	type accountResponse struct {
 		Data struct {
-			AccountBalanceSnapshots []models.AccountBalanceSnapshots `json:"items"`
+			AccountBalanceSnapshots []AccountBalanceSnapshots `json:"items"`
 		} `json:"data"`
 	}
 
@@ -142,23 +138,23 @@ func (c *Client) GetAccountBalanceSnapshots(accountNumber string, query queries.
 
 	err := c.request(http.MethodGet, path, header, query, nil, accountsRes)
 	if err != nil {
-		return []models.AccountBalanceSnapshots{}, err
+		return []AccountBalanceSnapshots{}, err
 	}
 
 	return accountsRes.Data.AccountBalanceSnapshots, nil
 }
 
 // Returns a list of account net liquidating value snapshots.
-func (c *Client) GetAccountNetLiqHistory(accountNumber string, query queries.HistoricLiquidity) ([]models.NetLiqOHLC, *Error) {
+func (c *Client) GetAccountNetLiqHistory(accountNumber string, query HistoricLiquidityQuery) ([]NetLiqOHLC, *Error) {
 	if c.Session.SessionToken == nil {
-		return []models.NetLiqOHLC{}, &Error{Message: "Session is invalid: Session Token cannot be nil."}
+		return []NetLiqOHLC{}, &Error{Message: "Session is invalid: Session Token cannot be nil."}
 	}
 
 	path := fmt.Sprintf("/accounts/%s/net-liq/history", accountNumber)
 
 	type accountResponse struct {
 		Data struct {
-			HistoricLiquidity []models.NetLiqOHLC `json:"items"`
+			HistoricLiquidity []NetLiqOHLC `json:"items"`
 		} `json:"data"`
 	}
 
@@ -169,22 +165,22 @@ func (c *Client) GetAccountNetLiqHistory(accountNumber string, query queries.His
 
 	err := c.request(http.MethodGet, path, header, query, nil, accountsRes)
 	if err != nil {
-		return []models.NetLiqOHLC{}, err
+		return []NetLiqOHLC{}, err
 	}
 
 	return accountsRes.Data.HistoricLiquidity, nil
 }
 
 // Get the position limit.
-func (c *Client) GetAccountPositionLimit(accountNumber string) (models.PositionLimit, *Error) {
+func (c *Client) GetAccountPositionLimit(accountNumber string) (PositionLimit, *Error) {
 	if c.Session.SessionToken == nil {
-		return models.PositionLimit{}, &Error{Message: "Session is invalid: Session Token cannot be nil."}
+		return PositionLimit{}, &Error{Message: "Session is invalid: Session Token cannot be nil."}
 	}
 
 	path := fmt.Sprintf("/accounts/%s/position-limit", accountNumber)
 
 	type accountResponse struct {
-		PositionLimit models.PositionLimit `json:"data"`
+		PositionLimit PositionLimit `json:"data"`
 	}
 
 	accountsRes := new(accountResponse)
@@ -194,7 +190,7 @@ func (c *Client) GetAccountPositionLimit(accountNumber string) (models.PositionL
 
 	err := c.request(http.MethodGet, path, header, nil, nil, accountsRes)
 	if err != nil {
-		return models.PositionLimit{}, err
+		return PositionLimit{}, err
 	}
 
 	return accountsRes.PositionLimit, nil

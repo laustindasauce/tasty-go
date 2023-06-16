@@ -5,8 +5,6 @@ import (
 	"net/http"
 	"net/http/httptest"
 	"strings"
-
-	"github.com/austinbspencer/tasty-go/models"
 )
 
 var (
@@ -24,7 +22,7 @@ func setup() {
 		log.Fatal(err)
 	}
 	sessionToken := "default-token-1234"
-	client.Session = models.Session{
+	client.Session = Session{
 		SessionToken: &sessionToken,
 	}
 	client.baseURL = server.URL

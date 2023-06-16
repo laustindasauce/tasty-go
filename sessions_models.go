@@ -1,4 +1,4 @@
-package models
+package tasty
 
 type LoginInfo struct {
 	// The user name or email of the user.

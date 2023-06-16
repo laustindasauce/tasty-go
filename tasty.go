@@ -9,8 +9,6 @@ import (
 	"net/url"
 	"strings"
 
-	"github.com/austinbspencer/tasty-go/models"
-	"github.com/austinbspencer/tasty-go/utils"
 	"github.com/google/go-querystring/query"
 )
 
@@ -30,7 +28,7 @@ type Client struct {
 	httpClient *http.Client
 	baseURL    string
 	baseHost   string
-	Session    models.Session
+	Session    Session
 }
 
 // NewClient creates a new Tasty Client.
@@ -151,7 +149,7 @@ func (c *Client) customRequest(method, path string, header http.Header, params, 
 	if resp.StatusCode == http.StatusNoContent {
 		return nil
 	}
-	if utils.ContainsInt(errorStatusCodes, resp.StatusCode) {
+	if ContainsInt(errorStatusCodes, resp.StatusCode) {
 		return c.decodeError(resp)
 	}
 
@@ -209,7 +207,7 @@ func (c *Client) request(method, path string, header http.Header, params, payloa
 	if resp.StatusCode == http.StatusNoContent {
 		return nil
 	}
-	if utils.ContainsInt(errorStatusCodes, resp.StatusCode) {
+	if ContainsInt(errorStatusCodes, resp.StatusCode) {
 		return c.decodeError(resp)
 	}
 

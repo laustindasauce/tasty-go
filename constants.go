@@ -1,4 +1,4 @@
-package constants
+package tasty
 
 type InstrumentType string
 type TimeOfDay string
@@ -27,14 +27,14 @@ const (
 	Bond           InstrumentType = "Bond"
 	Crypto         InstrumentType = "Cryptocurrency"
 	CurrencyPair   InstrumentType = "Currency Pair"
-	Equity         InstrumentType = "Equity"
+	EquityIT       InstrumentType = "Equity"
 	EquityOffering InstrumentType = "Equity Offering"
-	EquityOption   InstrumentType = "Equity Option"
-	Future         InstrumentType = "Future"
-	FutureOption   InstrumentType = "Future Option"
+	EquityOptionIT InstrumentType = "Equity Option"
+	FutureIT       InstrumentType = "Future"
+	FutureOptionIT InstrumentType = "Future Option"
 	Index          InstrumentType = "Index"
 	Unknown        InstrumentType = "Unknown"
-	Warrant        InstrumentType = "Warrant"
+	WarrantIT      InstrumentType = "Warrant"
 	// TimeOfDay.
 	EndOfDay       TimeOfDay = "EOD"
 	BeginningOfDay TimeOfDay = "BOD"

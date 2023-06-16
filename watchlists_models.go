@@ -1,9 +1,7 @@
-package models
+package tasty
 
 import (
 	"time"
-
-	"github.com/austinbspencer/tasty-go/constants"
 )
 
 type RemovedWatchlist struct {
@@ -36,8 +34,8 @@ type NewWatchlist struct {
 }
 
 type WatchlistEntry struct {
-	Symbol         string                   `json:"symbol"`
-	InstrumentType constants.InstrumentType `json:"instrument-type"`
+	Symbol         string         `json:"symbol"`
+	InstrumentType InstrumentType `json:"instrument-type"`
 }
 
 type PublicWatchlist struct {
@@ -51,8 +49,8 @@ type PublicWatchlist struct {
 
 // Something weird here in the api where instrument_type instead of instrument-type.
 type PublicWatchlistEntry struct {
-	Symbol         string                   `json:"symbol"`
-	InstrumentType constants.InstrumentType `json:"instrument_type"`
+	Symbol         string         `json:"symbol"`
+	InstrumentType InstrumentType `json:"instrument_type"`
 }
 
 type PairsWatchlist struct {

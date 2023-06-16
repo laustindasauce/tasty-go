@@ -5,21 +5,19 @@ import (
 	"net/http"
 	"net/url"
 	"time"
-
-	"github.com/austinbspencer/tasty-go/models"
 )
 
 // Returns an array of volatility data for given symbols.
-func (c *Client) GetMarketMetrics(symbols []string) ([]models.MarketMetricVolatility, *Error) {
+func (c *Client) GetMarketMetrics(symbols []string) ([]MarketMetricVolatility, *Error) {
 	if c.Session.SessionToken == nil {
-		return []models.MarketMetricVolatility{}, &Error{Message: "Session is invalid: Session Token cannot be nil."}
+		return []MarketMetricVolatility{}, &Error{Message: "Session is invalid: Session Token cannot be nil."}
 	}
 
 	path := "/market-metrics"
 
 	type marketMetricResponse struct {
 		Data struct {
-			MarketMetrics []models.MarketMetricVolatility `json:"items"`
+			MarketMetrics []MarketMetricVolatility `json:"items"`
 		} `json:"data"`
 	}
 
@@ -37,16 +35,16 @@ func (c *Client) GetMarketMetrics(symbols []string) ([]models.MarketMetricVolati
 
 	err := c.request(http.MethodGet, path, header, query, nil, marketMetricsRes)
 	if err != nil {
-		return []models.MarketMetricVolatility{}, err
+		return []MarketMetricVolatility{}, err
 	}
 
 	return marketMetricsRes.Data.MarketMetrics, nil
 }
 
 // Get historical dividend data.
-func (c *Client) GetHistoricDividends(symbol string) ([]models.DividendInfo, *Error) {
+func (c *Client) GetHistoricDividends(symbol string) ([]DividendInfo, *Error) {
 	if c.Session.SessionToken == nil {
-		return []models.DividendInfo{}, &Error{Message: "Session is invalid: Session Token cannot be nil."}
+		return []DividendInfo{}, &Error{Message: "Session is invalid: Session Token cannot be nil."}
 	}
 
 	// url escape required for instances where "/" exists in symbol i.e. BRK/B
@@ -54,7 +52,7 @@ func (c *Client) GetHistoricDividends(symbol string) ([]models.DividendInfo, *Er
 
 	type marketMetricResponse struct {
 		Data struct {
-			HistoricDividends []models.DividendInfo `json:"items"`
+			HistoricDividends []DividendInfo `json:"items"`
 		} `json:"data"`
 	}
 
@@ -65,16 +63,16 @@ func (c *Client) GetHistoricDividends(symbol string) ([]models.DividendInfo, *Er
 
 	err := c.customRequest(http.MethodGet, path, header, nil, nil, marketMetricsRes)
 	if err != nil {
-		return []models.DividendInfo{}, err
+		return []DividendInfo{}, err
 	}
 
 	return marketMetricsRes.Data.HistoricDividends, nil
 }
 
 // Get historical earnings data.
-func (c *Client) GetHistoricEarnings(symbol string, startDate time.Time) ([]models.EarningsInfo, *Error) {
+func (c *Client) GetHistoricEarnings(symbol string, startDate time.Time) ([]EarningsInfo, *Error) {
 	if c.Session.SessionToken == nil {
-		return []models.EarningsInfo{}, &Error{Message: "Session is invalid: Session Token cannot be nil."}
+		return []EarningsInfo{}, &Error{Message: "Session is invalid: Session Token cannot be nil."}
 	}
 
 	// url escape required for instances where "/" exists in symbol i.e. BRK/B
@@ -82,7 +80,7 @@ func (c *Client) GetHistoricEarnings(symbol string, startDate time.Time) ([]mode
 
 	type marketMetricResponse struct {
 		Data struct {
-			HistoricEarnings []models.EarningsInfo `json:"items"`
+			HistoricEarnings []EarningsInfo `json:"items"`
 		} `json:"data"`
 	}
 
@@ -100,7 +98,7 @@ func (c *Client) GetHistoricEarnings(symbol string, startDate time.Time) ([]mode
 
 	err := c.customRequest(http.MethodGet, path, header, query, nil, marketMetricsRes)
 	if err != nil {
-		return []models.EarningsInfo{}, err
+		return []EarningsInfo{}, err
 	}
 
 	return marketMetricsRes.Data.HistoricEarnings, nil

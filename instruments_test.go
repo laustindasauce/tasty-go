@@ -6,10 +6,6 @@ import (
 	"testing"
 	"time"
 
-	"github.com/austinbspencer/tasty-go/constants"
-	"github.com/austinbspencer/tasty-go/models"
-	"github.com/austinbspencer/tasty-go/queries"
-	"github.com/austinbspencer/tasty-go/utils"
 	"github.com/stretchr/testify/require"
 )
 
@@ -30,12 +26,12 @@ func TestGetCryptocurrencies(t *testing.T) {
 
 	require.Equal(t, 1, btc.ID)
 	require.Equal(t, "BTC/USD", btc.Symbol)
-	require.Equal(t, constants.Crypto, btc.InstrumentType)
+	require.Equal(t, Crypto, btc.InstrumentType)
 	require.Equal(t, "Bitcoin", btc.ShortDescription)
 	require.Equal(t, "Bitcoin to USD", btc.Description)
 	require.False(t, btc.IsClosingOnly)
 	require.True(t, btc.Active)
-	require.Equal(t, models.StringToFloat32(0.01), btc.TickSize)
+	require.Equal(t, StringToFloat32(0.01), btc.TickSize)
 	require.Equal(t, "BTC/USD:CXTALP", btc.StreamerSymbol)
 
 	venueSymbol := btc.DestinationVenueSymbols[0]
@@ -56,17 +52,17 @@ func TestGetCryptocurrency(t *testing.T) {
 		fmt.Fprint(writer, cryptoResp)
 	})
 
-	btc, err := client.GetCryptocurrency(constants.Bitcoin)
+	btc, err := client.GetCryptocurrency(Bitcoin)
 	require.Nil(t, err)
 
 	require.Equal(t, 1, btc.ID)
 	require.Equal(t, "BTC/USD", btc.Symbol)
-	require.Equal(t, constants.Crypto, btc.InstrumentType)
+	require.Equal(t, Crypto, btc.InstrumentType)
 	require.Equal(t, "Bitcoin", btc.ShortDescription)
 	require.Equal(t, "Bitcoin to USD", btc.Description)
 	require.False(t, btc.IsClosingOnly)
 	require.True(t, btc.Active)
-	require.Equal(t, models.StringToFloat32(0.01), btc.TickSize)
+	require.Equal(t, StringToFloat32(0.01), btc.TickSize)
 	require.Equal(t, "BTC/USD:CXTALP", btc.StreamerSymbol)
 
 	venueSymbol := btc.DestinationVenueSymbols[0]
@@ -87,7 +83,7 @@ func TestGetActiveEquities(t *testing.T) {
 		fmt.Fprint(writer, activeEquitiesResp)
 	})
 
-	resp, pagination, err := client.GetActiveEquities(queries.ActiveEquities{PerPage: 4})
+	resp, pagination, err := client.GetActiveEquities(ActiveEquitiesQuery{PerPage: 4})
 	require.Nil(t, err)
 
 	require.Equal(t, 4, len(resp))
@@ -96,14 +92,14 @@ func TestGetActiveEquities(t *testing.T) {
 
 	require.Equal(t, 15625396, equity.ID)
 	require.Equal(t, "YMM", equity.Symbol)
-	require.Equal(t, constants.Equity, equity.InstrumentType)
+	require.Equal(t, EquityIT, equity.InstrumentType)
 	require.Equal(t, "35969L108", equity.Cusip)
 	require.Equal(t, "Full Truck Alliance Co. Ltd. American Depositary Shares (each representing 20 Class A Ordinary Shares)", equity.ShortDescription)
 	require.False(t, equity.IsIndex)
 	require.Equal(t, "XNYS", equity.ListedMarket)
 	require.Equal(t, "Full Truck Alliance Co. Ltd. American Depositary Shares (each representing 20 Class A Ordinary Shares)", equity.Description)
 	require.Equal(t, "Easy To Borrow", equity.Lendability)
-	require.Equal(t, models.StringToFloat32(0.0), equity.BorrowRate)
+	require.Equal(t, StringToFloat32(0.0), equity.BorrowRate)
 	require.Equal(t, "Equity", equity.MarketTimeInstrumentCollection)
 	require.False(t, equity.IsClosingOnly)
 	require.False(t, equity.IsOptionsClosingOnly)
@@ -115,13 +111,13 @@ func TestGetActiveEquities(t *testing.T) {
 
 	tickSize := equity.TickSizes[0]
 
-	require.Equal(t, models.StringToFloat32(0.0001), tickSize.Value)
-	require.Equal(t, models.StringToFloat32(1.0), tickSize.Threshold)
+	require.Equal(t, StringToFloat32(0.0001), tickSize.Value)
+	require.Equal(t, StringToFloat32(1.0), tickSize.Threshold)
 
 	optionTickSize := equity.OptionTickSizes[0]
 
-	require.Equal(t, models.StringToFloat32(0.05), optionTickSize.Value)
-	require.Equal(t, models.StringToFloat32(3.0), optionTickSize.Threshold)
+	require.Equal(t, StringToFloat32(0.05), optionTickSize.Value)
+	require.Equal(t, StringToFloat32(3.0), optionTickSize.Threshold)
 
 	// Pagination
 	require.Equal(t, 4, pagination.PerPage)
@@ -143,7 +139,7 @@ func TestGetEquities(t *testing.T) {
 		fmt.Fprint(writer, equitiesResp)
 	})
 
-	resp, err := client.GetEquities(queries.Equities{Symbols: []string{"AAPL", "TSLA"}})
+	resp, err := client.GetEquities(EquitiesQuery{Symbols: []string{"AAPL", "TSLA"}})
 	require.Nil(t, err)
 
 	require.Equal(t, 2, len(resp))
@@ -152,14 +148,14 @@ func TestGetEquities(t *testing.T) {
 
 	require.Equal(t, 726, equity.ID)
 	require.Equal(t, "AAPL", equity.Symbol)
-	require.Equal(t, constants.Equity, equity.InstrumentType)
+	require.Equal(t, EquityIT, equity.InstrumentType)
 	require.Equal(t, "037833100", equity.Cusip)
 	require.Equal(t, "APPLE INC", equity.ShortDescription)
 	require.False(t, equity.IsIndex)
 	require.Equal(t, "XNAS", equity.ListedMarket)
 	require.Equal(t, "APPLE INC", equity.Description)
 	require.Equal(t, "Easy To Borrow", equity.Lendability)
-	require.Equal(t, models.StringToFloat32(0.0), equity.BorrowRate)
+	require.Equal(t, StringToFloat32(0.0), equity.BorrowRate)
 	require.Equal(t, "Equity", equity.MarketTimeInstrumentCollection)
 	require.False(t, equity.IsClosingOnly)
 	require.False(t, equity.IsOptionsClosingOnly)
@@ -171,13 +167,13 @@ func TestGetEquities(t *testing.T) {
 
 	tickSize := equity.TickSizes[0]
 
-	require.Equal(t, models.StringToFloat32(0.0001), tickSize.Value)
-	require.Equal(t, models.StringToFloat32(1.0), tickSize.Threshold)
+	require.Equal(t, StringToFloat32(0.0001), tickSize.Value)
+	require.Equal(t, StringToFloat32(1.0), tickSize.Threshold)
 
 	optionTickSize := equity.OptionTickSizes[0]
 
-	require.Equal(t, models.StringToFloat32(0.01), optionTickSize.Value)
-	require.Equal(t, models.StringToFloat32(3.0), optionTickSize.Threshold)
+	require.Equal(t, StringToFloat32(0.01), optionTickSize.Value)
+	require.Equal(t, StringToFloat32(3.0), optionTickSize.Threshold)
 }
 
 func TestGetEquity(t *testing.T) {
@@ -195,14 +191,14 @@ func TestGetEquity(t *testing.T) {
 
 	require.Equal(t, 726, equity.ID)
 	require.Equal(t, symbol, equity.Symbol)
-	require.Equal(t, constants.Equity, equity.InstrumentType)
+	require.Equal(t, EquityIT, equity.InstrumentType)
 	require.Equal(t, "037833100", equity.Cusip)
 	require.Equal(t, "APPLE INC", equity.ShortDescription)
 	require.False(t, equity.IsIndex)
 	require.Equal(t, "XNAS", equity.ListedMarket)
 	require.Equal(t, "APPLE INC", equity.Description)
 	require.Equal(t, "Easy To Borrow", equity.Lendability)
-	require.Equal(t, models.StringToFloat32(0.0), equity.BorrowRate)
+	require.Equal(t, StringToFloat32(0.0), equity.BorrowRate)
 	require.Equal(t, "Equity", equity.MarketTimeInstrumentCollection)
 	require.False(t, equity.IsClosingOnly)
 	require.False(t, equity.IsOptionsClosingOnly)
@@ -214,13 +210,13 @@ func TestGetEquity(t *testing.T) {
 
 	tickSize := equity.TickSizes[0]
 
-	require.Equal(t, models.StringToFloat32(0.0001), tickSize.Value)
-	require.Equal(t, models.StringToFloat32(1.0), tickSize.Threshold)
+	require.Equal(t, StringToFloat32(0.0001), tickSize.Value)
+	require.Equal(t, StringToFloat32(1.0), tickSize.Threshold)
 
 	optionTickSize := equity.OptionTickSizes[0]
 
-	require.Equal(t, models.StringToFloat32(0.01), optionTickSize.Value)
-	require.Equal(t, models.StringToFloat32(3.0), optionTickSize.Threshold)
+	require.Equal(t, StringToFloat32(0.01), optionTickSize.Value)
+	require.Equal(t, StringToFloat32(3.0), optionTickSize.Threshold)
 }
 
 func TestGetEquityOptions(t *testing.T) {
@@ -232,9 +228,9 @@ func TestGetEquityOptions(t *testing.T) {
 	})
 
 	symbol := "AAPL"
-	optionType := constants.Call
+	optionType := Call
 
-	sym := utils.EquityOptionsSymbology{
+	sym := EquityOptionsSymbology{
 		Symbol:     symbol,
 		Strike:     185,
 		OptionType: optionType,
@@ -242,7 +238,7 @@ func TestGetEquityOptions(t *testing.T) {
 	}
 	occSymbol := sym.Build()
 
-	resp, err := client.GetEquityOptions(queries.EquityOptions{Symbols: []string{occSymbol}})
+	resp, err := client.GetEquityOptions(EquityOptionsQuery{Symbols: []string{occSymbol}})
 	require.Nil(t, err)
 
 	require.Equal(t, 1, len(resp))
@@ -250,9 +246,9 @@ func TestGetEquityOptions(t *testing.T) {
 	equity := resp[0]
 
 	require.Equal(t, occSymbol, equity.Symbol)
-	require.Equal(t, constants.EquityOption, equity.InstrumentType)
+	require.Equal(t, EquityOptionIT, equity.InstrumentType)
 	require.True(t, equity.Active)
-	require.Equal(t, models.StringToFloat32(185.0), equity.StrikePrice)
+	require.Equal(t, StringToFloat32(185.0), equity.StrikePrice)
 	require.Equal(t, symbol, equity.RootSymbol)
 	require.Equal(t, symbol, equity.UnderlyingSymbol)
 	require.Equal(t, "2023-06-16", equity.ExpirationDate)
@@ -275,9 +271,9 @@ func TestGetEquityOption(t *testing.T) {
 	defer teardown()
 
 	symbol := "AAPL"
-	optionType := constants.Call
+	optionType := Call
 
-	sym := utils.EquityOptionsSymbology{
+	sym := EquityOptionsSymbology{
 		Symbol:     symbol,
 		Strike:     185,
 		OptionType: optionType,
@@ -293,9 +289,9 @@ func TestGetEquityOption(t *testing.T) {
 	require.Nil(t, err)
 
 	require.Equal(t, occSymbol, equity.Symbol)
-	require.Equal(t, constants.EquityOption, equity.InstrumentType)
+	require.Equal(t, EquityOptionIT, equity.InstrumentType)
 	require.True(t, equity.Active)
-	require.Equal(t, models.StringToFloat32(185.0), equity.StrikePrice)
+	require.Equal(t, StringToFloat32(185.0), equity.StrikePrice)
 	require.Equal(t, symbol, equity.RootSymbol)
 	require.Equal(t, symbol, equity.UnderlyingSymbol)
 	require.Equal(t, "2023-06-16", equity.ExpirationDate)
@@ -323,7 +319,7 @@ func TestGetFutures(t *testing.T) {
 
 	productCode := "ES"
 
-	resp, err := client.GetFutures(queries.Futures{ProductCode: []string{productCode}})
+	resp, err := client.GetFutures(FuturesQuery{ProductCode: []string{productCode}})
 	require.Nil(t, err)
 
 	require.Equal(t, 1, len(resp))
@@ -332,12 +328,12 @@ func TestGetFutures(t *testing.T) {
 
 	require.Equal(t, "/ESM3", future.Symbol)
 	require.Equal(t, productCode, future.ProductCode)
-	require.Equal(t, models.StringToFloat32(50), future.ContractSize)
-	require.Equal(t, models.StringToFloat32(.25), future.TickSize)
-	require.Equal(t, models.StringToFloat32(50), future.NotionalMultiplier)
-	require.Equal(t, models.StringToFloat32(0), future.MainFraction)
-	require.Equal(t, models.StringToFloat32(0), future.SubFraction)
-	require.Equal(t, models.StringToFloat32(0.01), future.DisplayFactor)
+	require.Equal(t, StringToFloat32(50), future.ContractSize)
+	require.Equal(t, StringToFloat32(.25), future.TickSize)
+	require.Equal(t, StringToFloat32(50), future.NotionalMultiplier)
+	require.Equal(t, StringToFloat32(0), future.MainFraction)
+	require.Equal(t, StringToFloat32(0), future.SubFraction)
+	require.Equal(t, StringToFloat32(0.01), future.DisplayFactor)
 	require.Equal(t, "2023-06-16", future.LastTradeDate)
 	require.Equal(t, "2023-06-16", future.ExpirationDate)
 	require.Equal(t, "2023-06-16", future.ClosingOnlyDate)
@@ -375,9 +371,9 @@ func TestGetFutures(t *testing.T) {
 
 	require.Equal(t, 4, len(futureProd.ListedMonths))
 	require.Equal(t, 4, len(futureProd.ActiveMonths))
-	require.Equal(t, models.StringToFloat32(50), futureProd.NotionalMultiplier)
-	require.Equal(t, models.StringToFloat32(.25), futureProd.TickSize)
-	require.Equal(t, models.StringToFloat32(.01), futureProd.DisplayFactor)
+	require.Equal(t, StringToFloat32(50), futureProd.NotionalMultiplier)
+	require.Equal(t, StringToFloat32(.25), futureProd.TickSize)
+	require.Equal(t, StringToFloat32(.01), futureProd.DisplayFactor)
 	require.Equal(t, "XCME", futureProd.StreamerExchangeCode)
 	require.False(t, futureProd.SmallNotional)
 	require.True(t, futureProd.BackMonthFirstCalendarSymbol)
@@ -394,10 +390,10 @@ func TestGetFutures(t *testing.T) {
 	require.Equal(t, 4, roll.BusinessDaysOffset)
 	require.False(t, roll.FirstNotice)
 
-	require.Equal(t, models.StringToFloat32(.25), future.TickSizes[0].Value)
-	require.Equal(t, models.StringToFloat32(.05), future.OptionTickSizes[0].Value)
-	require.Equal(t, models.StringToFloat32(5), future.OptionTickSizes[0].Threshold)
-	require.Equal(t, models.StringToFloat32(.05), future.SpreadTickSizes[0].Value)
+	require.Equal(t, StringToFloat32(.25), future.TickSizes[0].Value)
+	require.Equal(t, StringToFloat32(.05), future.OptionTickSizes[0].Value)
+	require.Equal(t, StringToFloat32(5), future.OptionTickSizes[0].Threshold)
+	require.Equal(t, StringToFloat32(.05), future.SpreadTickSizes[0].Value)
 	require.Equal(t, "/ESU3", future.SpreadTickSizes[0].Symbol)
 }
 
@@ -418,12 +414,12 @@ func TestGetFuture(t *testing.T) {
 
 	require.Equal(t, "/ESM3", future.Symbol)
 	require.Equal(t, productCode, future.ProductCode)
-	require.Equal(t, models.StringToFloat32(50), future.ContractSize)
-	require.Equal(t, models.StringToFloat32(.25), future.TickSize)
-	require.Equal(t, models.StringToFloat32(50), future.NotionalMultiplier)
-	require.Equal(t, models.StringToFloat32(0), future.MainFraction)
-	require.Equal(t, models.StringToFloat32(0), future.SubFraction)
-	require.Equal(t, models.StringToFloat32(0.01), future.DisplayFactor)
+	require.Equal(t, StringToFloat32(50), future.ContractSize)
+	require.Equal(t, StringToFloat32(.25), future.TickSize)
+	require.Equal(t, StringToFloat32(50), future.NotionalMultiplier)
+	require.Equal(t, StringToFloat32(0), future.MainFraction)
+	require.Equal(t, StringToFloat32(0), future.SubFraction)
+	require.Equal(t, StringToFloat32(0.01), future.DisplayFactor)
 	require.Equal(t, "2023-06-16", future.LastTradeDate)
 	require.Equal(t, "2023-06-16", future.ExpirationDate)
 	require.Equal(t, "2023-06-16", future.ClosingOnlyDate)
@@ -461,9 +457,9 @@ func TestGetFuture(t *testing.T) {
 
 	require.Equal(t, 4, len(futureProd.ListedMonths))
 	require.Equal(t, 4, len(futureProd.ActiveMonths))
-	require.Equal(t, models.StringToFloat32(50), futureProd.NotionalMultiplier)
-	require.Equal(t, models.StringToFloat32(.25), futureProd.TickSize)
-	require.Equal(t, models.StringToFloat32(.01), futureProd.DisplayFactor)
+	require.Equal(t, StringToFloat32(50), futureProd.NotionalMultiplier)
+	require.Equal(t, StringToFloat32(.25), futureProd.TickSize)
+	require.Equal(t, StringToFloat32(.01), futureProd.DisplayFactor)
 	require.Equal(t, "XCME", futureProd.StreamerExchangeCode)
 	require.False(t, futureProd.SmallNotional)
 	require.True(t, futureProd.BackMonthFirstCalendarSymbol)
@@ -480,10 +476,10 @@ func TestGetFuture(t *testing.T) {
 	require.Equal(t, 4, roll.BusinessDaysOffset)
 	require.False(t, roll.FirstNotice)
 
-	require.Equal(t, models.StringToFloat32(.25), future.TickSizes[0].Value)
-	require.Equal(t, models.StringToFloat32(.05), future.OptionTickSizes[0].Value)
-	require.Equal(t, models.StringToFloat32(5), future.OptionTickSizes[0].Threshold)
-	require.Equal(t, models.StringToFloat32(.05), future.SpreadTickSizes[0].Value)
+	require.Equal(t, StringToFloat32(.25), future.TickSizes[0].Value)
+	require.Equal(t, StringToFloat32(.05), future.OptionTickSizes[0].Value)
+	require.Equal(t, StringToFloat32(5), future.OptionTickSizes[0].Threshold)
+	require.Equal(t, StringToFloat32(.05), future.SpreadTickSizes[0].Value)
 	require.Equal(t, "/ESU3", future.SpreadTickSizes[0].Symbol)
 }
 
@@ -509,8 +505,8 @@ func TestGetFutureOptionProducts(t *testing.T) {
 	require.Equal(t, "ECYM", fop.ClearportCode)
 	require.Equal(t, "DB", fop.ClearingCode)
 	require.Equal(t, "01", fop.ClearingExchangeCode)
-	require.Equal(t, models.StringToFloat32(100), fop.ClearingPriceMultiplier)
-	require.Equal(t, models.StringToFloat32(0.01), fop.DisplayFactor)
+	require.Equal(t, StringToFloat32(100), fop.ClearingPriceMultiplier)
+	require.Equal(t, StringToFloat32(0.01), fop.DisplayFactor)
 	require.Equal(t, "CME", fop.Exchange)
 	require.Equal(t, "Financial", fop.ProductType)
 	require.Equal(t, "Regular", fop.ExpirationType)
@@ -533,9 +529,9 @@ func TestGetFutureOptionProducts(t *testing.T) {
 	require.Equal(t, "Financial", futureProd.ProductType)
 	require.Equal(t, 4, len(futureProd.ListedMonths))
 	require.Equal(t, 4, len(futureProd.ActiveMonths))
-	require.Equal(t, models.StringToFloat32(1.0), futureProd.NotionalMultiplier)
-	require.Equal(t, models.StringToFloat32(.25), futureProd.TickSize)
-	require.Equal(t, models.StringToFloat32(1.0), futureProd.DisplayFactor)
+	require.Equal(t, StringToFloat32(1.0), futureProd.NotionalMultiplier)
+	require.Equal(t, StringToFloat32(.25), futureProd.TickSize)
+	require.Equal(t, StringToFloat32(1.0), futureProd.DisplayFactor)
 	require.Equal(t, "XCBT", futureProd.StreamerExchangeCode)
 	require.True(t, futureProd.SmallNotional)
 	require.True(t, futureProd.BackMonthFirstCalendarSymbol)
@@ -575,8 +571,8 @@ func TestGetFutureOptionProduct(t *testing.T) {
 	require.Equal(t, "ECYM", fop.ClearportCode)
 	require.Equal(t, "DB", fop.ClearingCode)
 	require.Equal(t, "01", fop.ClearingExchangeCode)
-	require.Equal(t, models.StringToFloat32(100), fop.ClearingPriceMultiplier)
-	require.Equal(t, models.StringToFloat32(0.01), fop.DisplayFactor)
+	require.Equal(t, StringToFloat32(100), fop.ClearingPriceMultiplier)
+	require.Equal(t, StringToFloat32(0.01), fop.DisplayFactor)
 	require.Equal(t, "CME", fop.Exchange)
 	require.Equal(t, "Financial", fop.ProductType)
 	require.Equal(t, "Regular", fop.ExpirationType)
@@ -599,9 +595,9 @@ func TestGetFutureOptionProduct(t *testing.T) {
 	require.Equal(t, "Financial", futureProd.ProductType)
 	require.Equal(t, 4, len(futureProd.ListedMonths))
 	require.Equal(t, 4, len(futureProd.ActiveMonths))
-	require.Equal(t, models.StringToFloat32(1.0), futureProd.NotionalMultiplier)
-	require.Equal(t, models.StringToFloat32(.25), futureProd.TickSize)
-	require.Equal(t, models.StringToFloat32(1.0), futureProd.DisplayFactor)
+	require.Equal(t, StringToFloat32(1.0), futureProd.NotionalMultiplier)
+	require.Equal(t, StringToFloat32(.25), futureProd.TickSize)
+	require.Equal(t, StringToFloat32(1.0), futureProd.DisplayFactor)
 	require.Equal(t, "XCBT", futureProd.StreamerExchangeCode)
 	require.True(t, futureProd.SmallNotional)
 	require.True(t, futureProd.BackMonthFirstCalendarSymbol)
@@ -624,20 +620,20 @@ func TestGetFutureOptions(t *testing.T) {
 	setup()
 	defer teardown()
 
-	future := utils.FutureSymbology{ProductCode: "ES", MonthCode: constants.December, YearDigit: 9}
+	future := FutureSymbology{ProductCode: "ES", MonthCode: December, YearDigit: 9}
 
 	expiry := time.Date(2019, 9, 27, 0, 0, 0, 0, time.Local)
-	fcc := utils.FutureOptionsSymbology{
+	fcc := FutureOptionsSymbology{
 		OptionContractCode: "EW4U9",
 		FutureContractCode: future.Build(),
-		OptionType:         constants.Put,
+		OptionType:         Put,
 		Strike:             2975,
 		Expiration:         expiry,
 	}
 
 	symbol := fcc.Build()
 
-	query := queries.FutureOptions{
+	query := FutureOptionsQuery{
 		Symbols: []string{symbol},
 	}
 
@@ -658,23 +654,23 @@ func TestGetFutureOptions(t *testing.T) {
 	require.Equal(t, expiry.Format("2006-01-02"), fo.ExpirationDate)
 	require.Equal(t, "/ES", fo.RootSymbol)
 	require.Equal(t, "EW4", fo.OptionRootSymbol)
-	require.Equal(t, models.StringToFloat32(2975), fo.StrikePrice)
+	require.Equal(t, StringToFloat32(2975), fo.StrikePrice)
 	require.Equal(t, "CME", fo.Exchange)
 	require.Equal(t, "EW4U9 P2975", fo.ExchangeSymbol)
-	require.Equal(t, constants.Put, fo.OptionType)
+	require.Equal(t, Put, fo.OptionType)
 	require.Equal(t, "American", fo.ExerciseStyle)
 	require.True(t, fo.IsVanilla)
 	require.True(t, fo.IsPrimaryDeliverable)
-	require.Equal(t, models.StringToFloat32(1), fo.FuturePriceRatio)
-	require.Equal(t, models.StringToFloat32(1), fo.Multiplier)
-	require.Equal(t, models.StringToFloat32(1), fo.UnderlyingCount)
+	require.Equal(t, StringToFloat32(1), fo.FuturePriceRatio)
+	require.Equal(t, StringToFloat32(1), fo.Multiplier)
+	require.Equal(t, StringToFloat32(1), fo.UnderlyingCount)
 	require.True(t, fo.IsConfirmed)
-	require.Equal(t, models.StringToFloat32(.5), fo.NotionalValue)
-	require.Equal(t, models.StringToFloat32(.01), fo.DisplayFactor)
+	require.Equal(t, StringToFloat32(.5), fo.NotionalValue)
+	require.Equal(t, StringToFloat32(.01), fo.DisplayFactor)
 	require.Equal(t, "2", fo.SecurityExchange)
 	require.Equal(t, "0", fo.SxID)
 	require.Equal(t, "Future", fo.SettlementType)
-	require.Equal(t, models.StringToFloat32(1), fo.StrikeFactor)
+	require.Equal(t, StringToFloat32(1), fo.StrikeFactor)
 	require.Equal(t, expiry.Format("2006-01-02"), fo.MaturityDate)
 	require.True(t, fo.IsExercisableWeekly)
 	require.Equal(t, "0", fo.LastTradeTime)
@@ -693,8 +689,8 @@ func TestGetFutureOptions(t *testing.T) {
 	require.Equal(t, "EW4", fop.ClearportCode)
 	require.Equal(t, "W4", fop.ClearingCode)
 	require.Equal(t, "9C", fop.ClearingExchangeCode)
-	require.Equal(t, models.StringToFloat32(1), fop.ClearingPriceMultiplier)
-	require.Equal(t, models.StringToFloat32(.01), fop.DisplayFactor)
+	require.Equal(t, StringToFloat32(1), fop.ClearingPriceMultiplier)
+	require.Equal(t, StringToFloat32(.01), fop.DisplayFactor)
 	require.Equal(t, "CME", fop.Exchange)
 	require.Equal(t, "Physical", fop.ProductType)
 	require.Equal(t, "Weekly", fop.ExpirationType)
@@ -707,13 +703,13 @@ func TestGetFutureOption(t *testing.T) {
 	setup()
 	defer teardown()
 
-	future := utils.FutureSymbology{ProductCode: "ES", MonthCode: constants.December, YearDigit: 9}
+	future := FutureSymbology{ProductCode: "ES", MonthCode: December, YearDigit: 9}
 
 	expiry := time.Date(2019, 9, 27, 0, 0, 0, 0, time.Local)
-	fcc := utils.FutureOptionsSymbology{
+	fcc := FutureOptionsSymbology{
 		OptionContractCode: "EW4U9",
 		FutureContractCode: future.Build(),
-		OptionType:         constants.Put,
+		OptionType:         Put,
 		Strike:             2975,
 		Expiration:         expiry,
 	}
@@ -734,23 +730,23 @@ func TestGetFutureOption(t *testing.T) {
 	require.Equal(t, expiry.Format("2006-01-02"), fo.ExpirationDate)
 	require.Equal(t, "/ES", fo.RootSymbol)
 	require.Equal(t, "EW4", fo.OptionRootSymbol)
-	require.Equal(t, models.StringToFloat32(2975), fo.StrikePrice)
+	require.Equal(t, StringToFloat32(2975), fo.StrikePrice)
 	require.Equal(t, "CME", fo.Exchange)
 	require.Equal(t, "EW4U9 P2975", fo.ExchangeSymbol)
-	require.Equal(t, constants.Put, fo.OptionType)
+	require.Equal(t, Put, fo.OptionType)
 	require.Equal(t, "American", fo.ExerciseStyle)
 	require.True(t, fo.IsVanilla)
 	require.True(t, fo.IsPrimaryDeliverable)
-	require.Equal(t, models.StringToFloat32(1), fo.FuturePriceRatio)
-	require.Equal(t, models.StringToFloat32(1), fo.Multiplier)
-	require.Equal(t, models.StringToFloat32(1), fo.UnderlyingCount)
+	require.Equal(t, StringToFloat32(1), fo.FuturePriceRatio)
+	require.Equal(t, StringToFloat32(1), fo.Multiplier)
+	require.Equal(t, StringToFloat32(1), fo.UnderlyingCount)
 	require.True(t, fo.IsConfirmed)
-	require.Equal(t, models.StringToFloat32(.5), fo.NotionalValue)
-	require.Equal(t, models.StringToFloat32(.01), fo.DisplayFactor)
+	require.Equal(t, StringToFloat32(.5), fo.NotionalValue)
+	require.Equal(t, StringToFloat32(.01), fo.DisplayFactor)
 	require.Equal(t, "2", fo.SecurityExchange)
 	require.Equal(t, "0", fo.SxID)
 	require.Equal(t, "Future", fo.SettlementType)
-	require.Equal(t, models.StringToFloat32(1), fo.StrikeFactor)
+	require.Equal(t, StringToFloat32(1), fo.StrikeFactor)
 	require.Equal(t, expiry.Format("2006-01-02"), fo.MaturityDate)
 	require.True(t, fo.IsExercisableWeekly)
 	require.Equal(t, "0", fo.LastTradeTime)
@@ -769,8 +765,8 @@ func TestGetFutureOption(t *testing.T) {
 	require.Equal(t, "EW4", fop.ClearportCode)
 	require.Equal(t, "W4", fop.ClearingCode)
 	require.Equal(t, "9C", fop.ClearingExchangeCode)
-	require.Equal(t, models.StringToFloat32(1), fop.ClearingPriceMultiplier)
-	require.Equal(t, models.StringToFloat32(.01), fop.DisplayFactor)
+	require.Equal(t, StringToFloat32(1), fop.ClearingPriceMultiplier)
+	require.Equal(t, StringToFloat32(.01), fop.DisplayFactor)
 	require.Equal(t, "CME", fop.Exchange)
 	require.Equal(t, "Physical", fop.ProductType)
 	require.Equal(t, "Weekly", fop.ExpirationType)
@@ -783,7 +779,7 @@ func TestGetFutureProduct(t *testing.T) {
 	setup()
 	defer teardown()
 
-	exchange := constants.CME
+	exchange := CME
 	code := "ES"
 
 	mux.HandleFunc(fmt.Sprintf("/instruments/future-products/%s/%s", exchange, code), func(writer http.ResponseWriter, request *http.Request) {
@@ -805,9 +801,9 @@ func TestGetFutureProduct(t *testing.T) {
 	require.Equal(t, "Financial", fp.ProductType)
 	require.Equal(t, 4, len(fp.ListedMonths))
 	require.Equal(t, 4, len(fp.ActiveMonths))
-	require.Equal(t, models.StringToFloat32(50), fp.NotionalMultiplier)
-	require.Equal(t, models.StringToFloat32(.25), fp.TickSize)
-	require.Equal(t, models.StringToFloat32(.01), fp.DisplayFactor)
+	require.Equal(t, StringToFloat32(50), fp.NotionalMultiplier)
+	require.Equal(t, StringToFloat32(.25), fp.TickSize)
+	require.Equal(t, StringToFloat32(.01), fp.DisplayFactor)
 	require.Equal(t, "XCME", fp.StreamerExchangeCode)
 	require.False(t, fp.SmallNotional)
 	require.True(t, fp.BackMonthFirstCalendarSymbol)
@@ -825,8 +821,8 @@ func TestGetFutureProduct(t *testing.T) {
 	require.Equal(t, "E2B", op.ClearportCode)
 	require.Equal(t, "ES", op.ClearingCode)
 	require.Equal(t, "9C", op.ClearingExchangeCode)
-	require.Equal(t, models.StringToFloat32(1), op.ClearingPriceMultiplier)
-	require.Equal(t, models.StringToFloat32(.01), op.DisplayFactor)
+	require.Equal(t, StringToFloat32(1), op.ClearingPriceMultiplier)
+	require.Equal(t, StringToFloat32(.01), op.DisplayFactor)
 	require.Equal(t, "CME", op.Exchange)
 	require.Equal(t, "Physical", op.ProductType)
 	require.Equal(t, "Weekly", op.ExpirationType)
@@ -870,9 +866,9 @@ func TestGetFutureProducts(t *testing.T) {
 	require.Equal(t, "Financial", fp.ProductType)
 	require.Equal(t, 4, len(fp.ListedMonths))
 	require.Equal(t, 4, len(fp.ActiveMonths))
-	require.Equal(t, models.StringToFloat32(50), fp.NotionalMultiplier)
-	require.Equal(t, models.StringToFloat32(.25), fp.TickSize)
-	require.Equal(t, models.StringToFloat32(.01), fp.DisplayFactor)
+	require.Equal(t, StringToFloat32(50), fp.NotionalMultiplier)
+	require.Equal(t, StringToFloat32(.25), fp.TickSize)
+	require.Equal(t, StringToFloat32(.01), fp.DisplayFactor)
 	require.Equal(t, "XCME", fp.StreamerExchangeCode)
 	require.False(t, fp.SmallNotional)
 	require.True(t, fp.BackMonthFirstCalendarSymbol)
@@ -890,8 +886,8 @@ func TestGetFutureProducts(t *testing.T) {
 	require.Equal(t, "E2B", op.ClearportCode)
 	require.Equal(t, "ES", op.ClearingCode)
 	require.Equal(t, "9C", op.ClearingExchangeCode)
-	require.Equal(t, models.StringToFloat32(1), op.ClearingPriceMultiplier)
-	require.Equal(t, models.StringToFloat32(.01), op.DisplayFactor)
+	require.Equal(t, StringToFloat32(1), op.ClearingPriceMultiplier)
+	require.Equal(t, StringToFloat32(.01), op.DisplayFactor)
 	require.Equal(t, "CME", op.Exchange)
 	require.Equal(t, "Physical", op.ProductType)
 	require.Equal(t, "Weekly", op.ExpirationType)
@@ -921,7 +917,7 @@ func TestGetQuantityDecimalPrecisions(t *testing.T) {
 
 	prec := resp[0]
 
-	require.Equal(t, constants.Crypto, prec.InstrumentType)
+	require.Equal(t, Crypto, prec.InstrumentType)
 	require.Equal(t, "AAVE/USD", prec.Symbol)
 	require.Equal(t, 8, prec.Value)
 	require.Equal(t, 6, prec.MinimumIncrementPrecision)
@@ -943,7 +939,7 @@ func TestGetWarrants(t *testing.T) {
 	war := resp[0]
 
 	require.Equal(t, symbol, war.Symbol)
-	require.Equal(t, constants.Warrant, war.InstrumentType)
+	require.Equal(t, WarrantIT, war.InstrumentType)
 	require.Equal(t, "XNAS", war.ListedMarket)
 	require.Equal(t, "Nikola Corporation - Warrant expiring 6/3/2025", war.Description)
 	require.False(t, war.IsClosingOnly)
@@ -964,7 +960,7 @@ func TestGetWarrant(t *testing.T) {
 	require.Nil(t, err)
 
 	require.Equal(t, symbol, war.Symbol)
-	require.Equal(t, constants.Warrant, war.InstrumentType)
+	require.Equal(t, WarrantIT, war.InstrumentType)
 	require.Equal(t, "XNAS", war.ListedMarket)
 	require.Equal(t, "Nikola Corporation - Warrant expiring 6/3/2025", war.Description)
 	require.False(t, war.IsClosingOnly)

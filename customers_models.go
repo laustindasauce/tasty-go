@@ -1,4 +1,4 @@
-package models
+package tasty
 
 type Customer struct {
 	ID                              string              `json:"id"`

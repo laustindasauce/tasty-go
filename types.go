@@ -1,10 +1,9 @@
-package models
+package tasty
 
 import (
 	"encoding/json"
 	"strconv"
 	"strings"
-	"time"
 )
 
 type StringToFloat32 float32
@@ -38,24 +37,6 @@ func (foe *StringToFloat32) UnmarshalJSON(data []byte) error {
 // MarshalJSON is the custom marshaler interface.
 func (foe StringToFloat32) MarshalJSON() ([]byte, error) {
 	return json.Marshal(float32(foe))
-}
-
-type SimpleDate time.Time
-
-// UnmarshalJSON is the custom unmarshaler interface.
-func (j *SimpleDate) UnmarshalJSON(b []byte) error {
-	s := strings.Trim(string(b), "\"")
-	t, err := time.Parse("2006-01-02", s)
-	if err != nil {
-		return err
-	}
-	*j = SimpleDate(t)
-	return nil
-}
-
-// MarshalJSON is the custom marshaler interface.
-func (j SimpleDate) MarshalJSON() ([]byte, error) {
-	return json.Marshal(time.Time(j))
 }
 
 type Pagination struct {

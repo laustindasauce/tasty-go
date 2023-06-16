@@ -2,16 +2,14 @@ package tasty
 
 import (
 	"net/http"
-
-	"github.com/austinbspencer/tasty-go/models"
 )
 
 type sessionResponse struct {
-	Session models.Session `json:"data"`
+	Session Session `json:"data"`
 }
 
 // Create a new user session.
-func (c *Client) CreateSession(login models.LoginInfo, twoFactorCode *string) (models.Session, *Error) {
+func (c *Client) CreateSession(login LoginInfo, twoFactorCode *string) (Session, *Error) {
 	path := "/sessions"
 
 	session := new(sessionResponse)
@@ -26,16 +24,16 @@ func (c *Client) CreateSession(login models.LoginInfo, twoFactorCode *string) (m
 	if err == nil {
 		c.Session = session.Session
 	} else {
-		return models.Session{}, err
+		return Session{}, err
 	}
 
 	return session.Session, nil
 }
 
 // Validate the user session.
-func (c *Client) ValidateSession() (models.Session, *Error) {
+func (c *Client) ValidateSession() (Session, *Error) {
 	if c.Session.SessionToken == nil {
-		return models.Session{}, &Error{Message: "Session is invalid: Session Token cannot be nil."}
+		return Session{}, &Error{Message: "Session is invalid: Session Token cannot be nil."}
 	}
 	path := "/sessions/validate"
 
@@ -46,7 +44,7 @@ func (c *Client) ValidateSession() (models.Session, *Error) {
 
 	err := c.request(http.MethodPost, path, header, nil, nil, session)
 	if err != nil {
-		return models.Session{}, err
+		return Session{}, err
 	}
 
 	c.Session = session.Session
