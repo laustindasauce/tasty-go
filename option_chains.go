@@ -8,11 +8,7 @@ import (
 
 // Returns a futures option chain given a futures product code, i.e. ES.
 func (c *Client) GetFuturesOptionChains(productCode string) ([]FutureOption, *Error) {
-	if c.Session.SessionToken == nil {
-		return []FutureOption{}, &Error{Message: "Session is invalid: Session Token cannot be nil."}
-	}
-
-	reqURL := fmt.Sprintf("/futures-option-chains/%s", productCode)
+	path := fmt.Sprintf("/futures-option-chains/%s", productCode)
 
 	type instrumentResponse struct {
 		Data struct {
@@ -22,10 +18,7 @@ func (c *Client) GetFuturesOptionChains(productCode string) ([]FutureOption, *Er
 
 	instrumentRes := new(instrumentResponse)
 
-	header := http.Header{}
-	header.Add("Authorization", *c.Session.SessionToken)
-
-	err := c.request(http.MethodGet, reqURL, header, nil, nil, instrumentRes)
+	err := c.request(http.MethodGet, path, nil, nil, instrumentRes)
 	if err != nil {
 		return []FutureOption{}, err
 	}
@@ -36,11 +29,7 @@ func (c *Client) GetFuturesOptionChains(productCode string) ([]FutureOption, *Er
 // Returns a futures option chain given a futures product code in a nested form to minimize
 // redundant processing.
 func (c *Client) GetNestedFuturesOptionChains(productCode string) (NestedFuturesOptionChains, *Error) {
-	if c.Session.SessionToken == nil {
-		return NestedFuturesOptionChains{}, &Error{Message: "Session is invalid: Session Token cannot be nil."}
-	}
-
-	reqURL := fmt.Sprintf("/futures-option-chains/%s/nested", productCode)
+	path := fmt.Sprintf("/futures-option-chains/%s/nested", productCode)
 
 	type instrumentResponse struct {
 		Chains NestedFuturesOptionChains `json:"data"`
@@ -48,10 +37,7 @@ func (c *Client) GetNestedFuturesOptionChains(productCode string) (NestedFutures
 
 	instrumentRes := new(instrumentResponse)
 
-	header := http.Header{}
-	header.Add("Authorization", *c.Session.SessionToken)
-
-	err := c.request(http.MethodGet, reqURL, header, nil, nil, instrumentRes)
+	err := c.request(http.MethodGet, path, nil, nil, instrumentRes)
 	if err != nil {
 		return NestedFuturesOptionChains{}, err
 	}
@@ -61,10 +47,6 @@ func (c *Client) GetNestedFuturesOptionChains(productCode string) (NestedFutures
 
 // Returns an option chain given an underlying symbol, i.e. AAPL.
 func (c *Client) GetEquityOptionChains(symbol string) ([]EquityOption, *Error) {
-	if c.Session.SessionToken == nil {
-		return []EquityOption{}, &Error{Message: "Session is invalid: Session Token cannot be nil."}
-	}
-
 	// url escape required for instances where "/" exists in symbol i.e. BRK/B
 	symbol = url.PathEscape(symbol)
 
@@ -78,11 +60,8 @@ func (c *Client) GetEquityOptionChains(symbol string) ([]EquityOption, *Error) {
 
 	instrumentRes := new(instrumentResponse)
 
-	header := http.Header{}
-	header.Add("Authorization", *c.Session.SessionToken)
-
 	// customRequest required for instances where "/" exists in symbol i.e. BRK/B
-	err := c.customRequest(http.MethodGet, path, header, nil, nil, instrumentRes)
+	err := c.customRequest(http.MethodGet, path, nil, nil, instrumentRes)
 	if err != nil {
 		return []EquityOption{}, err
 	}
@@ -93,10 +72,6 @@ func (c *Client) GetEquityOptionChains(symbol string) ([]EquityOption, *Error) {
 // Returns an option chain given an underlying symbol,
 // i.e. AAPL in a nested form to minimize redundant processing.
 func (c *Client) GetNestedEquityOptionChains(symbol string) ([]NestedOptionChains, *Error) {
-	if c.Session.SessionToken == nil {
-		return []NestedOptionChains{}, &Error{Message: "Session is invalid: Session Token cannot be nil."}
-	}
-
 	// url escape required for instances where "/" exists in symbol i.e. BRK/B
 	symbol = url.PathEscape(symbol)
 
@@ -110,11 +85,8 @@ func (c *Client) GetNestedEquityOptionChains(symbol string) ([]NestedOptionChain
 
 	instrumentRes := new(instrumentResponse)
 
-	header := http.Header{}
-	header.Add("Authorization", *c.Session.SessionToken)
-
 	// customRequest required for instances where "/" exists in symbol i.e. BRK/B
-	err := c.customRequest(http.MethodGet, path, header, nil, nil, instrumentRes)
+	err := c.customRequest(http.MethodGet, path, nil, nil, instrumentRes)
 	if err != nil {
 		return []NestedOptionChains{}, err
 	}
@@ -125,10 +97,6 @@ func (c *Client) GetNestedEquityOptionChains(symbol string) ([]NestedOptionChain
 // Returns an option chain given an underlying symbol,
 // i.e. AAPL in a compact form to minimize content size.
 func (c *Client) GetCompactEquityOptionChains(symbol string) ([]CompactOptionChains, *Error) {
-	if c.Session.SessionToken == nil {
-		return []CompactOptionChains{}, &Error{Message: "Session is invalid: Session Token cannot be nil."}
-	}
-
 	// url escape required for instances where "/" exists in symbol i.e. BRK/B
 	symbol = url.PathEscape(symbol)
 
@@ -142,11 +110,8 @@ func (c *Client) GetCompactEquityOptionChains(symbol string) ([]CompactOptionCha
 
 	instrumentRes := new(instrumentResponse)
 
-	header := http.Header{}
-	header.Add("Authorization", *c.Session.SessionToken)
-
 	// customRequest required for instances where "/" exists in symbol i.e. BRK/B
-	err := c.customRequest(http.MethodGet, path, header, nil, nil, instrumentRes)
+	err := c.customRequest(http.MethodGet, path, nil, nil, instrumentRes)
 	if err != nil {
 		return []CompactOptionChains{}, err
 	}

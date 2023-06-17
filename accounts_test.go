@@ -43,6 +43,19 @@ func TestGetMyAccounts(t *testing.T) {
 	require.Equal(t, "2022-10-27T20:49:52.793Z", roth.CreatedAt.Format(time.RFC3339Nano))
 }
 
+func TestGetMyAccountsError(t *testing.T) {
+	setup()
+	defer teardown()
+
+	mux.HandleFunc("/customers/me/accounts", func(writer http.ResponseWriter, request *http.Request) {
+		writer.WriteHeader(401)
+		fmt.Fprint(writer, tastyUnauthorizedError)
+	})
+
+	_, err := client.GetMyAccounts()
+	expectedUnauthorized(t, err)
+}
+
 func TestGetAccountTradingStatus(t *testing.T) {
 	setup()
 	defer teardown()
@@ -88,6 +101,21 @@ func TestGetAccountTradingStatus(t *testing.T) {
 	require.False(t, resp.IsEquityOfferingClosingOnly)
 	require.Equal(t, "2022-10-27T20:49:52.928Z", resp.EnhancedFraudSafeguardsEnabledAt.Format(time.RFC3339Nano))
 	require.Equal(t, "2023-05-28T20:44:40.32Z", resp.UpdatedAt.Format(time.RFC3339Nano))
+}
+
+func TestGetAccountTradingStatusError(t *testing.T) {
+	setup()
+	defer teardown()
+
+	accountNumber := "5YZ55555"
+
+	mux.HandleFunc(fmt.Sprintf("/accounts/%s/trading-status", accountNumber), func(writer http.ResponseWriter, request *http.Request) {
+		writer.WriteHeader(401)
+		fmt.Fprint(writer, tastyUnauthorizedError)
+	})
+
+	_, err := client.GetAccountTradingStatus(accountNumber)
+	expectedUnauthorized(t, err)
 }
 
 func TestGetAccountBalances(t *testing.T) {
@@ -141,6 +169,21 @@ func TestGetAccountBalances(t *testing.T) {
 	require.Equal(t, "2023-06-08T16:30:18.889Z", resp.UpdatedAt.Format(time.RFC3339Nano))
 }
 
+func TestGetAccountBalancesError(t *testing.T) {
+	setup()
+	defer teardown()
+
+	accountNumber := "5YZ55555"
+
+	mux.HandleFunc(fmt.Sprintf("/accounts/%s/balances", accountNumber), func(writer http.ResponseWriter, request *http.Request) {
+		writer.WriteHeader(401)
+		fmt.Fprint(writer, tastyUnauthorizedError)
+	})
+
+	_, err := client.GetAccountBalances(accountNumber)
+	expectedUnauthorized(t, err)
+}
+
 func TestGetAccountPositions(t *testing.T) {
 	setup()
 	defer teardown()
@@ -181,6 +224,22 @@ func TestGetAccountPositions(t *testing.T) {
 	require.Equal(t, "2023-05-24", rivn.RealizedTodayDate)
 	require.Equal(t, "2023-05-24T17:17:57.615Z", rivn.CreatedAt.Format(time.RFC3339Nano))
 	require.Equal(t, "2023-05-24T17:17:58.632Z", rivn.UpdatedAt.Format(time.RFC3339Nano))
+}
+
+func TestGetAccountPositionsError(t *testing.T) {
+	setup()
+	defer teardown()
+
+	accountNumber := "5YZ55555"
+	query := AccountPositionQuery{UnderlyingSymbol: []string{"RIVN"}}
+
+	mux.HandleFunc(fmt.Sprintf("/accounts/%s/positions", accountNumber), func(writer http.ResponseWriter, request *http.Request) {
+		writer.WriteHeader(401)
+		fmt.Fprint(writer, tastyUnauthorizedError)
+	})
+
+	_, err := client.GetAccountPositions(accountNumber, query)
+	expectedUnauthorized(t, err)
 }
 
 func TestGetAccountBalanceSnapshots(t *testing.T) {
@@ -246,6 +305,22 @@ func TestGetAccountBalanceSnapshots(t *testing.T) {
 	require.Equal(t, "2023-06-08T18:37:39.568Z", snap.UpdatedAt.Format(time.RFC3339Nano))
 }
 
+func TestGetAccountBalanceSnapshotsError(t *testing.T) {
+	setup()
+	defer teardown()
+
+	accountNumber := "5YZ55555"
+	query := AccountBalanceSnapshotsQuery{SnapshotDate: time.Now().AddDate(0, -2, 0)}
+
+	mux.HandleFunc(fmt.Sprintf("/accounts/%s/balance-snapshots", accountNumber), func(writer http.ResponseWriter, request *http.Request) {
+		writer.WriteHeader(401)
+		fmt.Fprint(writer, tastyUnauthorizedError)
+	})
+
+	_, err := client.GetAccountBalanceSnapshots(accountNumber, query)
+	expectedUnauthorized(t, err)
+}
+
 func TestGetAccountNetLiqHistory(t *testing.T) {
 	setup()
 	defer teardown()
@@ -279,6 +354,22 @@ func TestGetAccountNetLiqHistory(t *testing.T) {
 	require.Equal(t, "2023-06-08 13:30:00+00", liq.Time)
 }
 
+func TestGetAccountNetLiqHistoryError(t *testing.T) {
+	setup()
+	defer teardown()
+
+	accountNumber := "5YZ55555"
+	query := HistoricLiquidityQuery{TimeBack: OneDay}
+
+	mux.HandleFunc(fmt.Sprintf("/accounts/%s/net-liq/history", accountNumber), func(writer http.ResponseWriter, request *http.Request) {
+		writer.WriteHeader(401)
+		fmt.Fprint(writer, tastyUnauthorizedError)
+	})
+
+	_, err := client.GetAccountNetLiqHistory(accountNumber, query)
+	expectedUnauthorized(t, err)
+}
+
 func TestGetAccountPositionLimit(t *testing.T) {
 	setup()
 	defer teardown()
@@ -302,6 +393,21 @@ func TestGetAccountPositionLimit(t *testing.T) {
 	require.Equal(t, 20000, resp.EquityOptionPositionSize)
 	require.Equal(t, 5000, resp.FuturePositionSize)
 	require.Equal(t, 5000, resp.FutureOptionPositionSize)
+}
+
+func TestGetAccountPositionLimitError(t *testing.T) {
+	setup()
+	defer teardown()
+
+	accountNumber := "5YZ55555"
+
+	mux.HandleFunc(fmt.Sprintf("/accounts/%s/position-limit", accountNumber), func(writer http.ResponseWriter, request *http.Request) {
+		writer.WriteHeader(401)
+		fmt.Fprint(writer, tastyUnauthorizedError)
+	})
+
+	_, err := client.GetAccountPositionLimit(accountNumber)
+	expectedUnauthorized(t, err)
 }
 
 const myAccountsResp = `{

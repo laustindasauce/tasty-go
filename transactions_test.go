@@ -66,6 +66,22 @@ func TestGetAccountTransactions(t *testing.T) {
 	require.Equal(t, "WOLVERINE_OPTIONS_A", tr.DestinationVenue)
 }
 
+func TestGetAccountTransactionsError(t *testing.T) {
+	setup()
+	defer teardown()
+
+	accountNumber := "5YZ55555"
+	query := TransactionsQuery{PerPage: 3}
+
+	mux.HandleFunc(fmt.Sprintf("/accounts/%s/transactions", accountNumber), func(writer http.ResponseWriter, request *http.Request) {
+		writer.WriteHeader(401)
+		fmt.Fprint(writer, tastyUnauthorizedError)
+	})
+
+	_, err := client.GetAccountTransactions(accountNumber, query)
+	expectedUnauthorized(t, err)
+}
+
 func TestGetAccountTransaction(t *testing.T) {
 	setup()
 	defer teardown()
@@ -119,6 +135,22 @@ func TestGetAccountTransaction(t *testing.T) {
 	require.Equal(t, "WOLVERINE_OPTIONS_A", tr.DestinationVenue)
 }
 
+func TestGetAccountTransactionError(t *testing.T) {
+	setup()
+	defer teardown()
+
+	accountNumber := "5YZ55555"
+	id := 2455333333
+
+	mux.HandleFunc(fmt.Sprintf("/accounts/%s/transactions/%d", accountNumber, id), func(writer http.ResponseWriter, request *http.Request) {
+		writer.WriteHeader(401)
+		fmt.Fprint(writer, tastyUnauthorizedError)
+	})
+
+	_, err := client.GetAccountTransaction(accountNumber, id)
+	expectedUnauthorized(t, err)
+}
+
 func TestGetAccountTransactionFees(t *testing.T) {
 	setup()
 	defer teardown()
@@ -134,6 +166,21 @@ func TestGetAccountTransactionFees(t *testing.T) {
 
 	require.Equal(t, StringToFloat32(0), fees.TotalFees)
 	require.Equal(t, None, fees.TotalFeesEffect)
+}
+
+func TestGetAccountTransactionFeesError(t *testing.T) {
+	setup()
+	defer teardown()
+
+	accountNumber := "5YZ55555"
+
+	mux.HandleFunc(fmt.Sprintf("/accounts/%s/transactions/total-fees", accountNumber), func(writer http.ResponseWriter, request *http.Request) {
+		writer.WriteHeader(401)
+		fmt.Fprint(writer, tastyUnauthorizedError)
+	})
+
+	_, err := client.GetAccountTransactionFees(accountNumber, nil)
+	expectedUnauthorized(t, err)
 }
 
 const transactionsResp = `{

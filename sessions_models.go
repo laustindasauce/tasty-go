@@ -24,3 +24,9 @@ type Session struct {
 	SessionToken  *string `json:"session-token"`
 	RememberToken *string `json:"remember-token"`
 }
+
+type PasswordReset struct {
+	Password             string `json:"password"`
+	PasswordConfirmation string `json:"password-confirmation"`
+	ResetPasswordToken   string `json:"reset-password-token"`
+}

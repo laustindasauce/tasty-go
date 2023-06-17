@@ -7,9 +7,6 @@ import (
 
 // Get authenticated customer.
 func (c *Client) GetMyCustomerInfo() (Customer, *Error) {
-	if c.Session.SessionToken == nil {
-		return Customer{}, &Error{Message: "Session is invalid: Session Token cannot be nil."}
-	}
 	path := "/customers/me"
 
 	type customerResponse struct {
@@ -18,10 +15,7 @@ func (c *Client) GetMyCustomerInfo() (Customer, *Error) {
 
 	customersRes := new(customerResponse)
 
-	header := http.Header{}
-	header.Add("Authorization", *c.Session.SessionToken)
-
-	err := c.request(http.MethodGet, path, header, nil, nil, customersRes)
+	err := c.request(http.MethodGet, path, nil, nil, customersRes)
 	if err != nil {
 		return Customer{}, err
 	}
@@ -31,9 +25,6 @@ func (c *Client) GetMyCustomerInfo() (Customer, *Error) {
 
 // Get a full customer resource.
 func (c *Client) GetCustomer(customerID string) (Customer, *Error) {
-	if c.Session.SessionToken == nil {
-		return Customer{}, &Error{Message: "Session is invalid: Session Token cannot be nil."}
-	}
 	path := fmt.Sprintf("/customers/%s", customerID)
 
 	type customerResponse struct {
@@ -42,10 +33,7 @@ func (c *Client) GetCustomer(customerID string) (Customer, *Error) {
 
 	customersRes := new(customerResponse)
 
-	header := http.Header{}
-	header.Add("Authorization", *c.Session.SessionToken)
-
-	err := c.request(http.MethodGet, path, header, nil, nil, customersRes)
+	err := c.request(http.MethodGet, path, nil, nil, customersRes)
 	if err != nil {
 		return Customer{}, err
 	}
@@ -55,9 +43,6 @@ func (c *Client) GetCustomer(customerID string) (Customer, *Error) {
 
 // Get a list of all the customer account resources attached to the current customer.
 func (c *Client) GetCustomerAccounts(customerID string) ([]Account, *Error) {
-	if c.Session.SessionToken == nil {
-		return []Account{}, &Error{Message: "Session is invalid: Session Token cannot be nil."}
-	}
 	path := fmt.Sprintf("/customers/%s/accounts", customerID)
 
 	type customerResponse struct {
@@ -70,10 +55,7 @@ func (c *Client) GetCustomerAccounts(customerID string) ([]Account, *Error) {
 
 	customersRes := new(customerResponse)
 
-	header := http.Header{}
-	header.Add("Authorization", *c.Session.SessionToken)
-
-	err := c.request(http.MethodGet, path, header, nil, nil, customersRes)
+	err := c.request(http.MethodGet, path, nil, nil, customersRes)
 	if err != nil {
 		return []Account{}, err
 	}
@@ -89,9 +71,6 @@ func (c *Client) GetCustomerAccounts(customerID string) ([]Account, *Error) {
 
 // Get a full customer account resource.
 func (c *Client) GetCustomerAccount(customerID, accountNumber string) (Account, *Error) {
-	if c.Session.SessionToken == nil {
-		return Account{}, &Error{Message: "Session is invalid: Session Token cannot be nil."}
-	}
 	path := fmt.Sprintf("/customers/%s/accounts/%s", customerID, accountNumber)
 
 	type customerResponse struct {
@@ -100,10 +79,7 @@ func (c *Client) GetCustomerAccount(customerID, accountNumber string) (Account, 
 
 	customersRes := new(customerResponse)
 
-	header := http.Header{}
-	header.Add("Authorization", *c.Session.SessionToken)
-
-	err := c.request(http.MethodGet, path, header, nil, nil, customersRes)
+	err := c.request(http.MethodGet, path, nil, nil, customersRes)
 	if err != nil {
 		return Account{}, err
 	}
@@ -113,9 +89,6 @@ func (c *Client) GetCustomerAccount(customerID, accountNumber string) (Account, 
 
 // Get authenticated user's full account resource.
 func (c *Client) GetMyAccount(accountNumber string) (Account, *Error) {
-	if c.Session.SessionToken == nil {
-		return Account{}, &Error{Message: "Session is invalid: Session Token cannot be nil."}
-	}
 	path := fmt.Sprintf("/customers/me/accounts/%s", accountNumber)
 
 	type customerResponse struct {
@@ -124,10 +97,7 @@ func (c *Client) GetMyAccount(accountNumber string) (Account, *Error) {
 
 	customersRes := new(customerResponse)
 
-	header := http.Header{}
-	header.Add("Authorization", *c.Session.SessionToken)
-
-	err := c.request(http.MethodGet, path, header, nil, nil, customersRes)
+	err := c.request(http.MethodGet, path, nil, nil, customersRes)
 	if err != nil {
 		return Account{}, err
 	}
@@ -138,9 +108,6 @@ func (c *Client) GetMyAccount(accountNumber string) (Account, *Error) {
 // Returns the appropriate quote streamer endpoint, level and identification token.
 // for the current customer to receive market data.
 func (c *Client) GetQuoteStreamerTokens() (QuoteStreamerTokenAuthResult, *Error) {
-	if c.Session.SessionToken == nil {
-		return QuoteStreamerTokenAuthResult{}, &Error{Message: "Session is invalid: Session Token cannot be nil."}
-	}
 	path := "/quote-streamer-tokens"
 
 	type customerResponse struct {
@@ -149,10 +116,7 @@ func (c *Client) GetQuoteStreamerTokens() (QuoteStreamerTokenAuthResult, *Error)
 
 	customersRes := new(customerResponse)
 
-	header := http.Header{}
-	header.Add("Authorization", *c.Session.SessionToken)
-
-	err := c.request(http.MethodGet, path, header, nil, nil, customersRes)
+	err := c.request(http.MethodGet, path, nil, nil, customersRes)
 	if err != nil {
 		return QuoteStreamerTokenAuthResult{}, err
 	}

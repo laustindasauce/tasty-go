@@ -91,6 +91,21 @@ func TestGetMarketMetrics(t *testing.T) {
 	require.Equal(t, time.Date(2023, time.June, 7, 11, 1, 36, 77000000, time.UTC), earnings.UpdatedAt)
 }
 
+func TestGetMarketMetricsError(t *testing.T) {
+	setup()
+	defer teardown()
+
+	symbols := []string{"AAPL", "TSLA"}
+
+	mux.HandleFunc("/market-metrics", func(writer http.ResponseWriter, request *http.Request) {
+		writer.WriteHeader(401)
+		fmt.Fprint(writer, tastyUnauthorizedError)
+	})
+
+	_, err := client.GetMarketMetrics(symbols)
+	expectedUnauthorized(t, err)
+}
+
 func TestGetHistoricDividends(t *testing.T) {
 	setup()
 	defer teardown()
@@ -107,6 +122,21 @@ func TestGetHistoricDividends(t *testing.T) {
 	require.Equal(t, 39, len(resp))
 	require.Equal(t, "2023-05-12", resp[0].OccurredDate)
 	require.Equal(t, StringToFloat32(0.24), resp[0].Amount)
+}
+
+func TestGetHistoricDividendsError(t *testing.T) {
+	setup()
+	defer teardown()
+
+	symbol := "AAPL"
+
+	mux.HandleFunc(fmt.Sprintf("/market-metrics/historic-corporate-events/dividends/%s", symbol), func(writer http.ResponseWriter, request *http.Request) {
+		writer.WriteHeader(401)
+		fmt.Fprint(writer, tastyUnauthorizedError)
+	})
+
+	_, err := client.GetHistoricDividends(symbol)
+	expectedUnauthorized(t, err)
 }
 
 func TestGetHistoricEarnings(t *testing.T) {
@@ -126,6 +156,22 @@ func TestGetHistoricEarnings(t *testing.T) {
 	require.Equal(t, 4, len(resp))
 	require.Equal(t, "2022-06-30", resp[0].OccurredDate)
 	require.Equal(t, StringToFloat32(1.2), resp[0].Eps)
+}
+
+func TestGetHistoricEarningsError(t *testing.T) {
+	setup()
+	defer teardown()
+
+	startDate := time.Now().AddDate(-1, 0, 0)
+	symbol := "AAPL"
+
+	mux.HandleFunc(fmt.Sprintf("/market-metrics/historic-corporate-events/earnings-reports/%s", symbol), func(writer http.ResponseWriter, request *http.Request) {
+		writer.WriteHeader(401)
+		fmt.Fprint(writer, tastyUnauthorizedError)
+	})
+
+	_, err := client.GetHistoricEarnings(symbol, startDate)
+	expectedUnauthorized(t, err)
 }
 
 const marketMetricsResp = `{

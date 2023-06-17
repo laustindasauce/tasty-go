@@ -118,6 +118,19 @@ func TestGetMyCustomerInfo(t *testing.T) {
 	require.Equal(t, "Senior AI & ML Engineer", p.JobTitle)
 }
 
+func TestGetMyCustomerInfoError(t *testing.T) {
+	setup()
+	defer teardown()
+
+	mux.HandleFunc("/customers/me", func(writer http.ResponseWriter, request *http.Request) {
+		writer.WriteHeader(401)
+		fmt.Fprint(writer, tastyUnauthorizedError)
+	})
+
+	_, err := client.GetMyCustomerInfo()
+	expectedUnauthorized(t, err)
+}
+
 func TestGetCustomer(t *testing.T) {
 	setup()
 	defer teardown()
@@ -226,6 +239,18 @@ func TestGetCustomer(t *testing.T) {
 	require.Equal(t, "Unknown", p.EmployerName)
 	require.Equal(t, "Senior AI & ML Engineer", p.JobTitle)
 }
+func TestGetCustomerError(t *testing.T) {
+	setup()
+	defer teardown()
+
+	mux.HandleFunc("/customers/me", func(writer http.ResponseWriter, request *http.Request) {
+		writer.WriteHeader(401)
+		fmt.Fprint(writer, tastyUnauthorizedError)
+	})
+
+	_, err := client.GetCustomer("me")
+	expectedUnauthorized(t, err)
+}
 
 func TestGetCustomerAccounts(t *testing.T) {
 	setup()
@@ -261,6 +286,19 @@ func TestGetCustomerAccounts(t *testing.T) {
 	require.Equal(t, "2022-10-27T20:49:52.793Z", roth.CreatedAt.Format(time.RFC3339Nano))
 }
 
+func TestGetCustomerAccountsError(t *testing.T) {
+	setup()
+	defer teardown()
+
+	mux.HandleFunc("/customers/me/accounts", func(writer http.ResponseWriter, request *http.Request) {
+		writer.WriteHeader(401)
+		fmt.Fprint(writer, tastyUnauthorizedError)
+	})
+
+	_, err := client.GetCustomerAccounts("me")
+	expectedUnauthorized(t, err)
+}
+
 func TestGetCustomerAccount(t *testing.T) {
 	setup()
 	defer teardown()
@@ -290,6 +328,22 @@ func TestGetCustomerAccount(t *testing.T) {
 	require.Equal(t, "SPECULATION", resp.InvestmentObjective)
 	require.Equal(t, "No Restrictions", resp.SuitableOptionsLevel)
 	require.Equal(t, "2023-06-13T23:00:29.903Z", resp.CreatedAt.Format(time.RFC3339Nano))
+}
+
+func TestGetCustomerAccountError(t *testing.T) {
+	setup()
+	defer teardown()
+
+	customerID := "me"
+	accountNumber := "5WV48989"
+
+	mux.HandleFunc(fmt.Sprintf("/customers/%s/accounts/%s", customerID, accountNumber), func(writer http.ResponseWriter, request *http.Request) {
+		writer.WriteHeader(401)
+		fmt.Fprint(writer, tastyUnauthorizedError)
+	})
+
+	_, err := client.GetCustomerAccount(customerID, accountNumber)
+	expectedUnauthorized(t, err)
 }
 
 func TestGetMyAccount(t *testing.T) {
@@ -322,6 +376,21 @@ func TestGetMyAccount(t *testing.T) {
 	require.Equal(t, "2023-06-13T23:00:29.903Z", resp.CreatedAt.Format(time.RFC3339Nano))
 }
 
+func TestGetMyAccountError(t *testing.T) {
+	setup()
+	defer teardown()
+
+	accountNumber := "5WV48989"
+
+	mux.HandleFunc(fmt.Sprintf("/customers/me/accounts/%s", accountNumber), func(writer http.ResponseWriter, request *http.Request) {
+		writer.WriteHeader(401)
+		fmt.Fprint(writer, tastyUnauthorizedError)
+	})
+
+	_, err := client.GetMyAccount(accountNumber)
+	expectedUnauthorized(t, err)
+}
+
 func TestGetQuoteStreamerTokens(t *testing.T) {
 	setup()
 	defer teardown()
@@ -337,6 +406,19 @@ func TestGetQuoteStreamerTokens(t *testing.T) {
 	require.Equal(t, "tasty-live.dxfeed.com:7301", resp.StreamerURL)
 	require.Equal(t, "https://tasty-live-web.dxfeed.com/live", resp.WebsocketURL)
 	require.Equal(t, "live", resp.Level)
+}
+
+func TestGetQuoteStreamerTokensError(t *testing.T) {
+	setup()
+	defer teardown()
+
+	mux.HandleFunc("/quote-streamer-tokens", func(writer http.ResponseWriter, request *http.Request) {
+		writer.WriteHeader(401)
+		fmt.Fprint(writer, tastyUnauthorizedError)
+	})
+
+	_, err := client.GetQuoteStreamerTokens()
+	expectedUnauthorized(t, err)
 }
 
 const getCustomerResp = `{

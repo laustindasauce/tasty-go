@@ -81,8 +81,8 @@ type RelatedOrder struct {
 type OrderLeg struct {
 	InstrumentType    InstrumentType `json:"instrument-type"`
 	Symbol            string         `json:"symbol"`
-	Quantity          int            `json:"quantity"`
-	RemainingQuantity int            `json:"remaining-quantity"`
+	Quantity          float32        `json:"quantity"`
+	RemainingQuantity float32        `json:"remaining-quantity"`
 	Action            OrderAction    `json:"action"`
 	Fills             []OrderFill    `json:"fills"`
 }
@@ -122,7 +122,7 @@ type OrderCondition struct {
 type OrderPriceComponent struct {
 	Symbol            string         `json:"symbol"`
 	InstrumentType    InstrumentType `json:"instrument-type"`
-	Quantity          int            `json:"quantity"`
+	Quantity          float32        `json:"quantity"`
 	QuantityDirection Direction      `json:"quantity-direction"`
 }
 
@@ -149,7 +149,7 @@ type NewOrderECR struct {
 type NewOrderLeg struct {
 	InstrumentType InstrumentType `json:"instrument-type"`
 	Symbol         string         `json:"symbol"`
-	Quantity       int            `json:"quantity,omitempty"`
+	Quantity       float32        `json:"quantity,omitempty"`
 	Action         OrderAction    `json:"action"`
 }
 
@@ -247,7 +247,7 @@ type NewOrderPriceComponent struct {
 	// The instrument's type in relation to the symbol.
 	InstrumentType InstrumentType `json:"instrument-type"`
 	// The Ratio quantity in relation to the symbol
-	Quantity int `json:"quantity"`
+	Quantity float32 `json:"quantity"`
 	// The quantity direction(ie Long or Short) in relation to the symbol
 	QuantityDirection Direction `json:"quantity-direction"`
 }

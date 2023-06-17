@@ -7,22 +7,15 @@ import (
 
 // Fetch current margin/capital requirements report for an account.
 func (c *Client) GetMarginRequirements(accountNumber string) (MarginRequirements, *Error) {
-	if c.Session.SessionToken == nil {
-		return MarginRequirements{}, &Error{Message: "Session is invalid: Session Token cannot be nil."}
-	}
-
 	path := fmt.Sprintf("/margin/accounts/%s/requirements", accountNumber)
 
-	type accountResponse struct {
+	type marginResponse struct {
 		MarginRequirements MarginRequirements `json:"data"`
 	}
 
-	marginRes := new(accountResponse)
+	marginRes := new(marginResponse)
 
-	header := http.Header{}
-	header.Add("Authorization", *c.Session.SessionToken)
-
-	err := c.request(http.MethodGet, path, header, nil, nil, marginRes)
+	err := c.request(http.MethodGet, path, nil, nil, marginRes)
 	if err != nil {
 		return MarginRequirements{}, err
 	}
@@ -31,26 +24,18 @@ func (c *Client) GetMarginRequirements(accountNumber string) (MarginRequirements
 }
 
 // Estimate margin requirements for an order given an account
-// This is not functional at the moment
-// Need more understanding on the expected payload
+// Need more understanding on the expected payload and response
 // https://developer.tastytrade.com/open-api-spec/margin-requirements
 func (c *Client) MarginRequirementsDryRun(accountNumber string, order NewOrder) (any, *Error) {
-	if c.Session.SessionToken == nil {
-		return nil, &Error{Message: "Session is invalid: Session Token cannot be nil."}
-	}
-
 	path := fmt.Sprintf("/margin/accounts/%s/requirements", accountNumber)
 
-	type accountResponse struct {
+	type marginResponse struct {
 		Response any `json:"data"`
 	}
 
-	marginRes := new(accountResponse)
+	marginRes := new(marginResponse)
 
-	header := http.Header{}
-	header.Add("Authorization", *c.Session.SessionToken)
-
-	err := c.request(http.MethodPost, path, header, nil, order, marginRes)
+	err := c.request(http.MethodPost, path, nil, order, marginRes)
 	if err != nil {
 		return nil, err
 	}
@@ -60,22 +45,15 @@ func (c *Client) MarginRequirementsDryRun(accountNumber string, order NewOrder) 
 
 // Get effective margin requirements for account.
 func (c *Client) GetEffectiveMarginRequirements(accountNumber, underlyingSymbol string) (EffectiveMarginRequirements, *Error) {
-	if c.Session.SessionToken == nil {
-		return EffectiveMarginRequirements{}, &Error{Message: "Session is invalid: Session Token cannot be nil."}
-	}
-
 	path := fmt.Sprintf("/accounts/%s/margin-requirements/%s/effective", accountNumber, underlyingSymbol)
 
-	type accountResponse struct {
+	type marginResponse struct {
 		EffectiveMarginRequirements EffectiveMarginRequirements `json:"data"`
 	}
 
-	marginRes := new(accountResponse)
+	marginRes := new(marginResponse)
 
-	header := http.Header{}
-	header.Add("Authorization", *c.Session.SessionToken)
-
-	err := c.request(http.MethodGet, path, header, nil, nil, marginRes)
+	err := c.request(http.MethodGet, path, nil, nil, marginRes)
 	if err != nil {
 		return EffectiveMarginRequirements{}, err
 	}

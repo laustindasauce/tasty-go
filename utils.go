@@ -42,8 +42,8 @@ func (foSym FutureOptionsSymbology) Build() string {
 	return fmt.Sprintf("%s %s%s%d", codes, expiryString, foSym.OptionType, foSym.Strike)
 }
 
-// ContainsInt returns whether or not the int exists in the slice.
-func ContainsInt(s []int, e int) bool {
+// containsInt returns whether or not the int exists in the slice.
+func containsInt(s []int, e int) bool {
 	for _, a := range s {
 		if a == e {
 			return true

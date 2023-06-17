@@ -15,7 +15,7 @@ func TestSubmitMarketOrderDryRun(t *testing.T) {
 
 	accountNumber := "5YZ55555"
 	symbol := "AAPL"
-	quantity := 1
+	quantity := float32(1)
 	action := BTO
 
 	mux.HandleFunc(fmt.Sprintf("/accounts/%s/orders/dry-run", accountNumber), func(writer http.ResponseWriter, request *http.Request) {
@@ -95,13 +95,63 @@ func TestSubmitMarketOrderDryRun(t *testing.T) {
 	require.Equal(t, Debit, fee.TotalFeesEffect)
 }
 
+func TestSubmitMarketOrderDryRunError(t *testing.T) {
+	setup()
+	defer teardown()
+
+	accountNumber := "5YZ55555"
+	symbol := "AAPL"
+	quantity := float32(1)
+	action := BTO
+
+	mux.HandleFunc(fmt.Sprintf("/accounts/%s/orders/dry-run", accountNumber), func(writer http.ResponseWriter, request *http.Request) {
+		writer.WriteHeader(401)
+		fmt.Fprint(writer, tastyUnauthorizedError)
+	})
+
+	order := NewOrder{
+		TimeInForce: Day,
+		OrderType:   Market,
+		Legs: []NewOrderLeg{
+			{
+				InstrumentType: EquityIT,
+				Symbol:         symbol,
+				Quantity:       quantity,
+				Action:         action,
+			},
+		},
+	}
+
+	_, _, err := client.SubmitOrderDryRun(accountNumber, order)
+	expectedUnauthorized(t, err)
+}
+
+func TestReconfirmOrderError(t *testing.T) {
+	setup()
+	defer teardown()
+
+	accountNumber := "5YZ55555"
+	orderID := 272985726
+
+	mux.HandleFunc(fmt.Sprintf("/accounts/%s/orders/%d/reconfirm", accountNumber, orderID), func(writer http.ResponseWriter, request *http.Request) {
+		writer.WriteHeader(422)
+		fmt.Fprint(writer, reconfirmResp)
+	})
+
+	_, err := client.ReconfirmOrder(accountNumber, orderID)
+	require.NotNil(t, err)
+
+	require.Equal(t, 422, err.StatusCode)
+	require.Equal(t, "The order could not be reconfirmed.", err.Message)
+}
+
 func TestSubmitGTCOrderDryRun(t *testing.T) {
 	setup()
 	defer teardown()
 
 	accountNumber := "5YZ55555"
 	symbol := "GOOGL"
-	quantity := 1
+	quantity := float32(1)
 	action := STC
 	price := float32(124.55)
 
@@ -173,13 +223,47 @@ func TestSubmitGTCOrderDryRun(t *testing.T) {
 	require.Equal(t, Credit, bpe.Effect)
 }
 
+func TestSubmitGTCOrderDryRunError(t *testing.T) {
+	setup()
+	defer teardown()
+
+	accountNumber := "5YZ55555"
+	symbol := "GOOGL"
+	quantity := float32(1)
+	action := STC
+	price := float32(124.55)
+
+	mux.HandleFunc(fmt.Sprintf("/accounts/%s/orders/dry-run", accountNumber), func(writer http.ResponseWriter, request *http.Request) {
+		writer.WriteHeader(401)
+		fmt.Fprint(writer, tastyUnauthorizedError)
+	})
+
+	order := NewOrder{
+		TimeInForce: GTC,
+		OrderType:   Limit,
+		Price:       price,
+		PriceEffect: Credit,
+		Legs: []NewOrderLeg{
+			{
+				InstrumentType: EquityIT,
+				Symbol:         symbol,
+				Quantity:       quantity,
+				Action:         action,
+			},
+		},
+	}
+
+	_, _, err := client.SubmitOrderDryRun(accountNumber, order)
+	expectedUnauthorized(t, err)
+}
+
 func TestSubmitErrorOrderDryRun(t *testing.T) {
 	setup()
 	defer teardown()
 
 	accountNumber := "5YZ55555"
 	symbol := "AAPL"
-	quantity := 10
+	quantity := float32(10)
 	action := BTO
 
 	mux.HandleFunc(fmt.Sprintf("/accounts/%s/orders/dry-run", accountNumber), func(writer http.ResponseWriter, request *http.Request) {
@@ -225,6 +309,37 @@ func TestSubmitErrorOrderDryRun(t *testing.T) {
 	require.Equal(t, "Account does not have sufficient buying power available for this order.", orderErr.Errors[0].Message)
 }
 
+func TestSubmitErrorOrderDryRunError(t *testing.T) {
+	setup()
+	defer teardown()
+
+	accountNumber := "5YZ55555"
+	symbol := "AAPL"
+	quantity := float32(10)
+	action := BTO
+
+	mux.HandleFunc(fmt.Sprintf("/accounts/%s/orders/dry-run", accountNumber), func(writer http.ResponseWriter, request *http.Request) {
+		writer.WriteHeader(401)
+		fmt.Fprint(writer, tastyUnauthorizedError)
+	})
+
+	order := NewOrder{
+		TimeInForce: Day,
+		OrderType:   Market,
+		Legs: []NewOrderLeg{
+			{
+				InstrumentType: EquityIT,
+				Symbol:         symbol,
+				Quantity:       quantity,
+				Action:         action,
+			},
+		},
+	}
+
+	_, _, err := client.SubmitOrderDryRun(accountNumber, order)
+	expectedUnauthorized(t, err)
+}
+
 func TestSubmitOrder(t *testing.T) {
 	setup()
 	defer teardown()
@@ -236,7 +351,7 @@ func TestSubmitOrder(t *testing.T) {
 	})
 
 	symbol := "RIVN"
-	quantity := 1
+	quantity := float32(1)
 	action1 := BTC
 
 	symbol1 := EquityOptionsSymbology{
@@ -355,6 +470,57 @@ func TestSubmitOrder(t *testing.T) {
 	require.Equal(t, Debit, fee.TotalFeesEffect)
 }
 
+func TestSubmitOrderError(t *testing.T) {
+	setup()
+	defer teardown()
+
+	accountNumber := "5YZ55555"
+
+	mux.HandleFunc(fmt.Sprintf("/accounts/%s/orders", accountNumber), func(writer http.ResponseWriter, request *http.Request) {
+		writer.WriteHeader(401)
+		fmt.Fprint(writer, tastyUnauthorizedError)
+	})
+
+	symbol := "RIVN"
+	quantity := float32(1)
+	action1 := BTC
+
+	symbol1 := EquityOptionsSymbology{
+		Symbol:     symbol,
+		OptionType: Call,
+		Strike:     15,
+		Expiration: time.Date(2023, 6, 23, 0, 0, 0, 0, time.Local),
+	}
+
+	order := NewOrder{
+		TimeInForce: GTC,
+		OrderType:   Limit,
+		PriceEffect: Debit,
+		Price:       0.04,
+		Legs: []NewOrderLeg{
+			{
+				InstrumentType: EquityOptionIT,
+				Symbol:         symbol1.Build(),
+				Quantity:       quantity,
+				Action:         action1,
+			},
+		},
+		Rules: NewOrderRules{Conditions: []NewOrderCondition{
+			{
+				Action:         Route,
+				Symbol:         symbol,
+				InstrumentType: "Equity",
+				Indicator:      Last,
+				Comparator:     LTE,
+				Threshold:      0.01,
+			},
+		}},
+	}
+
+	_, _, err := client.SubmitOrder(accountNumber, order)
+	expectedUnauthorized(t, err)
+}
+
 func TestGetAccountLiveOrders(t *testing.T) {
 	setup()
 	defer teardown()
@@ -390,8 +556,8 @@ func TestGetAccountLiveOrders(t *testing.T) {
 
 	require.Equal(t, EquityOptionIT, ol.InstrumentType)
 	require.Equal(t, "RIVN  230623C00015000", ol.Symbol)
-	require.Equal(t, 1, ol.Quantity)
-	require.Equal(t, 1, ol.RemainingQuantity)
+	require.Equal(t, float32(1), ol.Quantity)
+	require.Equal(t, float32(1), ol.RemainingQuantity)
 	require.Equal(t, BTC, ol.Action)
 	require.Empty(t, ol.Fills)
 
@@ -410,8 +576,54 @@ func TestGetAccountLiveOrders(t *testing.T) {
 
 	require.Equal(t, "RIVN", pc.Symbol)
 	require.Equal(t, EquityIT, pc.InstrumentType)
-	require.Equal(t, 1, pc.Quantity)
+	require.Equal(t, float32(1), pc.Quantity)
 	require.Equal(t, Long, pc.QuantityDirection)
+}
+
+func TestGetAccountLiveOrdersError(t *testing.T) {
+	setup()
+	defer teardown()
+
+	accountNumber := "5YZ55555"
+
+	mux.HandleFunc(fmt.Sprintf("/accounts/%s/orders/live", accountNumber), func(writer http.ResponseWriter, request *http.Request) {
+		writer.WriteHeader(401)
+		fmt.Fprint(writer, tastyUnauthorizedError)
+	})
+
+	_, err := client.GetAccountLiveOrders(accountNumber)
+	expectedUnauthorized(t, err)
+}
+
+func TestGetAccountOrders(t *testing.T) {
+	setup()
+	defer teardown()
+
+	accountNumber := "5WV48989"
+
+	mux.HandleFunc(fmt.Sprintf("/accounts/%s/orders", accountNumber), func(writer http.ResponseWriter, request *http.Request) {
+		fmt.Fprint(writer, accountOrdersResp)
+	})
+
+	resp, err := client.GetAccountOrders(accountNumber, OrdersQuery{PerPage: 2})
+	require.Nil(t, err)
+
+	require.Equal(t, 2, len(resp))
+}
+
+func TestGetAccountOrdersError(t *testing.T) {
+	setup()
+	defer teardown()
+
+	accountNumber := "5WV48989"
+
+	mux.HandleFunc(fmt.Sprintf("/accounts/%s/orders", accountNumber), func(writer http.ResponseWriter, request *http.Request) {
+		writer.WriteHeader(401)
+		fmt.Fprint(writer, tastyUnauthorizedError)
+	})
+
+	_, err := client.GetAccountOrders(accountNumber, OrdersQuery{PerPage: 2})
+	expectedUnauthorized(t, err)
 }
 
 func TestSubmitOrderECRDryRun(t *testing.T) {
@@ -453,6 +665,29 @@ func TestSubmitOrderECRDryRun(t *testing.T) {
 	require.Zero(t, o.UpdatedAt)
 }
 
+func TestSubmitOrderECRDryRunError(t *testing.T) {
+	setup()
+	defer teardown()
+
+	accountNumber := "5WV48989"
+	orderID := 68675
+
+	mux.HandleFunc(fmt.Sprintf("/accounts/%s/orders/%d/dry-run", accountNumber, orderID), func(writer http.ResponseWriter, request *http.Request) {
+		writer.WriteHeader(401)
+		fmt.Fprint(writer, tastyUnauthorizedError)
+	})
+
+	orderECR := NewOrderECR{
+		TimeInForce: Day,
+		Price:       185.45,
+		OrderType:   Limit,
+		PriceEffect: Debit,
+	}
+
+	_, err := client.SubmitOrderECRDryRun(accountNumber, orderID, orderECR)
+	expectedUnauthorized(t, err)
+}
+
 func TestGetOrder(t *testing.T) {
 	setup()
 	defer teardown()
@@ -481,6 +716,22 @@ func TestGetOrder(t *testing.T) {
 	require.True(t, o.Editable)
 	require.False(t, o.Edited)
 	require.Equal(t, 1686698526525, o.UpdatedAt)
+}
+
+func TestGetOrderError(t *testing.T) {
+	setup()
+	defer teardown()
+
+	accountNumber := "5WV48989"
+	orderID := 68675
+
+	mux.HandleFunc(fmt.Sprintf("/accounts/%s/orders/%d", accountNumber, orderID), func(writer http.ResponseWriter, request *http.Request) {
+		writer.WriteHeader(401)
+		fmt.Fprint(writer, tastyUnauthorizedError)
+	})
+
+	_, err := client.GetOrder(accountNumber, orderID)
+	expectedUnauthorized(t, err)
 }
 
 func TestCancelOrder(t *testing.T) {
@@ -513,6 +764,22 @@ func TestCancelOrder(t *testing.T) {
 	require.Equal(t, "2023-06-14T01:02:24.669Z", o.ReceivedAt.Format(time.RFC3339Nano))
 	require.Equal(t, 1686704544800, o.UpdatedAt)
 	require.Equal(t, "2023-06-14T01:02:24.794Z", o.TerminalAt.Format(time.RFC3339Nano))
+}
+
+func TestCancelOrderError(t *testing.T) {
+	setup()
+	defer teardown()
+
+	accountNumber := "5WV48989"
+	orderID := 68677
+
+	mux.HandleFunc(fmt.Sprintf("/accounts/%s/orders/%d", accountNumber, orderID), func(writer http.ResponseWriter, request *http.Request) {
+		writer.WriteHeader(401)
+		fmt.Fprint(writer, tastyUnauthorizedError)
+	})
+
+	_, err := client.CancelOrder(accountNumber, orderID)
+	expectedUnauthorized(t, err)
 }
 
 func TestReplaceOrder(t *testing.T) {
@@ -553,6 +820,30 @@ func TestReplaceOrder(t *testing.T) {
 	require.Equal(t, 1686706739960, o.UpdatedAt)
 }
 
+func TestReplaceOrderError(t *testing.T) {
+	setup()
+	defer teardown()
+
+	accountNumber := "5WV48989"
+	orderID := 68678
+
+	mux.HandleFunc(fmt.Sprintf("/accounts/%s/orders/%d", accountNumber, orderID), func(writer http.ResponseWriter, request *http.Request) {
+		writer.WriteHeader(401)
+		fmt.Fprint(writer, tastyUnauthorizedError)
+	})
+
+	orderECR := NewOrderECR{
+		TimeInForce: Day,
+		Price:       185.45,
+		OrderType:   Limit,
+		PriceEffect: Debit,
+		ValueEffect: Debit,
+	}
+
+	_, err := client.ReplaceOrder(accountNumber, orderID, orderECR)
+	expectedUnauthorized(t, err)
+}
+
 func TestPatchOrder(t *testing.T) {
 	setup()
 	defer teardown()
@@ -589,6 +880,72 @@ func TestPatchOrder(t *testing.T) {
 	require.True(t, o.Editable)
 	require.False(t, o.Edited)
 	require.Equal(t, 1686707204835, o.UpdatedAt)
+}
+
+func TestPatchOrderError(t *testing.T) {
+	setup()
+	defer teardown()
+
+	accountNumber := "5WV48989"
+	orderID := 68680
+
+	mux.HandleFunc(fmt.Sprintf("/accounts/%s/orders/%d", accountNumber, orderID), func(writer http.ResponseWriter, request *http.Request) {
+		writer.WriteHeader(401)
+		fmt.Fprint(writer, tastyUnauthorizedError)
+	})
+
+	orderECR := NewOrderECR{
+		TimeInForce: Day,
+		Price:       187.45,
+		OrderType:   Limit,
+		PriceEffect: Debit,
+		ValueEffect: Debit,
+	}
+
+	_, err := client.PatchOrder(accountNumber, orderID, orderECR)
+	expectedUnauthorized(t, err)
+}
+
+func TestGetCustomerLiveOrdersError(t *testing.T) {
+	setup()
+	defer teardown()
+
+	customerID := "me"
+
+	mux.HandleFunc(fmt.Sprintf("/customers/%s/orders/live", customerID), func(writer http.ResponseWriter, request *http.Request) {
+		writer.WriteHeader(401)
+		fmt.Fprint(writer, customerOrdersErrorResp)
+	})
+
+	_, err := client.GetCustomerLiveOrders(customerID)
+	require.NotNil(t, err)
+
+	require.Equal(t, "validation_error", err.Code)
+	require.Equal(t, "Request validation failed", err.Message)
+	require.NotEmpty(t, err.Errors)
+	require.Equal(t, "account-numbers", err.Errors[0].Domain)
+	require.Equal(t, "is missing", err.Errors[0].Reason)
+}
+
+func TestGetCustomerOrdersError(t *testing.T) {
+	setup()
+	defer teardown()
+
+	customerID := "me"
+
+	mux.HandleFunc(fmt.Sprintf("/customers/%s/orders", customerID), func(writer http.ResponseWriter, request *http.Request) {
+		writer.WriteHeader(401)
+		fmt.Fprint(writer, customerOrdersErrorResp)
+	})
+
+	_, err := client.GetCustomerOrders(customerID, OrdersQuery{})
+	require.NotNil(t, err)
+
+	require.Equal(t, "validation_error", err.Code)
+	require.Equal(t, "Request validation failed", err.Message)
+	require.NotEmpty(t, err.Errors)
+	require.Equal(t, "account-numbers", err.Errors[0].Domain)
+	require.Equal(t, "is missing", err.Errors[0].Reason)
 }
 
 const orderDryRunResp = `{
@@ -1192,4 +1549,141 @@ const patchOrderResp = `{
     }
   },
   "context": "/accounts/5WV48989/orders/68680"
+}`
+
+const accountOrdersResp = `{
+  "data": {
+    "items": [
+      {
+        "id": 68681,
+        "account-number": "5WV48989",
+        "time-in-force": "Day",
+        "order-type": "Limit",
+        "size": 1,
+        "underlying-symbol": "AAPL",
+        "underlying-instrument-type": "Equity",
+        "price": "187.45",
+        "price-effect": "Debit",
+        "value-effect": "Debit",
+        "status": "Contingent",
+        "contingent-status": "Pending Condition",
+        "cancellable": true,
+        "editable": true,
+        "edited": false,
+        "received-at": "2023-06-14T01:46:44.803+00:00",
+        "updated-at": 1686707204835,
+        "legs": [
+          {
+            "instrument-type": "Equity",
+            "symbol": "AAPL",
+            "quantity": 1,
+            "remaining-quantity": 1,
+            "action": "Buy to Open",
+            "fills": []
+          }
+        ],
+        "rules": {
+          "conditions": [
+            {
+              "id": 287,
+              "action": "route",
+              "symbol": "AAPL",
+              "instrument-type": "Equity",
+              "indicator": "last",
+              "comparator": "lte",
+              "threshold": "0.01",
+              "is-threshold-based-on-notional": false,
+              "price-components": [
+                {
+                  "symbol": "AAPL",
+                  "instrument-type": "Equity",
+                  "quantity": 1,
+                  "quantity-direction": "Long"
+                }
+              ]
+            }
+          ]
+        }
+      },
+      {
+        "id": 68680,
+        "account-number": "5WV48989",
+        "time-in-force": "Day",
+        "order-type": "Limit",
+        "size": 1,
+        "underlying-symbol": "AAPL",
+        "underlying-instrument-type": "Equity",
+        "price": "185.45",
+        "price-effect": "Debit",
+        "value-effect": "Debit",
+        "status": "Cancelled",
+        "cancellable": false,
+        "cancelled-at": "2023-06-14T01:46:44.799+00:00",
+        "editable": false,
+        "edited": true,
+        "received-at": "2023-06-14T01:38:59.936+00:00",
+        "updated-at": 1686707204813,
+        "terminal-at": "2023-06-14T01:46:44.799+00:00",
+        "legs": [
+          {
+            "instrument-type": "Equity",
+            "symbol": "AAPL",
+            "quantity": 1,
+            "remaining-quantity": 1,
+            "action": "Buy to Open",
+            "fills": []
+          }
+        ],
+        "rules": {
+          "conditions": [
+            {
+              "id": 286,
+              "action": "route",
+              "symbol": "AAPL",
+              "instrument-type": "Equity",
+              "indicator": "last",
+              "comparator": "lte",
+              "threshold": "0.01",
+              "is-threshold-based-on-notional": false,
+              "price-components": [
+                {
+                  "symbol": "AAPL",
+                  "instrument-type": "Equity",
+                  "quantity": 1,
+                  "quantity-direction": "Long"
+                }
+              ]
+            }
+          ]
+        }
+      }
+    ]
+  },
+  "context": "/accounts/5WV48989/orders",
+  "pagination": {
+    "per-page": 2,
+    "page-offset": 0,
+    "item-offset": 0,
+    "total-items": 8,
+    "total-pages": 4,
+    "current-item-count": 2,
+    "previous-link": null,
+    "next-link": null,
+    "paging-link-template": null
+  }
+}`
+
+const reconfirmResp = `{"error":{"code":"cannot_reconfirm_order","message":"The order could not be reconfirmed."}}`
+
+const customerOrdersErrorResp = `{
+    "error": {
+        "code": "validation_error",
+        "message": "Request validation failed",
+        "errors": [
+            {
+                "domain": "account-numbers",
+                "reason": "is missing"
+            }
+        ]
+    }
 }`

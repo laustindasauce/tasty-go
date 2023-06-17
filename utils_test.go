@@ -25,8 +25,8 @@ func TestFutureSymbology(t *testing.T) {
 func TestContainsInt(t *testing.T) {
 	nums := []int{1, 2, 3, 4, 5}
 
-	require.False(t, ContainsInt(nums, 10))
-	require.True(t, ContainsInt(nums, 3))
+	require.False(t, containsInt(nums, 10))
+	require.True(t, containsInt(nums, 3))
 }
 
 func TestGetSymbolWithPadding(t *testing.T) {

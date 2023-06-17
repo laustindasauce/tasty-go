@@ -7,9 +7,6 @@ import (
 
 // Get the accounts for the authenticated client.
 func (c *Client) GetMyAccounts() ([]Account, *Error) {
-	if c.Session.SessionToken == nil {
-		return []Account{}, &Error{Message: "Session is invalid: Session Token cannot be nil."}
-	}
 	path := "/customers/me/accounts"
 
 	type accountResponse struct {
@@ -22,10 +19,7 @@ func (c *Client) GetMyAccounts() ([]Account, *Error) {
 
 	accountsRes := new(accountResponse)
 
-	header := http.Header{}
-	header.Add("Authorization", *c.Session.SessionToken)
-
-	err := c.request(http.MethodGet, path, header, nil, nil, accountsRes)
+	err := c.request(http.MethodGet, path, nil, nil, accountsRes)
 	if err != nil {
 		return []Account{}, err
 	}
@@ -41,9 +35,6 @@ func (c *Client) GetMyAccounts() ([]Account, *Error) {
 
 // Returns current trading status for an account.
 func (c *Client) GetAccountTradingStatus(accountNumber string) (AccountTradingStatus, *Error) {
-	if c.Session.SessionToken == nil {
-		return AccountTradingStatus{}, &Error{Message: "Session is invalid: Session Token cannot be nil."}
-	}
 	path := fmt.Sprintf("/accounts/%s/trading-status", accountNumber)
 
 	type tradingStatusRes struct {
@@ -51,10 +42,7 @@ func (c *Client) GetAccountTradingStatus(accountNumber string) (AccountTradingSt
 	}
 	accountsRes := new(tradingStatusRes)
 
-	header := http.Header{}
-	header.Add("Authorization", *c.Session.SessionToken)
-
-	err := c.request(http.MethodGet, path, header, nil, nil, accountsRes)
+	err := c.request(http.MethodGet, path, nil, nil, accountsRes)
 	if err != nil {
 		return AccountTradingStatus{}, err
 	}
@@ -64,9 +52,6 @@ func (c *Client) GetAccountTradingStatus(accountNumber string) (AccountTradingSt
 
 // Returns the current balance values for an account.
 func (c *Client) GetAccountBalances(accountNumber string) (AccountBalance, *Error) {
-	if c.Session.SessionToken == nil {
-		return AccountBalance{}, &Error{Message: "Session is invalid: Session Token cannot be nil."}
-	}
 	path := fmt.Sprintf("/accounts/%s/balances", accountNumber)
 
 	type accountBalanceRes struct {
@@ -74,10 +59,7 @@ func (c *Client) GetAccountBalances(accountNumber string) (AccountBalance, *Erro
 	}
 	accountsRes := new(accountBalanceRes)
 
-	header := http.Header{}
-	header.Add("Authorization", *c.Session.SessionToken)
-
-	err := c.request(http.MethodGet, path, header, nil, nil, accountsRes)
+	err := c.request(http.MethodGet, path, nil, nil, accountsRes)
 	if err != nil {
 		return AccountBalance{}, err
 	}
@@ -88,9 +70,6 @@ func (c *Client) GetAccountBalances(accountNumber string) (AccountBalance, *Erro
 // Returns a list of the account's positions.
 // Can be filtered by symbol, underlying_symbol.
 func (c *Client) GetAccountPositions(accountNumber string, query AccountPositionQuery) ([]AccountPosition, *Error) {
-	if c.Session.SessionToken == nil {
-		return []AccountPosition{}, &Error{Message: "Session is invalid: Session Token cannot be nil."}
-	}
 	path := fmt.Sprintf("/accounts/%s/positions", accountNumber)
 
 	type accountResponse struct {
@@ -101,10 +80,7 @@ func (c *Client) GetAccountPositions(accountNumber string, query AccountPosition
 
 	accountsRes := new(accountResponse)
 
-	header := http.Header{}
-	header.Add("Authorization", *c.Session.SessionToken)
-
-	err := c.request(http.MethodGet, path, header, query, nil, accountsRes)
+	err := c.request(http.MethodGet, path, query, nil, accountsRes)
 	if err != nil {
 		return []AccountPosition{}, err
 	}
@@ -114,10 +90,6 @@ func (c *Client) GetAccountPositions(accountNumber string, query AccountPosition
 
 // Returns most recent snapshot and current balance for an account.
 func (c *Client) GetAccountBalanceSnapshots(accountNumber string, query AccountBalanceSnapshotsQuery) ([]AccountBalanceSnapshots, *Error) {
-	if c.Session.SessionToken == nil {
-		return []AccountBalanceSnapshots{}, &Error{Message: "Session is invalid: Session Token cannot be nil."}
-	}
-
 	// Default to EOD
 	if query.TimeOfDay == "" {
 		query.TimeOfDay = EndOfDay
@@ -133,10 +105,7 @@ func (c *Client) GetAccountBalanceSnapshots(accountNumber string, query AccountB
 
 	accountsRes := new(accountResponse)
 
-	header := http.Header{}
-	header.Add("Authorization", *c.Session.SessionToken)
-
-	err := c.request(http.MethodGet, path, header, query, nil, accountsRes)
+	err := c.request(http.MethodGet, path, query, nil, accountsRes)
 	if err != nil {
 		return []AccountBalanceSnapshots{}, err
 	}
@@ -146,10 +115,6 @@ func (c *Client) GetAccountBalanceSnapshots(accountNumber string, query AccountB
 
 // Returns a list of account net liquidating value snapshots.
 func (c *Client) GetAccountNetLiqHistory(accountNumber string, query HistoricLiquidityQuery) ([]NetLiqOHLC, *Error) {
-	if c.Session.SessionToken == nil {
-		return []NetLiqOHLC{}, &Error{Message: "Session is invalid: Session Token cannot be nil."}
-	}
-
 	path := fmt.Sprintf("/accounts/%s/net-liq/history", accountNumber)
 
 	type accountResponse struct {
@@ -160,10 +125,7 @@ func (c *Client) GetAccountNetLiqHistory(accountNumber string, query HistoricLiq
 
 	accountsRes := new(accountResponse)
 
-	header := http.Header{}
-	header.Add("Authorization", *c.Session.SessionToken)
-
-	err := c.request(http.MethodGet, path, header, query, nil, accountsRes)
+	err := c.request(http.MethodGet, path, query, nil, accountsRes)
 	if err != nil {
 		return []NetLiqOHLC{}, err
 	}
@@ -173,10 +135,6 @@ func (c *Client) GetAccountNetLiqHistory(accountNumber string, query HistoricLiq
 
 // Get the position limit.
 func (c *Client) GetAccountPositionLimit(accountNumber string) (PositionLimit, *Error) {
-	if c.Session.SessionToken == nil {
-		return PositionLimit{}, &Error{Message: "Session is invalid: Session Token cannot be nil."}
-	}
-
 	path := fmt.Sprintf("/accounts/%s/position-limit", accountNumber)
 
 	type accountResponse struct {
@@ -185,10 +143,7 @@ func (c *Client) GetAccountPositionLimit(accountNumber string) (PositionLimit, *
 
 	accountsRes := new(accountResponse)
 
-	header := http.Header{}
-	header.Add("Authorization", *c.Session.SessionToken)
-
-	err := c.request(http.MethodGet, path, header, nil, nil, accountsRes)
+	err := c.request(http.MethodGet, path, nil, nil, accountsRes)
 	if err != nil {
 		return PositionLimit{}, err
 	}
