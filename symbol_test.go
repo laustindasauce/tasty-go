@@ -29,6 +29,21 @@ func TestSymbolSearch(t *testing.T) {
 	require.Equal(t, "Apple Inc. - Common Stock", aapl.Description)
 }
 
+func TestSymbolSearchError(t *testing.T) {
+	setup()
+	defer teardown()
+
+	symbolSearch := "apple"
+
+	mux.HandleFunc(fmt.Sprintf("/symbols/search/%s", symbolSearch), func(writer http.ResponseWriter, request *http.Request) {
+		writer.WriteHeader(401)
+		fmt.Fprint(writer, tastyUnauthorizedError)
+	})
+
+	_, err := client.SymbolSearch(symbolSearch)
+	expectedUnauthorized(t, err)
+}
+
 const symbolSearchResp = `{
     "data": {
         "items": [

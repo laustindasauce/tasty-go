@@ -8,6 +8,7 @@ import (
 	"net/http"
 	"net/url"
 	"strings"
+	"time"
 
 	"github.com/google/go-querystring/query"
 )
@@ -20,7 +21,8 @@ const (
 )
 
 var (
-	errorStatusCodes = []int{400, 401, 403, 404, 415, 422, 500}
+	defaultHTTPClient = &http.Client{Timeout: time.Duration(30) * time.Second}
+	errorStatusCodes  = []int{400, 401, 403, 404, 415, 422, 500}
 )
 
 // Client for the tasty api wrapper.
@@ -33,6 +35,9 @@ type Client struct {
 
 // NewClient creates a new Tasty Client.
 func NewClient(httpClient *http.Client) (*Client, error) {
+	if httpClient == nil {
+		httpClient = defaultHTTPClient
+	}
 	c := &Client{
 		httpClient: httpClient,
 		baseURL:    apiBaseURL,
@@ -44,6 +49,9 @@ func NewClient(httpClient *http.Client) (*Client, error) {
 
 // NewCertClient creates a new Tasty Cert Client.
 func NewCertClient(httpClient *http.Client) (*Client, error) {
+	if httpClient == nil {
+		httpClient = defaultHTTPClient
+	}
 	c := &Client{
 		httpClient: httpClient,
 		baseURL:    apiCertBaseURL,
@@ -78,7 +86,7 @@ func (e Error) Error() string {
 
 // decodeError decodes an Error from response status code based off
 // the developer docs in TastyWorks -> https://developer.tastytrade.com/#error-codes
-func (c *Client) decodeError(resp *http.Response) *Error {
+func decodeError(resp *http.Response) *Error {
 	e := new(Error)
 
 	type errorRes struct {
@@ -102,7 +110,11 @@ func (c *Client) decodeError(resp *http.Response) *Error {
 }
 
 // customRequest handles any requests for the client with unique paths.
-func (c *Client) customRequest(method, path string, header http.Header, params, payload, result any) *Error {
+func (c *Client) customRequest(method, path string, params, payload, result any) *Error {
+	if c.Session.SessionToken == nil {
+		return &Error{Code: "invalid_session", Message: "Session is invalid: Session Token cannot be nil."}
+	}
+
 	r := new(http.Request)
 
 	r.Method = method
@@ -120,8 +132,8 @@ func (c *Client) customRequest(method, path string, header http.Header, params, 
 
 	r.Body = io.NopCloser(bytes.NewBuffer(body))
 
-	r.Header = header
-
+	r.Header = http.Header{}
+	r.Header.Add("Authorization", *c.Session.SessionToken)
 	r.Header.Add("Content-Type", "application/json")
 
 	if params != nil {
@@ -149,8 +161,8 @@ func (c *Client) customRequest(method, path string, header http.Header, params, 
 	if resp.StatusCode == http.StatusNoContent {
 		return nil
 	}
-	if ContainsInt(errorStatusCodes, resp.StatusCode) {
-		return c.decodeError(resp)
+	if containsInt(errorStatusCodes, resp.StatusCode) {
+		return decodeError(resp)
 	}
 
 	if result != nil {
@@ -164,7 +176,11 @@ func (c *Client) customRequest(method, path string, header http.Header, params, 
 }
 
 // request handles any requests for the client.
-func (c *Client) request(method, path string, header http.Header, params, payload, result any) *Error {
+func (c *Client) request(method, path string, params, payload, result any) *Error {
+	if c.Session.SessionToken == nil {
+		return &Error{Code: "invalid_session", Message: "Session is invalid: Session Token cannot be nil."}
+	}
+
 	body, err := json.Marshal(payload)
 	if err != nil {
 		return &Error{Message: fmt.Sprintf("Client Side Error: %v", err)}
@@ -177,7 +193,69 @@ func (c *Client) request(method, path string, header http.Header, params, payloa
 		return &Error{Message: fmt.Sprintf("Client Side Error: %v", err)}
 	}
 
-	r.Header = header
+	r.Header = http.Header{}
+	r.Header.Add("Authorization", *c.Session.SessionToken)
+	r.Header.Add("Content-Type", "application/json")
+
+	if params != nil {
+		queryString, queryErr := query.Values(params)
+		if queryErr != nil {
+			return &Error{Message: fmt.Sprintf("Client Side Error: %v", err)}
+		}
+		r.URL.RawQuery = queryString.Encode()
+	}
+
+	resp, err := c.httpClient.Do(r)
+	if err != nil {
+		return &Error{Message: fmt.Sprintf("Client Side Error: %v", err)}
+	}
+
+	// body, err = ioutil.ReadAll(resp.Body)
+
+	// if err != nil {
+	// 	return &Error{Message: fmt.Sprintf("Client Side Error: %v", err)}
+	// }
+
+	// fmt.Println(string(body))
+
+	defer resp.Body.Close()
+
+	if resp.StatusCode == http.StatusNoContent {
+		return nil
+	}
+	if containsInt(errorStatusCodes, resp.StatusCode) {
+		return decodeError(resp)
+	}
+
+	if result != nil {
+		err = json.NewDecoder(resp.Body).Decode(result)
+		if err != nil {
+			return &Error{Message: fmt.Sprintf("Client Side Error: %v", err)}
+		}
+	}
+
+	return nil
+}
+
+// noAuthRequest handles any requests for the client without authentication.
+func (c *Client) noAuthRequest(method, path string, header http.Header, params, payload, result any) *Error {
+	body, err := json.Marshal(payload)
+	if err != nil {
+		return &Error{Message: fmt.Sprintf("Client Side Error: %v", err)}
+	}
+
+	fullURL := c.baseURL + path
+
+	r, err := http.NewRequest(method, fullURL, bytes.NewBuffer(body))
+	if err != nil {
+		return &Error{Message: fmt.Sprintf("Client Side Error: %v", err)}
+	}
+
+	if header == nil {
+		r.Header = http.Header{}
+	} else {
+		r.Header = header
+	}
 
 	r.Header.Add("Content-Type", "application/json")
 
@@ -207,8 +285,8 @@ func (c *Client) request(method, path string, header http.Header, params, payloa
 	if resp.StatusCode == http.StatusNoContent {
 		return nil
 	}
-	if ContainsInt(errorStatusCodes, resp.StatusCode) {
-		return c.decodeError(resp)
+	if containsInt(errorStatusCodes, resp.StatusCode) {
+		return decodeError(resp)
 	}
 
 	if result != nil {

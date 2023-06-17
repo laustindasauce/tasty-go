@@ -61,6 +61,19 @@ func TestGetMyWatchlists(t *testing.T) {
 	require.Equal(t, watchlist.OrderIndex, w.OrderIndex)
 }
 
+func TestGetMyWatchlistsError(t *testing.T) {
+	setup()
+	defer teardown()
+
+	mux.HandleFunc("/watchlists", func(writer http.ResponseWriter, request *http.Request) {
+		writer.WriteHeader(401)
+		fmt.Fprint(writer, tastyUnauthorizedError)
+	})
+
+	_, err := client.GetMyWatchlists()
+	expectedUnauthorized(t, err)
+}
+
 func TestGetMyWatchlist(t *testing.T) {
 	setup()
 	defer teardown()
@@ -78,6 +91,19 @@ func TestGetMyWatchlist(t *testing.T) {
 	require.Equal(t, watchlist.WatchlistEntries[0].InstrumentType, w.WatchlistEntries[0].InstrumentType)
 	require.Equal(t, watchlist.GroupName, w.GroupName)
 	require.Equal(t, watchlist.OrderIndex, w.OrderIndex)
+}
+
+func TestGetMyWatchlistError(t *testing.T) {
+	setup()
+	defer teardown()
+
+	mux.HandleFunc(fmt.Sprintf("/watchlists/%s", watchlist.Name), func(writer http.ResponseWriter, request *http.Request) {
+		writer.WriteHeader(401)
+		fmt.Fprint(writer, tastyUnauthorizedError)
+	})
+
+	_, err := client.GetMyWatchlist(watchlist.Name)
+	expectedUnauthorized(t, err)
 }
 
 func TestCreateWatchlist(t *testing.T) {
@@ -99,6 +125,19 @@ func TestCreateWatchlist(t *testing.T) {
 	require.Equal(t, watchlist.OrderIndex, w.OrderIndex)
 }
 
+func TestCreateWatchlistError(t *testing.T) {
+	setup()
+	defer teardown()
+
+	mux.HandleFunc("/watchlists", func(writer http.ResponseWriter, request *http.Request) {
+		writer.WriteHeader(401)
+		fmt.Fprint(writer, tastyUnauthorizedError)
+	})
+
+	_, err := client.CreateWatchlist(watchlist)
+	expectedUnauthorized(t, err)
+}
+
 func TestEditWatchlist(t *testing.T) {
 	setup()
 	defer teardown()
@@ -116,6 +155,19 @@ func TestEditWatchlist(t *testing.T) {
 	require.Equal(t, newWatchlist.WatchlistEntries[0].InstrumentType, w.WatchlistEntries[0].InstrumentType)
 	require.Equal(t, newWatchlist.GroupName, w.GroupName)
 	require.Equal(t, newWatchlist.OrderIndex, w.OrderIndex)
+}
+
+func TestEditWatchlistError(t *testing.T) {
+	setup()
+	defer teardown()
+
+	mux.HandleFunc(fmt.Sprintf("/watchlists/%s", watchlist.Name), func(writer http.ResponseWriter, request *http.Request) {
+		writer.WriteHeader(401)
+		fmt.Fprint(writer, tastyUnauthorizedError)
+	})
+
+	_, err := client.EditWatchlist(watchlist.Name, newWatchlist)
+	expectedUnauthorized(t, err)
 }
 
 func TestDeleteWatchlist(t *testing.T) {
@@ -144,6 +196,19 @@ func TestDeleteWatchlist(t *testing.T) {
 	require.Equal(t, newWatchlist.OrderIndex, w.OrderIndex)
 }
 
+func TestDeleteWatchlistError(t *testing.T) {
+	setup()
+	defer teardown()
+
+	mux.HandleFunc(fmt.Sprintf("/watchlists/%s", newWatchlist.Name), func(writer http.ResponseWriter, request *http.Request) {
+		writer.WriteHeader(401)
+		fmt.Fprint(writer, tastyUnauthorizedError)
+	})
+
+	_, err := client.DeleteWatchlist(newWatchlist.Name)
+	expectedUnauthorized(t, err)
+}
+
 func TestGetPairsWatchlists(t *testing.T) {
 	setup()
 	defer teardown()
@@ -168,6 +233,19 @@ func TestGetPairsWatchlists(t *testing.T) {
 	require.Equal(t, "/ZB", pe.RightSymbol)
 	require.Equal(t, 1, pe.RightQuantity)
 	require.Equal(t, 1, w.OrderIndex)
+}
+
+func TestGetPairsWatchlistsError(t *testing.T) {
+	setup()
+	defer teardown()
+
+	mux.HandleFunc("/pairs-watchlists", func(writer http.ResponseWriter, request *http.Request) {
+		writer.WriteHeader(401)
+		fmt.Fprint(writer, tastyUnauthorizedError)
+	})
+
+	_, err := client.GetPairsWatchlists()
+	expectedUnauthorized(t, err)
 }
 
 func TestGetPairsWatchlist(t *testing.T) {
@@ -196,6 +274,21 @@ func TestGetPairsWatchlist(t *testing.T) {
 	require.Equal(t, 1, w.OrderIndex)
 }
 
+func TestGetPairsWatchlistError(t *testing.T) {
+	setup()
+	defer teardown()
+
+	name := "Futures"
+
+	mux.HandleFunc(fmt.Sprintf("/pairs-watchlists/%s", name), func(writer http.ResponseWriter, request *http.Request) {
+		writer.WriteHeader(401)
+		fmt.Fprint(writer, tastyUnauthorizedError)
+	})
+
+	_, err := client.GetPairsWatchlist(name)
+	expectedUnauthorized(t, err)
+}
+
 func TestGetPublicWatchlists(t *testing.T) {
 	setup()
 	defer teardown()
@@ -221,6 +314,21 @@ func TestGetPublicWatchlists(t *testing.T) {
 	require.Equal(t, 100, w.OrderIndex)
 }
 
+func TestGetPublicWatchlistsError(t *testing.T) {
+	setup()
+	defer teardown()
+
+	mux.HandleFunc("/public-watchlists", func(writer http.ResponseWriter, request *http.Request) {
+		writer.WriteHeader(401)
+		fmt.Fprint(writer, tastyUnauthorizedError)
+	})
+
+	countsOnly := false
+
+	_, err := client.GetPublicWatchlists(countsOnly)
+	expectedUnauthorized(t, err)
+}
+
 func TestGetPublicWatchlistsCounts(t *testing.T) {
 	setup()
 	defer teardown()
@@ -241,6 +349,21 @@ func TestGetPublicWatchlistsCounts(t *testing.T) {
 	require.Equal(t, "CRE Hospitality Price Return Index", c.Name)
 	require.Equal(t, 317219, *c.ID)
 	require.Equal(t, 14, *c.WatchlistEntryCount)
+}
+
+func TestGetPublicWatchlistsCountsError(t *testing.T) {
+	setup()
+	defer teardown()
+
+	mux.HandleFunc("/public-watchlists", func(writer http.ResponseWriter, request *http.Request) {
+		writer.WriteHeader(401)
+		fmt.Fprint(writer, tastyUnauthorizedError)
+	})
+
+	countsOnly := true
+
+	_, err := client.GetPublicWatchlists(countsOnly)
+	expectedUnauthorized(t, err)
 }
 
 func TestGetPublicWatchlist(t *testing.T) {
@@ -264,6 +387,21 @@ func TestGetPublicWatchlist(t *testing.T) {
 	require.Equal(t, EquityIT, pe.InstrumentType)
 	require.Equal(t, "Liquidity", w.GroupName)
 	require.Equal(t, 100, w.OrderIndex)
+}
+
+func TestGetPublicWatchlistError(t *testing.T) {
+	setup()
+	defer teardown()
+
+	name := "High Options Volume"
+
+	mux.HandleFunc(fmt.Sprintf("/public-watchlists/%s", name), func(writer http.ResponseWriter, request *http.Request) {
+		writer.WriteHeader(401)
+		fmt.Fprint(writer, tastyUnauthorizedError)
+	})
+
+	_, err := client.GetPublicWatchlist(name)
+	expectedUnauthorized(t, err)
 }
 
 const getWatchlistsResp = `{

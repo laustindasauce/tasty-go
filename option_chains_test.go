@@ -77,6 +77,21 @@ func TestGetFuturesOptionChains(t *testing.T) {
 	require.Equal(t, "Equity Index", fop.MarketSector)
 }
 
+func TestGetFuturesOptionChainsError(t *testing.T) {
+	setup()
+	defer teardown()
+
+	productCode := "ES"
+
+	mux.HandleFunc(fmt.Sprintf("/futures-option-chains/%s", productCode), func(writer http.ResponseWriter, request *http.Request) {
+		writer.WriteHeader(401)
+		fmt.Fprint(writer, tastyUnauthorizedError)
+	})
+
+	_, err := client.GetFuturesOptionChains(productCode)
+	expectedUnauthorized(t, err)
+}
+
 func TestGetNestedFuturesOptionChains(t *testing.T) {
 	setup()
 	defer teardown()
@@ -138,6 +153,21 @@ func TestGetNestedFuturesOptionChains(t *testing.T) {
 	require.Equal(t, "./EW4N23P3990:XCME", strike.PutStreamerSymbol)
 }
 
+func TestGetNestedFuturesOptionChainsError(t *testing.T) {
+	setup()
+	defer teardown()
+
+	productCode := "ES"
+
+	mux.HandleFunc(fmt.Sprintf("/futures-option-chains/%s/nested", productCode), func(writer http.ResponseWriter, request *http.Request) {
+		writer.WriteHeader(401)
+		fmt.Fprint(writer, tastyUnauthorizedError)
+	})
+
+	_, err := client.GetNestedFuturesOptionChains(productCode)
+	expectedUnauthorized(t, err)
+}
+
 func TestGetEquityOptionChains(t *testing.T) {
 	setup()
 	defer teardown()
@@ -174,6 +204,21 @@ func TestGetEquityOptionChains(t *testing.T) {
 	require.Equal(t, "2023-06-16T20:00:00Z", eo.ExpiresAt.Format(time.RFC3339))
 	require.False(t, eo.IsClosingOnly)
 	require.Equal(t, ".AAPL230616C60", eo.StreamerSymbol)
+}
+
+func TestGetEquityOptionChainsError(t *testing.T) {
+	setup()
+	defer teardown()
+
+	symbol := "AAPL"
+
+	mux.HandleFunc(fmt.Sprintf("/option-chains/%s", symbol), func(writer http.ResponseWriter, request *http.Request) {
+		writer.WriteHeader(401)
+		fmt.Fprint(writer, tastyUnauthorizedError)
+	})
+
+	_, err := client.GetEquityOptionChains(symbol)
+	expectedUnauthorized(t, err)
 }
 
 func TestGetNestedEquityOptionChains(t *testing.T) {
@@ -228,6 +273,21 @@ func TestGetNestedEquityOptionChains(t *testing.T) {
 	require.Equal(t, ".AAPL230616P60", strike.PutStreamerSymbol)
 }
 
+func TestGetNestedEquityOptionChainsError(t *testing.T) {
+	setup()
+	defer teardown()
+
+	symbol := "AAPL"
+
+	mux.HandleFunc(fmt.Sprintf("/option-chains/%s/nested", symbol), func(writer http.ResponseWriter, request *http.Request) {
+		writer.WriteHeader(401)
+		fmt.Fprint(writer, tastyUnauthorizedError)
+	})
+
+	_, err := client.GetNestedEquityOptionChains(symbol)
+	expectedUnauthorized(t, err)
+}
+
 func TestGetCompactEquityOptionChains(t *testing.T) {
 	setup()
 	defer teardown()
@@ -263,6 +323,21 @@ func TestGetCompactEquityOptionChains(t *testing.T) {
 	require.Equal(t, "AAPL  230616C00060000", eo.Symbols[0])
 	// streamer symbols
 	require.Equal(t, ".AAPL230616C60", eo.StreamerSymbols[0])
+}
+
+func TestGetCompactEquityOptionChainsError(t *testing.T) {
+	setup()
+	defer teardown()
+
+	symbol := "AAPL"
+
+	mux.HandleFunc(fmt.Sprintf("/option-chains/%s/compact", symbol), func(writer http.ResponseWriter, request *http.Request) {
+		writer.WriteHeader(401)
+		fmt.Fprint(writer, tastyUnauthorizedError)
+	})
+
+	_, err := client.GetCompactEquityOptionChains(symbol)
+	expectedUnauthorized(t, err)
 }
 
 const futuresOptionChainsResp = `{

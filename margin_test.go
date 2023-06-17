@@ -153,6 +153,21 @@ func TestGetMarginRequirements(t *testing.T) {
 	require.Equal(t, "2023-06-09", entry.ExpirationDate)
 }
 
+func TestGetMarginRequirementsError(t *testing.T) {
+	setup()
+	defer teardown()
+
+	accountNumber := "5YZ55555"
+
+	mux.HandleFunc(fmt.Sprintf("/margin/accounts/%s/requirements", accountNumber), func(writer http.ResponseWriter, request *http.Request) {
+		writer.WriteHeader(401)
+		fmt.Fprint(writer, tastyUnauthorizedError)
+	})
+
+	_, err := client.GetMarginRequirements(accountNumber)
+	expectedUnauthorized(t, err)
+}
+
 func TestGetEffectiveMarginRequirements(t *testing.T) {
 	setup()
 	defer teardown()
@@ -175,6 +190,37 @@ func TestGetEffectiveMarginRequirements(t *testing.T) {
 	require.Equal(t, StringToFloat32(.2), resp.NakedOptionStandard)
 	require.Equal(t, StringToFloat32(.1), resp.NakedOptionMinimum)
 	require.Equal(t, StringToFloat32(250), resp.NakedOptionFloor)
+}
+
+func TestGetEffectiveMarginRequirementsError(t *testing.T) {
+	setup()
+	defer teardown()
+
+	accountNumber := "5YZ55555"
+	underlyingSymbol := "AAPL"
+
+	mux.HandleFunc(fmt.Sprintf("/accounts/%s/margin-requirements/%s/effective", accountNumber, underlyingSymbol), func(writer http.ResponseWriter, request *http.Request) {
+		writer.WriteHeader(401)
+		fmt.Fprint(writer, tastyUnauthorizedError)
+	})
+
+	_, err := client.GetEffectiveMarginRequirements(accountNumber, underlyingSymbol)
+	expectedUnauthorized(t, err)
+}
+
+func TestMarginRequirementsDryRunError(t *testing.T) {
+	setup()
+	defer teardown()
+
+	accountNumber := "5YZ55555"
+
+	mux.HandleFunc(fmt.Sprintf("/margin/accounts/%s/requirements", accountNumber), func(writer http.ResponseWriter, request *http.Request) {
+		writer.WriteHeader(401)
+		fmt.Fprint(writer, tastyUnauthorizedError)
+	})
+
+	_, err := client.MarginRequirementsDryRun(accountNumber, NewOrder{})
+	expectedUnauthorized(t, err)
 }
 
 const marginReqResp = `{

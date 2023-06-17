@@ -8,10 +8,6 @@ import (
 // Reconfirm an order
 // ** This is currently untested.
 func (c *Client) ReconfirmOrder(accountNumber string, id int) (Order, *Error) {
-	if c.Session.SessionToken == nil {
-		return Order{}, &Error{Message: "Session is invalid: Session Token cannot be nil."}
-	}
-
 	path := fmt.Sprintf("/accounts/%s/orders/%d/reconfirm", accountNumber, id)
 
 	type ordersResponse struct {
@@ -20,10 +16,7 @@ func (c *Client) ReconfirmOrder(accountNumber string, id int) (Order, *Error) {
 
 	ordersRes := new(ordersResponse)
 
-	header := http.Header{}
-	header.Add("Authorization", *c.Session.SessionToken)
-
-	err := c.request(http.MethodPost, path, header, nil, nil, ordersRes)
+	err := c.request(http.MethodPost, path, nil, nil, ordersRes)
 	if err != nil {
 		return Order{}, err
 	}
@@ -33,10 +26,6 @@ func (c *Client) ReconfirmOrder(accountNumber string, id int) (Order, *Error) {
 
 // Create an order and then runs the preflights without placing the order.
 func (c *Client) SubmitOrderDryRun(accountNumber string, order NewOrder) (OrderResponse, *OrderErrorResponse, *Error) {
-	if c.Session.SessionToken == nil {
-		return OrderResponse{}, nil, &Error{Message: "Session is invalid: Session Token cannot be nil."}
-	}
-
 	path := fmt.Sprintf("/accounts/%s/orders/dry-run", accountNumber)
 
 	type ordersResponse struct {
@@ -46,10 +35,7 @@ func (c *Client) SubmitOrderDryRun(accountNumber string, order NewOrder) (OrderR
 
 	ordersRes := new(ordersResponse)
 
-	header := http.Header{}
-	header.Add("Authorization", *c.Session.SessionToken)
-
-	err := c.request(http.MethodPost, path, header, nil, order, ordersRes)
+	err := c.request(http.MethodPost, path, nil, order, ordersRes)
 	if err != nil {
 		return OrderResponse{}, nil, err
 	}
@@ -59,10 +45,6 @@ func (c *Client) SubmitOrderDryRun(accountNumber string, order NewOrder) (OrderR
 
 // Create an order for the client.
 func (c *Client) SubmitOrder(accountNumber string, order NewOrder) (OrderResponse, *OrderErrorResponse, *Error) {
-	if c.Session.SessionToken == nil {
-		return OrderResponse{}, nil, &Error{Message: "Session is invalid: Session Token cannot be nil."}
-	}
-
 	path := fmt.Sprintf("/accounts/%s/orders", accountNumber)
 
 	type ordersResponse struct {
@@ -72,10 +54,7 @@ func (c *Client) SubmitOrder(accountNumber string, order NewOrder) (OrderRespons
 
 	ordersRes := new(ordersResponse)
 
-	header := http.Header{}
-	header.Add("Authorization", *c.Session.SessionToken)
-
-	err := c.request(http.MethodPost, path, header, nil, order, ordersRes)
+	err := c.request(http.MethodPost, path, nil, order, ordersRes)
 	if err != nil {
 		return OrderResponse{}, nil, err
 	}
@@ -85,10 +64,6 @@ func (c *Client) SubmitOrder(accountNumber string, order NewOrder) (OrderRespons
 
 // Returns a list of live orders for the resource.
 func (c *Client) GetAccountLiveOrders(accountNumber string) ([]Order, *Error) {
-	if c.Session.SessionToken == nil {
-		return []Order{}, &Error{Message: "Session is invalid: Session Token cannot be nil."}
-	}
-
 	path := fmt.Sprintf("/accounts/%s/orders/live", accountNumber)
 
 	type ordersResponse struct {
@@ -99,10 +74,7 @@ func (c *Client) GetAccountLiveOrders(accountNumber string) ([]Order, *Error) {
 
 	ordersRes := new(ordersResponse)
 
-	header := http.Header{}
-	header.Add("Authorization", *c.Session.SessionToken)
-
-	err := c.request(http.MethodGet, path, header, nil, nil, ordersRes)
+	err := c.request(http.MethodGet, path, nil, nil, ordersRes)
 	if err != nil {
 		return []Order{}, err
 	}
@@ -114,10 +86,6 @@ func (c *Client) GetAccountLiveOrders(accountNumber string) ([]Order, *Error) {
 // authentication token) based on sort param. If no sort is passed in, it defaults
 // to descending order.
 func (c *Client) GetAccountOrders(accountNumber string, query OrdersQuery) ([]Order, *Error) {
-	if c.Session.SessionToken == nil {
-		return []Order{}, &Error{Message: "Session is invalid: Session Token cannot be nil."}
-	}
-
 	path := fmt.Sprintf("/accounts/%s/orders", accountNumber)
 
 	type ordersResponse struct {
@@ -128,10 +96,7 @@ func (c *Client) GetAccountOrders(accountNumber string, query OrdersQuery) ([]Or
 
 	ordersRes := new(ordersResponse)
 
-	header := http.Header{}
-	header.Add("Authorization", *c.Session.SessionToken)
-
-	err := c.request(http.MethodGet, path, header, query, nil, ordersRes)
+	err := c.request(http.MethodGet, path, query, nil, ordersRes)
 	if err != nil {
 		return []Order{}, err
 	}
@@ -141,10 +106,6 @@ func (c *Client) GetAccountOrders(accountNumber string, query OrdersQuery) ([]Or
 
 // Runs through preflights for cancel-replace and edit without routing.
 func (c *Client) SubmitOrderECRDryRun(accountNumber string, id int, orderECR NewOrderECR) (OrderResponse, *Error) {
-	if c.Session.SessionToken == nil {
-		return OrderResponse{}, &Error{Message: "Session is invalid: Session Token cannot be nil."}
-	}
-
 	path := fmt.Sprintf("/accounts/%s/orders/%d/dry-run", accountNumber, id)
 
 	type ordersResponse struct {
@@ -153,10 +114,7 @@ func (c *Client) SubmitOrderECRDryRun(accountNumber string, id int, orderECR New
 
 	ordersRes := new(ordersResponse)
 
-	header := http.Header{}
-	header.Add("Authorization", *c.Session.SessionToken)
-
-	err := c.request(http.MethodPost, path, header, nil, orderECR, ordersRes)
+	err := c.request(http.MethodPost, path, nil, orderECR, ordersRes)
 	if err != nil {
 		return OrderResponse{}, err
 	}
@@ -166,10 +124,6 @@ func (c *Client) SubmitOrderECRDryRun(accountNumber string, id int, orderECR New
 
 // Returns a single order based on the id.
 func (c *Client) GetOrder(accountNumber string, id int) (Order, *Error) {
-	if c.Session.SessionToken == nil {
-		return Order{}, &Error{Message: "Session is invalid: Session Token cannot be nil."}
-	}
-
 	path := fmt.Sprintf("/accounts/%s/orders/%d", accountNumber, id)
 
 	type ordersResponse struct {
@@ -178,10 +132,7 @@ func (c *Client) GetOrder(accountNumber string, id int) (Order, *Error) {
 
 	ordersRes := new(ordersResponse)
 
-	header := http.Header{}
-	header.Add("Authorization", *c.Session.SessionToken)
-
-	err := c.request(http.MethodGet, path, header, nil, nil, ordersRes)
+	err := c.request(http.MethodGet, path, nil, nil, ordersRes)
 	if err != nil {
 		return Order{}, err
 	}
@@ -191,10 +142,6 @@ func (c *Client) GetOrder(accountNumber string, id int) (Order, *Error) {
 
 // Requests order cancellation.
 func (c *Client) CancelOrder(accountNumber string, id int) (Order, *Error) {
-	if c.Session.SessionToken == nil {
-		return Order{}, &Error{Message: "Session is invalid: Session Token cannot be nil."}
-	}
-
 	path := fmt.Sprintf("/accounts/%s/orders/%d", accountNumber, id)
 
 	type ordersResponse struct {
@@ -203,10 +150,7 @@ func (c *Client) CancelOrder(accountNumber string, id int) (Order, *Error) {
 
 	ordersRes := new(ordersResponse)
 
-	header := http.Header{}
-	header.Add("Authorization", *c.Session.SessionToken)
-
-	err := c.request(http.MethodDelete, path, header, nil, nil, ordersRes)
+	err := c.request(http.MethodDelete, path, nil, nil, ordersRes)
 	if err != nil {
 		return Order{}, err
 	}
@@ -217,10 +161,6 @@ func (c *Client) CancelOrder(accountNumber string, id int) (Order, *Error) {
 // Replaces a live order with a new one. Subsequent fills of the original
 // order will abort the replacement.
 func (c *Client) ReplaceOrder(accountNumber string, id int, orderECR NewOrderECR) (Order, *Error) {
-	if c.Session.SessionToken == nil {
-		return Order{}, &Error{Message: "Session is invalid: Session Token cannot be nil."}
-	}
-
 	path := fmt.Sprintf("/accounts/%s/orders/%d", accountNumber, id)
 
 	type ordersResponse struct {
@@ -229,10 +169,7 @@ func (c *Client) ReplaceOrder(accountNumber string, id int, orderECR NewOrderECR
 
 	ordersRes := new(ordersResponse)
 
-	header := http.Header{}
-	header.Add("Authorization", *c.Session.SessionToken)
-
-	err := c.request(http.MethodPut, path, header, nil, orderECR, ordersRes)
+	err := c.request(http.MethodPut, path, nil, orderECR, ordersRes)
 	if err != nil {
 		return Order{}, err
 	}
@@ -243,10 +180,6 @@ func (c *Client) ReplaceOrder(accountNumber string, id int, orderECR NewOrderECR
 // Edit price and execution properties of a live order by replacement.
 // Subsequent fills of the original order will abort the replacement.
 func (c *Client) PatchOrder(accountNumber string, id int, orderECR NewOrderECR) (Order, *Error) {
-	if c.Session.SessionToken == nil {
-		return Order{}, &Error{Message: "Session is invalid: Session Token cannot be nil."}
-	}
-
 	path := fmt.Sprintf("/accounts/%s/orders/%d", accountNumber, id)
 
 	type ordersResponse struct {
@@ -255,10 +188,7 @@ func (c *Client) PatchOrder(accountNumber string, id int, orderECR NewOrderECR) 
 
 	ordersRes := new(ordersResponse)
 
-	header := http.Header{}
-	header.Add("Authorization", *c.Session.SessionToken)
-
-	err := c.request(http.MethodPatch, path, header, nil, orderECR, ordersRes)
+	err := c.request(http.MethodPatch, path, nil, orderECR, ordersRes)
 	if err != nil {
 		return Order{}, err
 	}
@@ -267,11 +197,9 @@ func (c *Client) PatchOrder(accountNumber string, id int, orderECR NewOrderECR) 
 }
 
 // Returns a list of live orders for the resource.
+// Currently untested for successful response but
+// expect same response format as account live orders.
 func (c *Client) GetCustomerLiveOrders(customerID string) ([]Order, *Error) {
-	if c.Session.SessionToken == nil {
-		return []Order{}, &Error{Message: "Session is invalid: Session Token cannot be nil."}
-	}
-
 	path := fmt.Sprintf("/customers/%s/orders/live", customerID)
 
 	type ordersResponse struct {
@@ -282,10 +210,7 @@ func (c *Client) GetCustomerLiveOrders(customerID string) ([]Order, *Error) {
 
 	ordersRes := new(ordersResponse)
 
-	header := http.Header{}
-	header.Add("Authorization", *c.Session.SessionToken)
-
-	err := c.request(http.MethodGet, path, header, nil, nil, ordersRes)
+	err := c.request(http.MethodGet, path, nil, nil, ordersRes)
 	if err != nil {
 		return []Order{}, err
 	}
@@ -296,11 +221,9 @@ func (c *Client) GetCustomerLiveOrders(customerID string) ([]Order, *Error) {
 // Returns a paginated list of the customer's orders (as identified by the provided
 // authentication token) based on sort param. If no sort is passed in, it defaults
 // to descending order.
+// Currently untested for successful response but
+// expect same response format as account orders.
 func (c *Client) GetCustomerOrders(customerID string, query OrdersQuery) ([]Order, *Error) {
-	if c.Session.SessionToken == nil {
-		return []Order{}, &Error{Message: "Session is invalid: Session Token cannot be nil."}
-	}
-
 	path := fmt.Sprintf("/customers/%s/orders", customerID)
 
 	type ordersResponse struct {
@@ -311,10 +234,7 @@ func (c *Client) GetCustomerOrders(customerID string, query OrdersQuery) ([]Orde
 
 	ordersRes := new(ordersResponse)
 
-	header := http.Header{}
-	header.Add("Authorization", *c.Session.SessionToken)
-
-	err := c.request(http.MethodGet, path, header, query, nil, ordersRes)
+	err := c.request(http.MethodGet, path, query, nil, ordersRes)
 	if err != nil {
 		return []Order{}, err
 	}
