@@ -906,6 +906,54 @@ func TestPatchOrderError(t *testing.T) {
 	expectedUnauthorized(t, err)
 }
 
+func TestGetCustomerLiveOrders(t *testing.T) {
+	setup()
+	defer teardown()
+
+	accountNumber := "5YZ55555"
+	customerID := "me"
+
+	mux.HandleFunc(fmt.Sprintf("/customers/%s/orders/live", customerID), func(writer http.ResponseWriter, request *http.Request) {
+		fmt.Fprint(writer, customerLiveOrdersResp)
+	})
+
+	resp, err := client.GetCustomerLiveOrders(customerID, OrdersQuery{AccountNumbers: []string{accountNumber}})
+	require.Nil(t, err)
+
+	o := resp[0]
+
+	require.Equal(t, accountNumber, o.AccountNumber)
+	require.Equal(t, Day, o.TimeInForce)
+	require.Equal(t, Limit, o.OrderType)
+	require.Equal(t, 1, o.Size)
+	require.Equal(t, "RIVN", o.UnderlyingSymbol)
+	require.Equal(t, EquityIT, o.UnderlyingInstrumentType)
+	require.Equal(t, StringToFloat32(0.01), o.Price)
+	require.Equal(t, Debit, o.PriceEffect)
+	require.Equal(t, Filled, o.Status)
+	require.False(t, o.Cancellable)
+	require.False(t, o.Editable)
+	require.False(t, o.Edited)
+
+	ol := o.Legs[0]
+
+	require.Equal(t, EquityOptionIT, ol.InstrumentType)
+	require.Equal(t, "RIVN  230623C00015000", ol.Symbol)
+	require.Equal(t, float32(1), ol.Quantity)
+	require.Equal(t, float32(0), ol.RemainingQuantity)
+	require.Equal(t, BTC, ol.Action)
+
+	fi := ol.Fills[0]
+
+	require.Equal(t, "2263911504", fi.ExtGroupFillID)
+	require.Equal(t, "90305", fi.ExtExecID)
+	require.Equal(t, "3_OPT850090305", fi.FillID)
+	require.Equal(t, float32(1), fi.Quantity)
+	require.Equal(t, StringToFloat32(0.01), fi.FillPrice)
+	require.Equal(t, "2023-06-23T14:12:04.214Z", fi.FilledAt.Format(time.RFC3339Nano))
+	require.Equal(t, "CITADEL_OPTIONS_A", fi.DestinationVenue)
+}
+
 func TestGetCustomerLiveOrdersError(t *testing.T) {
 	setup()
 	defer teardown()
@@ -917,7 +965,7 @@ func TestGetCustomerLiveOrdersError(t *testing.T) {
 		fmt.Fprint(writer, customerOrdersErrorResp)
 	})
 
-	_, err := client.GetCustomerLiveOrders(customerID)
+	_, err := client.GetCustomerLiveOrders(customerID, OrdersQuery{})
 	require.NotNil(t, err)
 
 	require.Equal(t, "validation_error", err.Code)
@@ -925,6 +973,54 @@ func TestGetCustomerLiveOrdersError(t *testing.T) {
 	require.NotEmpty(t, err.Errors)
 	require.Equal(t, "account-numbers", err.Errors[0].Domain)
 	require.Equal(t, "is missing", err.Errors[0].Reason)
+}
+
+func TestGetCustomerOrders(t *testing.T) {
+	setup()
+	defer teardown()
+
+	accountNumber := "5YZ55555"
+	customerID := "me"
+
+	mux.HandleFunc(fmt.Sprintf("/customers/%s/orders", customerID), func(writer http.ResponseWriter, request *http.Request) {
+		fmt.Fprint(writer, customerLiveOrdersResp)
+	})
+
+	resp, err := client.GetCustomerOrders(customerID, OrdersQuery{AccountNumbers: []string{accountNumber}})
+	require.Nil(t, err)
+
+	o := resp[0]
+
+	require.Equal(t, accountNumber, o.AccountNumber)
+	require.Equal(t, Day, o.TimeInForce)
+	require.Equal(t, Limit, o.OrderType)
+	require.Equal(t, 1, o.Size)
+	require.Equal(t, "RIVN", o.UnderlyingSymbol)
+	require.Equal(t, EquityIT, o.UnderlyingInstrumentType)
+	require.Equal(t, StringToFloat32(0.01), o.Price)
+	require.Equal(t, Debit, o.PriceEffect)
+	require.Equal(t, Filled, o.Status)
+	require.False(t, o.Cancellable)
+	require.False(t, o.Editable)
+	require.False(t, o.Edited)
+
+	ol := o.Legs[0]
+
+	require.Equal(t, EquityOptionIT, ol.InstrumentType)
+	require.Equal(t, "RIVN  230623C00015000", ol.Symbol)
+	require.Equal(t, float32(1), ol.Quantity)
+	require.Equal(t, float32(0), ol.RemainingQuantity)
+	require.Equal(t, BTC, ol.Action)
+
+	fi := ol.Fills[0]
+
+	require.Equal(t, "2263911504", fi.ExtGroupFillID)
+	require.Equal(t, "90305", fi.ExtExecID)
+	require.Equal(t, "3_OPT850090305", fi.FillID)
+	require.Equal(t, float32(1), fi.Quantity)
+	require.Equal(t, StringToFloat32(0.01), fi.FillPrice)
+	require.Equal(t, "2023-06-23T14:12:04.214Z", fi.FilledAt.Format(time.RFC3339Nano))
+	require.Equal(t, "CITADEL_OPTIONS_A", fi.DestinationVenue)
 }
 
 func TestGetCustomerOrdersError(t *testing.T) {
@@ -1686,4 +1782,53 @@ const customerOrdersErrorResp = `{
             }
         ]
     }
+}`
+
+const customerLiveOrdersResp = `{
+  "data": {
+    "items": [
+      {
+        "id": 274344092,
+        "account-number": "5YZ55555",
+        "time-in-force": "Day",
+        "order-type": "Limit",
+        "size": 1,
+        "underlying-symbol": "RIVN",
+        "underlying-instrument-type": "Equity",
+        "price": "0.01",
+        "price-effect": "Debit",
+        "status": "Filled",
+        "cancellable": false,
+        "editable": false,
+        "edited": false,
+        "ext-exchange-order-number": "60722521974940",
+        "ext-client-order-id": "9c0000373a105a289c",
+        "ext-global-order-number": 14138,
+        "received-at": "2023-06-23T13:52:59.062+00:00",
+        "updated-at": 1687529524255,
+        "terminal-at": "2023-06-23T14:12:04.250+00:00",
+        "legs": [
+          {
+            "instrument-type": "Equity Option",
+            "symbol": "RIVN  230623C00015000",
+            "quantity": 1,
+            "remaining-quantity": 0,
+            "action": "Buy to Close",
+            "fills": [
+              {
+                "ext-group-fill-id": "2263911504",
+                "ext-exec-id": "90305",
+                "fill-id": "3_OPT850090305",
+                "quantity": 1,
+                "fill-price": "0.01",
+                "filled-at": "2023-06-23T14:12:04.214+00:00",
+                "destination-venue": "CITADEL_OPTIONS_A"
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  "context": "/customers/me/orders/live"
 }`

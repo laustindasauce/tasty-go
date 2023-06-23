@@ -91,9 +91,9 @@ type OrderFill struct {
 	ExtGroupFillID   string          `json:"ext-group-fill-id"`
 	ExtExecID        string          `json:"ext-exec-id"`
 	FillID           string          `json:"fill-id"`
-	Quantity         int             `json:"quantity"`
+	Quantity         float32         `json:"quantity"`
 	FillPrice        StringToFloat32 `json:"fill-price"`
-	FilledAt         string          `json:"filled-at"`
+	FilledAt         time.Time       `json:"filled-at"`
 	DestinationVenue string          `json:"destination-venue"`
 }
 
@@ -270,6 +270,9 @@ type NewOrderCondition struct {
 
 // The query for account orders.
 type OrdersQuery struct {
+	// Account numbers to get orders from (customer must have at least
+	// viewing access over the account)
+	AccountNumbers []string `url:"account-numbers[],omitempty"`
 	// Default value 10
 	PerPage int `url:"per-page,omitempty"`
 	// Default value 0
