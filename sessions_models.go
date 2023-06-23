@@ -17,6 +17,7 @@ type User struct {
 	Email      string `json:"email"`
 	Username   string `json:"username"`
 	ExternalID string `json:"external-id"`
+	ID         *int   `json:"id"`
 }
 
 type Session struct {

@@ -22,6 +22,7 @@ func TestCreateSession(t *testing.T) {
 	require.Equal(t, "default@gmail.com", resp.User.Email)
 	require.Equal(t, "default", resp.User.Username)
 	require.Equal(t, "U0001563674", resp.User.ExternalID)
+	require.Nil(t, resp.User.ID)
 	require.NotNil(t, resp.SessionToken)
 	require.Equal(t, "example-session-token+C", *resp.SessionToken)
 	require.Nil(t, resp.RememberToken)
@@ -67,18 +68,16 @@ func TestValidateSession(t *testing.T) {
 	defer teardown()
 
 	mux.HandleFunc("/sessions/validate", func(writer http.ResponseWriter, request *http.Request) {
-		fmt.Fprint(writer, sessionResp)
+		fmt.Fprint(writer, sessionValidateResp)
 	})
 
 	resp, err := client.ValidateSession()
 	require.Nil(t, err)
 
-	require.Equal(t, "default@gmail.com", resp.User.Email)
-	require.Equal(t, "default", resp.User.Username)
-	require.Equal(t, "U0001563674", resp.User.ExternalID)
-	require.NotNil(t, resp.SessionToken)
-	require.Equal(t, "example-session-token+C", *resp.SessionToken)
-	require.Nil(t, resp.RememberToken)
+	require.Equal(t, "default@gmail.com", resp.Email)
+	require.Equal(t, "default", resp.Username)
+	require.Equal(t, "U0001563674", resp.ExternalID)
+	require.Equal(t, 123456, *resp.ID)
 }
 
 func TestValidateSessionError(t *testing.T) {
@@ -200,6 +199,16 @@ const sessionResp = `{
     "session-token": "example-session-token+C"
   },
   "context": "/sessions"
+}`
+
+const sessionValidateResp = `{
+  "data": {
+    "email": "default@gmail.com",
+    "username": "default",
+    "external-id": "U0001563674",
+    "id": 123456
+  },
+  "context": "/sessions/validate"
 }`
 
 const passwordChangeRequestErrorResp = `{

@@ -4,13 +4,13 @@ import (
 	"net/http"
 )
 
-type sessionResponse struct {
-	Session Session `json:"data"`
-}
-
 // Create a new user session.
 func (c *Client) CreateSession(login LoginInfo, twoFactorCode *string) (Session, *Error) {
 	path := "/sessions"
+
+	type sessionResponse struct {
+		Session Session `json:"data"`
+	}
 
 	session := new(sessionResponse)
 
@@ -31,19 +31,23 @@ func (c *Client) CreateSession(login LoginInfo, twoFactorCode *string) (Session,
 }
 
 // Validate the user session.
-func (c *Client) ValidateSession() (Session, *Error) {
+func (c *Client) ValidateSession() (User, *Error) {
 	path := "/sessions/validate"
 
-	session := new(sessionResponse)
-
-	err := c.request(http.MethodPost, path, nil, nil, session)
-	if err != nil {
-		return Session{}, err
+	type validSessionResponse struct {
+		User User `json:"data"`
 	}
 
-	c.Session = session.Session
+	user := new(validSessionResponse)
 
-	return session.Session, nil
+	err := c.request(http.MethodPost, path, nil, nil, user)
+	if err != nil {
+		return User{}, err
+	}
+
+	c.Session.User = user.User
+
+	return user.User, nil
 }
 
 // Destroy the user session and invalidate the token.
