@@ -197,9 +197,8 @@ func (c *Client) PatchOrder(accountNumber string, id int, orderECR NewOrderECR) 
 }
 
 // Returns a list of live orders for the resource.
-// Currently untested for successful response but
-// expect same response format as account live orders.
-func (c *Client) GetCustomerLiveOrders(customerID string) ([]Order, *Error) {
+// Requires account numbers param to pull orders from.
+func (c *Client) GetCustomerLiveOrders(customerID string, query OrdersQuery) ([]Order, *Error) {
 	path := fmt.Sprintf("/customers/%s/orders/live", customerID)
 
 	type ordersResponse struct {
@@ -210,7 +209,7 @@ func (c *Client) GetCustomerLiveOrders(customerID string) ([]Order, *Error) {
 
 	ordersRes := new(ordersResponse)
 
-	err := c.request(http.MethodGet, path, nil, nil, ordersRes)
+	err := c.request(http.MethodGet, path, query, nil, ordersRes)
 	if err != nil {
 		return []Order{}, err
 	}
@@ -220,9 +219,7 @@ func (c *Client) GetCustomerLiveOrders(customerID string) ([]Order, *Error) {
 
 // Returns a paginated list of the customer's orders (as identified by the provided
 // authentication token) based on sort param. If no sort is passed in, it defaults
-// to descending order.
-// Currently untested for successful response but
-// expect same response format as account orders.
+// to descending order. Requires account numbers param to pull orders from.
 func (c *Client) GetCustomerOrders(customerID string, query OrdersQuery) ([]Order, *Error) {
 	path := fmt.Sprintf("/customers/%s/orders", customerID)
 
