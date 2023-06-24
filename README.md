@@ -9,11 +9,19 @@ This library provides unofficial Go clients for [TastyTrade API](https://tastytr
 
 > You will need to opt into TastyTrade's API [here](https://developer.tastytrade.com)
 
+## TastyTrade
+
+[TastyTrade](https://tastytrade.com/about-us/) pioneered options trading technology for retail traders.
+
+[Create your account](https://start.tastytrade.com/#/login?referralCode=MS53QAT6DS) if you don't already have one to begin trading with TastyTrade.
+
 ## TO-DO
 
 - Untested endpoints
   - Margin requirements dry-run
+    - Server is returning 500 error when sending what the documentation shows as expected request body.
   - Order reconfirm
+    - TastyTrade API support has informed me that this endpoint is for Equity Offering orders only.
 
 ## Installation
 
@@ -1075,3 +1083,23 @@ func main() {
 ```
 
 </details>
+
+## Testing
+
+Nearly 100% code coverage testing.
+
+> Run all tests
+
+```bash
+go test .
+```
+
+> Run all tests with code coverage information
+
+```bash
+go test -race -covermode=atomic -coverprofile=coverage.out -v .
+```
+
+## Contributing
+
+Please consider opening an [issue](https://github.com/austinbspencer/tasty-go/issues) if you notice any bugs or areas of possible improvement. You can also fork this repo and open a pull request with your own changes. Be sure that all changes have adequate testing in a similar fashion to the rest of the repository.
