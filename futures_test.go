@@ -458,6 +458,36 @@ func TestGetFutureOptions(t *testing.T) {
 	require.Equal(t, "Equity Index", fop.MarketSector)
 }
 
+func TestGetFutureOptionsError(t *testing.T) {
+	setup()
+	defer teardown()
+
+	future := FutureSymbology{ProductCode: "ES", MonthCode: December, YearDigit: 9}
+
+	expiry := time.Date(2019, 9, 27, 0, 0, 0, 0, time.Local)
+	fcc := FutureOptionsSymbology{
+		OptionContractCode: "EW4U9",
+		FutureContractCode: future.Build(),
+		OptionType:         Put,
+		Strike:             2975,
+		Expiration:         expiry,
+	}
+
+	symbol := fcc.Build()
+
+	query := FutureOptionsQuery{
+		Symbols: []string{symbol},
+	}
+
+	mux.HandleFunc("/instruments/future-options", func(writer http.ResponseWriter, request *http.Request) {
+		writer.WriteHeader(401)
+		fmt.Fprint(writer, tastyUnauthorizedError)
+	})
+
+	_, err := client.GetFutureOptions(query)
+	expectedUnauthorized(t, err)
+}
+
 func TestGetFutureOption(t *testing.T) {
 	setup()
 	defer teardown()
@@ -534,33 +564,17 @@ func TestGetFutureOption(t *testing.T) {
 	require.Equal(t, "Equity Index", fop.MarketSector)
 }
 
-func TestGetFutureOptionsError(t *testing.T) {
+func TestGetFutureOptionError(t *testing.T) {
 	setup()
 	defer teardown()
 
-	future := FutureSymbology{ProductCode: "ES", MonthCode: December, YearDigit: 9}
-
-	expiry := time.Date(2019, 9, 27, 0, 0, 0, 0, time.Local)
-	fcc := FutureOptionsSymbology{
-		OptionContractCode: "EW4U9",
-		FutureContractCode: future.Build(),
-		OptionType:         Put,
-		Strike:             2975,
-		Expiration:         expiry,
-	}
-
-	symbol := fcc.Build()
-
-	query := FutureOptionsQuery{
-		Symbols: []string{symbol},
-	}
-
-	mux.HandleFunc("/instruments/future-options", func(writer http.ResponseWriter, request *http.Request) {
+	// Need to hard code the endpoint since mux won't handle the . in the url
+	mux.HandleFunc("/instruments/future-options/test", func(writer http.ResponseWriter, request *http.Request) {
 		writer.WriteHeader(401)
 		fmt.Fprint(writer, tastyUnauthorizedError)
 	})
 
-	_, err := client.GetFutureOptions(query)
+	_, err := client.GetFutureOption("test")
 	expectedUnauthorized(t, err)
 }
 

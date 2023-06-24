@@ -168,6 +168,25 @@ func TestGetAccountTransactionFees(t *testing.T) {
 	require.Equal(t, None, fees.TotalFeesEffect)
 }
 
+func TestGetAccountTransactionFeesWithParams(t *testing.T) {
+	setup()
+	defer teardown()
+
+	accountNumber := "5YZ55555"
+	queryDate := time.Date(2023, 6, 16, 0, 0, 0, 0, time.Local)
+
+	mux.HandleFunc(fmt.Sprintf("/accounts/%s/transactions/total-fees", accountNumber), func(writer http.ResponseWriter, request *http.Request) {
+		fmt.Fprint(writer, transactionFeesResp)
+		require.Equal(t, "2023-06-16", request.URL.Query().Get("date"))
+	})
+
+	fees, err := client.GetAccountTransactionFees(accountNumber, &queryDate)
+	require.Nil(t, err)
+
+	require.Equal(t, StringToFloat32(0), fees.TotalFees)
+	require.Equal(t, None, fees.TotalFeesEffect)
+}
+
 func TestGetAccountTransactionFeesError(t *testing.T) {
 	setup()
 	defer teardown()

@@ -214,7 +214,7 @@ func TestMarginRequirementsDryRunError(t *testing.T) {
 
 	accountNumber := "5YZ55555"
 
-	mux.HandleFunc(fmt.Sprintf("/margin/accounts/%s/requirements", accountNumber), func(writer http.ResponseWriter, request *http.Request) {
+	mux.HandleFunc(fmt.Sprintf("/margin/accounts/%s/dry-run", accountNumber), func(writer http.ResponseWriter, request *http.Request) {
 		writer.WriteHeader(401)
 		fmt.Fprint(writer, tastyUnauthorizedError)
 	})

@@ -26,8 +26,10 @@ func (c *Client) GetMarginRequirements(accountNumber string) (MarginRequirements
 // Estimate margin requirements for an order given an account
 // Need more understanding on the expected payload and response
 // https://developer.tastytrade.com/open-api-spec/margin-requirements
+// When sending request body in format shown in the docs I am receiving
+// internal server error response.
 func (c *Client) MarginRequirementsDryRun(accountNumber string, order NewOrder) (any, *Error) {
-	path := fmt.Sprintf("/margin/accounts/%s/requirements", accountNumber)
+	path := fmt.Sprintf("/margin/accounts/%s/dry-run", accountNumber)
 
 	type marginResponse struct {
 		Response any `json:"data"`

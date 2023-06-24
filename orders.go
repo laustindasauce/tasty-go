@@ -7,6 +7,9 @@ import (
 
 // Reconfirm an order
 // ** This is currently untested.
+// Requires the order to be an Equity Offering
+// Unable to submit equity offering orders even in cert environment
+// equity_offering_not_supported.
 func (c *Client) ReconfirmOrder(accountNumber string, id int) (Order, *Error) {
 	path := fmt.Sprintf("/accounts/%s/orders/%d/reconfirm", accountNumber, id)
 

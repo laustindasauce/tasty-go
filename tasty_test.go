@@ -131,11 +131,18 @@ func TestCustomRequest(t *testing.T) {
 func TestRequest(t *testing.T) {
 	c, err := NewCertClient(&http.Client{Timeout: time.Duration(30) * time.Second})
 	require.NoError(t, err)
+
+	tastyError := c.request(http.MethodGet, "/no-auth", nil, nil, nil)
+	require.NotNil(t, tastyError)
+	require.Equal(t,
+		"\nError in request 0;\nCode: invalid_session\nMessage: Session is invalid: Session Token cannot be nil.",
+		tastyError.Error())
+
 	c.Session.SessionToken = &testToken
 
 	// Test invalid payload
 	invalid := math.Inf(1)
-	tastyError := c.request(http.MethodGet, "/test", nil, invalid, nil)
+	tastyError = c.request(http.MethodGet, "/test", nil, invalid, nil)
 	require.NotNil(t, tastyError)
 
 	require.Equal(t,
@@ -156,6 +163,15 @@ func TestRequest(t *testing.T) {
 
 	require.Equal(t,
 		"\nError in request 0;\nCode: \nMessage: Client Side Error: net/http: invalid method \"GET/sdfl/\"",
+		tastyError.Error())
+
+	// Test invalid URL
+	c.baseURL = "invalid"
+	tastyError = c.request(http.MethodGet, "/test", nil, nil, nil)
+	require.NotNil(t, tastyError)
+
+	require.Equal(t,
+		"\nError in request 0;\nCode: \nMessage: Client Side Error: Get \"invalid/test\": unsupported protocol scheme \"\"",
 		tastyError.Error())
 }
 
@@ -186,6 +202,15 @@ func TestNoAuthRequest(t *testing.T) {
 
 	require.Equal(t,
 		"\nError in request 0;\nCode: \nMessage: Client Side Error: net/http: invalid method \"GET/sdfl/\"",
+		tastyError.Error())
+
+	// Test invalid URL
+	c.baseURL = "invalid"
+	tastyError = c.noAuthRequest(http.MethodGet, "/test", nil, nil, nil, nil)
+	require.NotNil(t, tastyError)
+
+	require.Equal(t,
+		"\nError in request 0;\nCode: \nMessage: Client Side Error: Get \"invalid/test\": unsupported protocol scheme \"\"",
 		tastyError.Error())
 }
 
@@ -334,6 +359,19 @@ func TestRequestMissingCredentials(t *testing.T) {
 	require.Equal(t,
 		"\nError in request 0;\nCode: invalid_session\nMessage: Session is invalid: Session Token cannot be nil.",
 		tastyErr.Error())
+}
+
+func TestNoAuthRequestWithParams(t *testing.T) {
+	setup()
+	defer teardown()
+
+	mux.HandleFunc("/with-params", func(writer http.ResponseWriter, request *http.Request) {
+		writer.WriteHeader(http.StatusNoContent)
+		require.Equal(t, "true", request.URL.Query().Get("is-etf"))
+	})
+
+	err := client.noAuthRequest(http.MethodGet, "/with-params", nil, EquitiesQuery{IsETF: true}, nil, nil)
+	require.Nil(t, err)
 }
 
 const tastyUnauthorizedError = `{
