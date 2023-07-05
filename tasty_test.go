@@ -395,29 +395,24 @@ const tastyInvalidSessionError = `{
     }
 }`
 
-func expectedUnauthorized(t *testing.T, err *Error) {
+func expectedUnauthorized(t *testing.T, err error) {
 	require.NotNil(t, err)
 
-	require.Equal(t, "unauthorized", err.Code)
-	require.Equal(t,
-		"Unauthorized. Unique customer support identifier: test",
-		err.Message)
+	require.Equal(t, "\nError in request 401;\nCode: unauthorized\nMessage: Unauthorized. Unique customer support identifier: test", err.Error())
 }
 
-func expectedInvalidCredentials(t *testing.T, err *Error) {
+func expectedInvalidCredentials(t *testing.T, err error) {
 	require.NotNil(t, err)
 
-	require.Equal(t, "invalid_credentials", err.Code)
 	require.Equal(t,
-		"Invalid login, please check your username and password. Unique customer support identifier: test-id",
-		err.Message)
+		"\nError in request 401;\nCode: invalid_credentials\nMessage: Invalid login, please check your username and password. Unique customer support identifier: test-id",
+		err.Error())
 }
 
-func expectedInvalidSession(t *testing.T, err *Error) {
+func expectedInvalidSession(t *testing.T, err error) {
 	require.NotNil(t, err)
 
-	require.Equal(t, "invalid_session", err.Code)
 	require.Equal(t,
-		"Session user not present. Unique customer support identifier: test-id",
-		err.Message)
+		"\nError in request 401;\nCode: invalid_session\nMessage: Session user not present. Unique customer support identifier: test-id",
+		err.Error())
 }

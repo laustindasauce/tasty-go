@@ -142,11 +142,7 @@ func TestRequestPasswordResetEmailError(t *testing.T) {
 	err := client.RequestPasswordResetEmail("")
 	require.NotNil(t, err)
 
-	require.Equal(t, "validation_error", err.Code)
-	require.Equal(t, "Request validation failed", err.Message)
-	require.NotEmpty(t, err.Errors)
-	require.Equal(t, "email", err.Errors[0].Domain)
-	require.Equal(t, "is empty", err.Errors[0].Reason)
+	require.Equal(t, "\nError in request 400;\nCode: validation_error\nMessage: Request validation failed", err.Error())
 }
 
 func TestChangePassword(t *testing.T) {
@@ -182,11 +178,7 @@ func TestChangePasswordError(t *testing.T) {
 		})
 	require.NotNil(t, err)
 
-	require.Equal(t, "validation_error", err.Code)
-	require.Equal(t, "Request validation failed", err.Message)
-	require.NotEmpty(t, err.Errors)
-	require.Equal(t, "reset-password-token", err.Errors[1].Domain)
-	require.Equal(t, "are missing, exactly one parameter must be provided", err.Errors[1].Reason)
+	require.Equal(t, "\nError in request 400;\nCode: validation_error\nMessage: Request validation failed", err.Error())
 }
 
 const sessionResp = `{
