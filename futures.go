@@ -6,7 +6,7 @@ import (
 )
 
 // Returns a set of outright futures given an array of one or more symbols.
-func (c *Client) GetFutures(query FuturesQuery) ([]Future, *Error) {
+func (c *Client) GetFutures(query FuturesQuery) ([]Future, error) {
 	path := "/instruments/futures"
 
 	type instrumentResponse struct {
@@ -26,7 +26,7 @@ func (c *Client) GetFutures(query FuturesQuery) ([]Future, *Error) {
 }
 
 // Returns an outright future given a symbol.
-func (c *Client) GetFuture(symbol string) (Future, *Error) {
+func (c *Client) GetFuture(symbol string) (Future, error) {
 	path := fmt.Sprintf("/instruments/futures/%s", symbol)
 
 	type instrumentResponse struct {
@@ -44,7 +44,7 @@ func (c *Client) GetFuture(symbol string) (Future, *Error) {
 }
 
 // Returns metadata for all supported future option products.
-func (c *Client) GetFutureOptionProducts() ([]FutureOptionProduct, *Error) {
+func (c *Client) GetFutureOptionProducts() ([]FutureOptionProduct, error) {
 	path := "/instruments/future-option-products"
 
 	type instrumentResponse struct {
@@ -64,7 +64,7 @@ func (c *Client) GetFutureOptionProducts() ([]FutureOptionProduct, *Error) {
 }
 
 // Get a future option product by exchange and root symbol.
-func (c *Client) GetFutureOptionProduct(exchange, rootSymbol string) (FutureOptionProduct, *Error) {
+func (c *Client) GetFutureOptionProduct(exchange, rootSymbol string) (FutureOptionProduct, error) {
 	path := fmt.Sprintf("/instruments/future-option-products/%s/%s", exchange, rootSymbol)
 
 	type instrumentResponse struct {
@@ -83,7 +83,7 @@ func (c *Client) GetFutureOptionProduct(exchange, rootSymbol string) (FutureOpti
 
 // Returns a set of future option(s) given an array of one or more symbols.
 // Uses TW symbology: [./ESZ9 EW4U9 190927P2975].
-func (c *Client) GetFutureOptions(query FutureOptionsQuery) ([]FutureOption, *Error) {
+func (c *Client) GetFutureOptions(query FutureOptionsQuery) ([]FutureOption, error) {
 	path := "/instruments/future-options"
 
 	type instrumentResponse struct {
@@ -103,7 +103,7 @@ func (c *Client) GetFutureOptions(query FutureOptionsQuery) ([]FutureOption, *Er
 }
 
 // Returns a future option given a symbol. Uses TW symbology: ./ESZ9 EW4U9 190927P2975.
-func (c *Client) GetFutureOption(symbol string) (FutureOption, *Error) {
+func (c *Client) GetFutureOption(symbol string) (FutureOption, error) {
 	path := fmt.Sprintf("/instruments/future-options/%s", symbol)
 
 	type instrumentResponse struct {
@@ -122,7 +122,7 @@ func (c *Client) GetFutureOption(symbol string) (FutureOption, *Error) {
 }
 
 // Returns metadata for all supported futures products.
-func (c *Client) GetFutureProducts() ([]FutureProduct, *Error) {
+func (c *Client) GetFutureProducts() ([]FutureProduct, error) {
 	path := "/instruments/future-products"
 
 	type instrumentResponse struct {
@@ -142,7 +142,7 @@ func (c *Client) GetFutureProducts() ([]FutureProduct, *Error) {
 }
 
 // Get future product from exchange and product code.
-func (c *Client) GetFutureProduct(exchange Exchange, productCode string) (FutureProduct, *Error) {
+func (c *Client) GetFutureProduct(exchange Exchange, productCode string) (FutureProduct, error) {
 	path := fmt.Sprintf("/instruments/future-products/%s/%s", exchange, productCode)
 
 	type instrumentResponse struct {

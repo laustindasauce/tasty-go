@@ -6,7 +6,7 @@ import (
 )
 
 // Get the accounts for the authenticated client.
-func (c *Client) GetMyAccounts() ([]Account, *Error) {
+func (c *Client) GetMyAccounts() ([]Account, error) {
 	path := "/customers/me/accounts"
 
 	type accountResponse struct {
@@ -34,7 +34,7 @@ func (c *Client) GetMyAccounts() ([]Account, *Error) {
 }
 
 // Returns current trading status for an account.
-func (c *Client) GetAccountTradingStatus(accountNumber string) (AccountTradingStatus, *Error) {
+func (c *Client) GetAccountTradingStatus(accountNumber string) (AccountTradingStatus, error) {
 	path := fmt.Sprintf("/accounts/%s/trading-status", accountNumber)
 
 	type tradingStatusRes struct {
@@ -51,7 +51,7 @@ func (c *Client) GetAccountTradingStatus(accountNumber string) (AccountTradingSt
 }
 
 // Returns the current balance values for an account.
-func (c *Client) GetAccountBalances(accountNumber string) (AccountBalance, *Error) {
+func (c *Client) GetAccountBalances(accountNumber string) (AccountBalance, error) {
 	path := fmt.Sprintf("/accounts/%s/balances", accountNumber)
 
 	type accountBalanceRes struct {
@@ -69,7 +69,7 @@ func (c *Client) GetAccountBalances(accountNumber string) (AccountBalance, *Erro
 
 // Returns a list of the account's positions.
 // Can be filtered by symbol, underlying_symbol.
-func (c *Client) GetAccountPositions(accountNumber string, query AccountPositionQuery) ([]AccountPosition, *Error) {
+func (c *Client) GetAccountPositions(accountNumber string, query AccountPositionQuery) ([]AccountPosition, error) {
 	path := fmt.Sprintf("/accounts/%s/positions", accountNumber)
 
 	type accountResponse struct {
@@ -89,7 +89,7 @@ func (c *Client) GetAccountPositions(accountNumber string, query AccountPosition
 }
 
 // Returns most recent snapshot and current balance for an account.
-func (c *Client) GetAccountBalanceSnapshots(accountNumber string, query AccountBalanceSnapshotsQuery) ([]AccountBalanceSnapshots, *Error) {
+func (c *Client) GetAccountBalanceSnapshots(accountNumber string, query AccountBalanceSnapshotsQuery) ([]AccountBalanceSnapshots, error) {
 	// Default to EOD
 	if query.TimeOfDay == "" {
 		query.TimeOfDay = EndOfDay
@@ -114,7 +114,7 @@ func (c *Client) GetAccountBalanceSnapshots(accountNumber string, query AccountB
 }
 
 // Returns a list of account net liquidating value snapshots.
-func (c *Client) GetAccountNetLiqHistory(accountNumber string, query HistoricLiquidityQuery) ([]NetLiqOHLC, *Error) {
+func (c *Client) GetAccountNetLiqHistory(accountNumber string, query HistoricLiquidityQuery) ([]NetLiqOHLC, error) {
 	path := fmt.Sprintf("/accounts/%s/net-liq/history", accountNumber)
 
 	type accountResponse struct {
@@ -134,7 +134,7 @@ func (c *Client) GetAccountNetLiqHistory(accountNumber string, query HistoricLiq
 }
 
 // Get the position limit.
-func (c *Client) GetAccountPositionLimit(accountNumber string) (PositionLimit, *Error) {
+func (c *Client) GetAccountPositionLimit(accountNumber string) (PositionLimit, error) {
 	path := fmt.Sprintf("/accounts/%s/position-limit", accountNumber)
 
 	type accountResponse struct {

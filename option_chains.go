@@ -7,7 +7,7 @@ import (
 )
 
 // Returns a futures option chain given a futures product code, i.e. ES.
-func (c *Client) GetFuturesOptionChains(productCode string) ([]FutureOption, *Error) {
+func (c *Client) GetFuturesOptionChains(productCode string) ([]FutureOption, error) {
 	path := fmt.Sprintf("/futures-option-chains/%s", productCode)
 
 	type instrumentResponse struct {
@@ -28,7 +28,7 @@ func (c *Client) GetFuturesOptionChains(productCode string) ([]FutureOption, *Er
 
 // Returns a futures option chain given a futures product code in a nested form to minimize
 // redundant processing.
-func (c *Client) GetNestedFuturesOptionChains(productCode string) (NestedFuturesOptionChains, *Error) {
+func (c *Client) GetNestedFuturesOptionChains(productCode string) (NestedFuturesOptionChains, error) {
 	path := fmt.Sprintf("/futures-option-chains/%s/nested", productCode)
 
 	type instrumentResponse struct {
@@ -46,7 +46,7 @@ func (c *Client) GetNestedFuturesOptionChains(productCode string) (NestedFutures
 }
 
 // Returns an option chain given an underlying symbol, i.e. AAPL.
-func (c *Client) GetEquityOptionChains(symbol string) ([]EquityOption, *Error) {
+func (c *Client) GetEquityOptionChains(symbol string) ([]EquityOption, error) {
 	// url escape required for instances where "/" exists in symbol i.e. BRK/B
 	symbol = url.PathEscape(symbol)
 
@@ -71,7 +71,7 @@ func (c *Client) GetEquityOptionChains(symbol string) ([]EquityOption, *Error) {
 
 // Returns an option chain given an underlying symbol,
 // i.e. AAPL in a nested form to minimize redundant processing.
-func (c *Client) GetNestedEquityOptionChains(symbol string) ([]NestedOptionChains, *Error) {
+func (c *Client) GetNestedEquityOptionChains(symbol string) ([]NestedOptionChains, error) {
 	// url escape required for instances where "/" exists in symbol i.e. BRK/B
 	symbol = url.PathEscape(symbol)
 
@@ -96,7 +96,7 @@ func (c *Client) GetNestedEquityOptionChains(symbol string) ([]NestedOptionChain
 
 // Returns an option chain given an underlying symbol,
 // i.e. AAPL in a compact form to minimize content size.
-func (c *Client) GetCompactEquityOptionChains(symbol string) ([]CompactOptionChains, *Error) {
+func (c *Client) GetCompactEquityOptionChains(symbol string) ([]CompactOptionChains, error) {
 	// url escape required for instances where "/" exists in symbol i.e. BRK/B
 	symbol = url.PathEscape(symbol)
 

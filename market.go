@@ -8,7 +8,7 @@ import (
 )
 
 // Returns an array of volatility data for given symbols.
-func (c *Client) GetMarketMetrics(symbols []string) ([]MarketMetricVolatility, *Error) {
+func (c *Client) GetMarketMetrics(symbols []string) ([]MarketMetricVolatility, error) {
 	path := "/market-metrics"
 
 	type marketMetricResponse struct {
@@ -35,7 +35,7 @@ func (c *Client) GetMarketMetrics(symbols []string) ([]MarketMetricVolatility, *
 }
 
 // Get historical dividend data.
-func (c *Client) GetHistoricDividends(symbol string) ([]DividendInfo, *Error) {
+func (c *Client) GetHistoricDividends(symbol string) ([]DividendInfo, error) {
 	// url escape required for instances where "/" exists in symbol i.e. BRK/B
 	path := fmt.Sprintf("/market-metrics/historic-corporate-events/dividends/%s", url.PathEscape(symbol))
 
@@ -56,7 +56,7 @@ func (c *Client) GetHistoricDividends(symbol string) ([]DividendInfo, *Error) {
 }
 
 // Get historical earnings data.
-func (c *Client) GetHistoricEarnings(symbol string, startDate time.Time) ([]EarningsInfo, *Error) {
+func (c *Client) GetHistoricEarnings(symbol string, startDate time.Time) ([]EarningsInfo, error) {
 	// url escape required for instances where "/" exists in symbol i.e. BRK/B
 	path := fmt.Sprintf("/market-metrics/historic-corporate-events/earnings-reports/%s", url.PathEscape(symbol))
 

@@ -7,7 +7,7 @@ import (
 )
 
 // Returns a list of all watchlists for the given account.
-func (c *Client) GetMyWatchlists() ([]Watchlist, *Error) {
+func (c *Client) GetMyWatchlists() ([]Watchlist, error) {
 	path := "/watchlists"
 
 	type watchlistResponse struct {
@@ -27,7 +27,7 @@ func (c *Client) GetMyWatchlists() ([]Watchlist, *Error) {
 }
 
 // Returns a requested account watchlist.
-func (c *Client) GetMyWatchlist(name string) (Watchlist, *Error) {
+func (c *Client) GetMyWatchlist(name string) (Watchlist, error) {
 	path := fmt.Sprintf("/watchlists/%s", url.PathEscape(name))
 
 	type watchlistResponse struct {
@@ -46,7 +46,7 @@ func (c *Client) GetMyWatchlist(name string) (Watchlist, *Error) {
 }
 
 // Create an account watchlist.
-func (c *Client) CreateWatchlist(watchlist NewWatchlist) (Watchlist, *Error) {
+func (c *Client) CreateWatchlist(watchlist NewWatchlist) (Watchlist, error) {
 	path := "/watchlists"
 
 	type watchlistResponse struct {
@@ -64,7 +64,7 @@ func (c *Client) CreateWatchlist(watchlist NewWatchlist) (Watchlist, *Error) {
 }
 
 // Replace all properties of an account watchlist.
-func (c *Client) EditWatchlist(name string, watchlist NewWatchlist) (Watchlist, *Error) {
+func (c *Client) EditWatchlist(name string, watchlist NewWatchlist) (Watchlist, error) {
 	path := fmt.Sprintf("/watchlists/%s", url.PathEscape(name))
 
 	type watchlistResponse struct {
@@ -83,7 +83,7 @@ func (c *Client) EditWatchlist(name string, watchlist NewWatchlist) (Watchlist, 
 }
 
 // Delete a watchlist for the given account.
-func (c *Client) DeleteWatchlist(name string) (RemovedWatchlist, *Error) {
+func (c *Client) DeleteWatchlist(name string) (RemovedWatchlist, error) {
 	path := fmt.Sprintf("/watchlists/%s", url.PathEscape(name))
 
 	removedWatchlist := new(RemovedWatchlist)
@@ -98,7 +98,7 @@ func (c *Client) DeleteWatchlist(name string) (RemovedWatchlist, *Error) {
 }
 
 // Returns a list of all tastyworks pairs watchlists.
-func (c *Client) GetPairsWatchlists() ([]PairsWatchlist, *Error) {
+func (c *Client) GetPairsWatchlists() ([]PairsWatchlist, error) {
 	path := "/pairs-watchlists"
 
 	type watchlistResponse struct {
@@ -118,7 +118,7 @@ func (c *Client) GetPairsWatchlists() ([]PairsWatchlist, *Error) {
 }
 
 // Returns a requested tastyworks pairs watchlist.
-func (c *Client) GetPairsWatchlist(name string) (PairsWatchlist, *Error) {
+func (c *Client) GetPairsWatchlist(name string) (PairsWatchlist, error) {
 	path := fmt.Sprintf("/pairs-watchlists/%s", url.PathEscape(name))
 
 	type watchlistResponse struct {
@@ -137,7 +137,7 @@ func (c *Client) GetPairsWatchlist(name string) (PairsWatchlist, *Error) {
 }
 
 // Returns a list of all tastyworks watchlists.
-func (c *Client) GetPublicWatchlists(countsOnly bool) ([]PublicWatchlist, *Error) {
+func (c *Client) GetPublicWatchlists(countsOnly bool) ([]PublicWatchlist, error) {
 	path := "/public-watchlists"
 
 	type watchlistResponse struct {
@@ -163,7 +163,7 @@ func (c *Client) GetPublicWatchlists(countsOnly bool) ([]PublicWatchlist, *Error
 }
 
 // Returns a requested tastyworks watchlist.
-func (c *Client) GetPublicWatchlist(name string) (Watchlist, *Error) {
+func (c *Client) GetPublicWatchlist(name string) (Watchlist, error) {
 	path := fmt.Sprintf("/public-watchlists/%s", url.PathEscape(name))
 
 	type watchlistResponse struct {
