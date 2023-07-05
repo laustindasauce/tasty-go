@@ -5,7 +5,7 @@ import (
 )
 
 // Create a new user session.
-func (c *Client) CreateSession(login LoginInfo, twoFactorCode *string) (Session, *Error) {
+func (c *Client) CreateSession(login LoginInfo, twoFactorCode *string) (Session, error) {
 	path := "/sessions"
 
 	type sessionResponse struct {
@@ -31,7 +31,7 @@ func (c *Client) CreateSession(login LoginInfo, twoFactorCode *string) (Session,
 }
 
 // Validate the user session.
-func (c *Client) ValidateSession() (User, *Error) {
+func (c *Client) ValidateSession() (User, error) {
 	path := "/sessions/validate"
 
 	type validSessionResponse struct {
@@ -51,14 +51,14 @@ func (c *Client) ValidateSession() (User, *Error) {
 }
 
 // Destroy the user session and invalidate the token.
-func (c *Client) DestroySession() *Error {
+func (c *Client) DestroySession() error {
 	path := "/sessions"
 
 	return c.request(http.MethodDelete, path, nil, nil, nil)
 }
 
 // Request a password reset email.
-func (c *Client) RequestPasswordResetEmail(email string) *Error {
+func (c *Client) RequestPasswordResetEmail(email string) error {
 	path := "/password/reset"
 
 	type reset struct {
@@ -72,7 +72,7 @@ func (c *Client) RequestPasswordResetEmail(email string) *Error {
 }
 
 // Request a password reset email.
-func (c *Client) ChangePassword(resetInfo PasswordReset) *Error {
+func (c *Client) ChangePassword(resetInfo PasswordReset) error {
 	path := "/password"
 
 	return c.noAuthRequest(http.MethodPost, path, http.Header{}, nil, resetInfo, nil)

@@ -6,7 +6,7 @@ import (
 )
 
 // Get authenticated customer.
-func (c *Client) GetMyCustomerInfo() (Customer, *Error) {
+func (c *Client) GetMyCustomerInfo() (Customer, error) {
 	path := "/customers/me"
 
 	type customerResponse struct {
@@ -24,7 +24,7 @@ func (c *Client) GetMyCustomerInfo() (Customer, *Error) {
 }
 
 // Get a full customer resource.
-func (c *Client) GetCustomer(customerID string) (Customer, *Error) {
+func (c *Client) GetCustomer(customerID string) (Customer, error) {
 	path := fmt.Sprintf("/customers/%s", customerID)
 
 	type customerResponse struct {
@@ -42,7 +42,7 @@ func (c *Client) GetCustomer(customerID string) (Customer, *Error) {
 }
 
 // Get a list of all the customer account resources attached to the current customer.
-func (c *Client) GetCustomerAccounts(customerID string) ([]Account, *Error) {
+func (c *Client) GetCustomerAccounts(customerID string) ([]Account, error) {
 	path := fmt.Sprintf("/customers/%s/accounts", customerID)
 
 	type customerResponse struct {
@@ -70,7 +70,7 @@ func (c *Client) GetCustomerAccounts(customerID string) ([]Account, *Error) {
 }
 
 // Get a full customer account resource.
-func (c *Client) GetCustomerAccount(customerID, accountNumber string) (Account, *Error) {
+func (c *Client) GetCustomerAccount(customerID, accountNumber string) (Account, error) {
 	path := fmt.Sprintf("/customers/%s/accounts/%s", customerID, accountNumber)
 
 	type customerResponse struct {
@@ -88,7 +88,7 @@ func (c *Client) GetCustomerAccount(customerID, accountNumber string) (Account, 
 }
 
 // Get authenticated user's full account resource.
-func (c *Client) GetMyAccount(accountNumber string) (Account, *Error) {
+func (c *Client) GetMyAccount(accountNumber string) (Account, error) {
 	path := fmt.Sprintf("/customers/me/accounts/%s", accountNumber)
 
 	type customerResponse struct {
@@ -107,7 +107,7 @@ func (c *Client) GetMyAccount(accountNumber string) (Account, *Error) {
 
 // Returns the appropriate quote streamer endpoint, level and identification token.
 // for the current customer to receive market data.
-func (c *Client) GetQuoteStreamerTokens() (QuoteStreamerTokenAuthResult, *Error) {
+func (c *Client) GetQuoteStreamerTokens() (QuoteStreamerTokenAuthResult, error) {
 	path := "/quote-streamer-tokens"
 
 	type customerResponse struct {

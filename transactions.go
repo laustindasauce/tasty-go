@@ -9,7 +9,7 @@ import (
 // Returns a paginated list of the account's transactions (as identified by
 // the provided authentication token) based on sort param. If no sort is
 // passed in, it defaults to descending order.
-func (c *Client) GetAccountTransactions(accountNumber string, query TransactionsQuery) ([]Transaction, *Error) {
+func (c *Client) GetAccountTransactions(accountNumber string, query TransactionsQuery) ([]Transaction, error) {
 	path := fmt.Sprintf("/accounts/%s/transactions", accountNumber)
 
 	type accountResponse struct {
@@ -29,7 +29,7 @@ func (c *Client) GetAccountTransactions(accountNumber string, query Transactions
 }
 
 // Retrieve a transaction by account number and ID.
-func (c *Client) GetAccountTransaction(accountNumber string, id int) (Transaction, *Error) {
+func (c *Client) GetAccountTransaction(accountNumber string, id int) (Transaction, error) {
 	path := fmt.Sprintf("/accounts/%s/transactions/%d", accountNumber, id)
 
 	type accountResponse struct {
@@ -48,7 +48,7 @@ func (c *Client) GetAccountTransaction(accountNumber string, id int) (Transactio
 
 // Return the total fees for an account for a given day
 // the day will default to today.
-func (c *Client) GetAccountTransactionFees(accountNumber string, date *time.Time) (TransactionFees, *Error) {
+func (c *Client) GetAccountTransactionFees(accountNumber string, date *time.Time) (TransactionFees, error) {
 	path := fmt.Sprintf("/accounts/%s/transactions/total-fees", accountNumber)
 
 	type accountResponse struct {

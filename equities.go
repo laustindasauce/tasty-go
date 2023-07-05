@@ -7,7 +7,7 @@ import (
 )
 
 // Returns all active equities in a paginated fashion.
-func (c *Client) GetActiveEquities(query ActiveEquitiesQuery) ([]Equity, Pagination, *Error) {
+func (c *Client) GetActiveEquities(query ActiveEquitiesQuery) ([]Equity, Pagination, error) {
 	path := "/instruments/equities/active"
 
 	type instrumentResponse struct {
@@ -28,7 +28,7 @@ func (c *Client) GetActiveEquities(query ActiveEquitiesQuery) ([]Equity, Paginat
 }
 
 // Returns a set of equity definitions given an array of one or more symbols.
-func (c *Client) GetEquities(query EquitiesQuery) ([]Equity, *Error) {
+func (c *Client) GetEquities(query EquitiesQuery) ([]Equity, error) {
 	path := "/instruments/equities"
 
 	type instrumentResponse struct {
@@ -48,7 +48,7 @@ func (c *Client) GetEquities(query EquitiesQuery) ([]Equity, *Error) {
 }
 
 // Returns a single equity definition for the provided symbol.
-func (c *Client) GetEquity(symbol string) (Equity, *Error) {
+func (c *Client) GetEquity(symbol string) (Equity, error) {
 	// url escape required for instances where "/" exists in symbol i.e. BRK/B
 	path := fmt.Sprintf("/instruments/equities/%s", url.PathEscape(symbol))
 
@@ -68,7 +68,7 @@ func (c *Client) GetEquity(symbol string) (Equity, *Error) {
 }
 
 // Returns a set of equity options given one or more symbols.
-func (c *Client) GetEquityOptions(query EquityOptionsQuery) ([]EquityOption, *Error) {
+func (c *Client) GetEquityOptions(query EquityOptionsQuery) ([]EquityOption, error) {
 	path := "/instruments/equity-options"
 
 	type instrumentResponse struct {
@@ -88,7 +88,7 @@ func (c *Client) GetEquityOptions(query EquityOptionsQuery) ([]EquityOption, *Er
 }
 
 // Returns a set of equity options given one or more symbols.
-func (c *Client) GetEquityOption(sym EquityOptionsSymbology, active bool) (EquityOption, *Error) {
+func (c *Client) GetEquityOption(sym EquityOptionsSymbology, active bool) (EquityOption, error) {
 	occSymbol := sym.Build()
 
 	path := fmt.Sprintf("/instruments/equity-options/%s", occSymbol)

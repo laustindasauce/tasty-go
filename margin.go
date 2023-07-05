@@ -6,7 +6,7 @@ import (
 )
 
 // Fetch current margin/capital requirements report for an account.
-func (c *Client) GetMarginRequirements(accountNumber string) (MarginRequirements, *Error) {
+func (c *Client) GetMarginRequirements(accountNumber string) (MarginRequirements, error) {
 	path := fmt.Sprintf("/margin/accounts/%s/requirements", accountNumber)
 
 	type marginResponse struct {
@@ -28,7 +28,7 @@ func (c *Client) GetMarginRequirements(accountNumber string) (MarginRequirements
 // https://developer.tastytrade.com/open-api-spec/margin-requirements
 // When sending request body in format shown in the docs I am receiving
 // internal server error response.
-func (c *Client) MarginRequirementsDryRun(accountNumber string, order NewOrder) (any, *Error) {
+func (c *Client) MarginRequirementsDryRun(accountNumber string, order NewOrder) (any, error) {
 	path := fmt.Sprintf("/margin/accounts/%s/dry-run", accountNumber)
 
 	type marginResponse struct {
@@ -46,7 +46,7 @@ func (c *Client) MarginRequirementsDryRun(accountNumber string, order NewOrder) 
 }
 
 // Get effective margin requirements for account.
-func (c *Client) GetEffectiveMarginRequirements(accountNumber, underlyingSymbol string) (EffectiveMarginRequirements, *Error) {
+func (c *Client) GetEffectiveMarginRequirements(accountNumber, underlyingSymbol string) (EffectiveMarginRequirements, error) {
 	path := fmt.Sprintf("/accounts/%s/margin-requirements/%s/effective", accountNumber, underlyingSymbol)
 
 	type marginResponse struct {

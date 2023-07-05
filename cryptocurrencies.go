@@ -7,7 +7,7 @@ import (
 )
 
 // Retrieve a set of cryptocurrencies given an array of one or more symbols.
-func (c *Client) GetCryptocurrencies(symbols []string) ([]CryptocurrencyInfo, *Error) {
+func (c *Client) GetCryptocurrencies(symbols []string) ([]CryptocurrencyInfo, error) {
 	path := "/instruments/cryptocurrencies"
 
 	type instrumentResponse struct {
@@ -34,7 +34,7 @@ func (c *Client) GetCryptocurrencies(symbols []string) ([]CryptocurrencyInfo, *E
 }
 
 // Retrieve a cryptocurrency given a symbol.
-func (c *Client) GetCryptocurrency(symbol Cryptocurrency) (CryptocurrencyInfo, *Error) {
+func (c *Client) GetCryptocurrency(symbol Cryptocurrency) (CryptocurrencyInfo, error) {
 	symbolString := url.PathEscape(string(symbol))
 
 	path := fmt.Sprintf("/instruments/cryptocurrencies/%s", symbolString)

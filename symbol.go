@@ -7,7 +7,7 @@ import (
 )
 
 // Returns an array of symbol data.
-func (c *Client) SymbolSearch(symbol string) ([]SymbolData, *Error) {
+func (c *Client) SymbolSearch(symbol string) ([]SymbolData, error) {
 	// url escape required for instances where "/" exists in symbol i.e. BRK/B
 	symbol = url.PathEscape(symbol)
 

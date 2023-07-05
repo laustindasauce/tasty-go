@@ -6,7 +6,7 @@ import (
 )
 
 // Retrieve all quantity decimal precisions.
-func (c *Client) GetQuantityDecimalPrecisions() ([]QuantityDecimalPrecision, *Error) {
+func (c *Client) GetQuantityDecimalPrecisions() ([]QuantityDecimalPrecision, error) {
 	path := "/instruments/quantity-decimal-precisions"
 
 	type instrumentResponse struct {
@@ -26,7 +26,7 @@ func (c *Client) GetQuantityDecimalPrecisions() ([]QuantityDecimalPrecision, *Er
 }
 
 // Returns a set of warrant definitions that can be filtered by parameters.
-func (c *Client) GetWarrants(symbols []string) ([]Warrant, *Error) {
+func (c *Client) GetWarrants(symbols []string) ([]Warrant, error) {
 	path := "/instruments/warrants"
 
 	type instrumentResponse struct {
@@ -53,7 +53,7 @@ func (c *Client) GetWarrants(symbols []string) ([]Warrant, *Error) {
 }
 
 // Returns a single warrant definition for the provided symbol.
-func (c *Client) GetWarrant(symbol string) (Warrant, *Error) {
+func (c *Client) GetWarrant(symbol string) (Warrant, error) {
 	path := fmt.Sprintf("/instruments/warrants/%s", symbol)
 
 	type instrumentResponse struct {
