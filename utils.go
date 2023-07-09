@@ -1,9 +1,38 @@
 package tasty
 
 import (
+	"errors"
 	"fmt"
+	"strconv"
+	"strings"
 	"time"
+	"unicode"
 )
+
+var validMonthCodes = []string{string(January), string(February), string(March),
+	string(April), string(May), string(June), string(July), string(August),
+	string(September), string(October), string(November), string(December)}
+
+func yearDigitFromFS(symbol string) (int, error) {
+	var num string
+	rns := []rune(symbol)
+	for i := len(rns) - 1; i >= 0; i-- {
+		if unicode.IsNumber(rns[i]) {
+			num = string(symbol[i]) + num
+		} else {
+			// break after first non number
+			break
+		}
+	}
+
+	if num == "" {
+		return 0, errors.New("missing valid year")
+	}
+
+	res, _ := strconv.Atoi(num)
+
+	return res, nil
+}
 
 // FutureSymbology is a struct to help build future contract codes
 // Futures symbols always start with a slash followed by the contract code. The contract code
@@ -20,6 +49,38 @@ type FutureSymbology struct {
 // Builds the future symbol into correct symbology.
 func (fcc FutureSymbology) Build() string {
 	return fmt.Sprintf("/%s%s%d", fcc.ProductCode, fcc.MonthCode, fcc.YearDigit)
+}
+
+// Parse the future symbol into FutureSymbology struct.
+func NewFSFromString(symbol string) (FutureSymbology, error) {
+	var sym FutureSymbology
+
+	if len(symbol) < 5 || len(symbol) > 6 {
+		return sym, errors.New("invalid futures symbol")
+	}
+
+	if strings.Index(symbol, "/") != 0 {
+		return sym, errors.New("future symbol must start with '/'")
+	}
+
+	year, err := yearDigitFromFS(symbol)
+	if err != nil {
+		return sym, err
+	}
+
+	sym.YearDigit = year
+
+	idx := len(symbol) - len(fmt.Sprint(year))
+
+	sym.MonthCode = MonthCode(symbol[idx-1 : idx])
+
+	if !containsString(validMonthCodes, string(sym.MonthCode)) {
+		return sym, fmt.Errorf("invalid month code: %s", sym.MonthCode)
+	}
+
+	sym.ProductCode = symbol[1 : idx-1]
+
+	return sym, nil
 }
 
 // FutureOptionsSymbology is a struct to help build option symbol in correct Future Options Symbology
@@ -42,8 +103,58 @@ func (foSym FutureOptionsSymbology) Build() string {
 	return fmt.Sprintf("%s %s%s%d", codes, expiryString, foSym.OptionType, foSym.Strike)
 }
 
+// Parse the future options symbol into FutureOptionsSymbology struct.
+func NewFOSFromString(symbol string) (FutureOptionsSymbology, error) {
+	var sym FutureOptionsSymbology
+
+	components := strings.Split(symbol, " ")
+
+	if len(components) != 3 {
+		return sym, errors.New("invalid future options symbol structure")
+	}
+
+	if len(components[2]) < 8 {
+		return sym, errors.New("invalid future options symbol structure: strike info too short")
+	}
+
+	if strings.Index(symbol, "./") != 0 {
+		return sym, errors.New("future options symbol must start with './'")
+	}
+
+	// pass first component without period
+	futureContractCode, err := NewFSFromString(components[0][1:])
+	if err != nil {
+		return sym, fmt.Errorf("invalid contract code: %s", err.Error())
+	}
+	sym.FutureContractCode = futureContractCode.Build()
+
+	// This includes option product code and expiry info
+	sym.OptionContractCode = components[1]
+
+	expiry, optionType, strike, err := getExpiryTypeStrike(components[2])
+	if err != nil {
+		return sym, err
+	}
+
+	sym.Expiration = expiry
+	sym.OptionType = optionType
+	sym.Strike = int(strike)
+
+	return sym, nil
+}
+
 // containsInt returns whether or not the int exists in the slice.
 func containsInt(s []int, e int) bool {
+	for _, a := range s {
+		if a == e {
+			return true
+		}
+	}
+	return false
+}
+
+// containsString returns whether or not the string exists in the slice.
+func containsString(s []string, e string) bool {
 	for _, a := range s {
 		if a == e {
 			return true
@@ -71,6 +182,28 @@ func (sym EquityOptionsSymbology) Build() string {
 	return fmt.Sprintf("%s%s%s%s", symbol, expiryString, sym.OptionType, strikeString)
 }
 
+// Parse occ symbol into EquityOptionsSymbology struct.
+func NewOCCFromString(occSymbol string) (EquityOptionsSymbology, error) {
+	var sym EquityOptionsSymbology
+	if len(occSymbol) != 21 {
+		return sym, errors.New("invalid occ symbol")
+	}
+
+	// Assuming valid symbol
+	sym.Symbol = strings.ToUpper(strings.TrimSpace(occSymbol[:6]))
+
+	expiry, optionType, strike, err := getExpiryTypeStrike(occSymbol[6:])
+	if err != nil {
+		return sym, err
+	}
+
+	sym.Expiration = expiry
+	sym.OptionType = optionType
+	sym.Strike = strike / float32(1000)
+
+	return sym, nil
+}
+
 // convert the strike into a string with correct padding.
 func getStrikeWithPadding(strike float32) string {
 	strikeString := fmt.Sprintf("%d", int(strike*1000))
@@ -87,4 +220,29 @@ func getSymbolWithPadding(symbol string) string {
 	}
 
 	return symbol
+}
+
+func getExpiryTypeStrike(symbol string) (time.Time, OptionType, float32, error) {
+	var expiry time.Time
+	var optionType OptionType
+	var strike float32
+
+	expiry, err := time.Parse("060102", symbol[:6])
+	if err != nil {
+		return expiry, optionType, strike, err
+	}
+
+	optionType = OptionType(symbol[6:7])
+	if optionType != Call && optionType != Put {
+		return expiry, optionType, strike, fmt.Errorf("unknown option type: %s", optionType)
+	}
+
+	strike64, err := strconv.ParseFloat(symbol[7:], 32)
+	if err != nil {
+		return expiry, optionType, strike, fmt.Errorf("invalid option strike: %s", symbol[7:])
+	}
+
+	strike = float32(strike64)
+
+	return expiry, optionType, strike, nil
 }
