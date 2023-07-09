@@ -88,23 +88,24 @@ func (c *Client) GetAccountLiveOrders(accountNumber string) ([]Order, error) {
 // Returns a paginated list of the account's orders (as identified by the provided
 // authentication token) based on sort param. If no sort is passed in, it defaults
 // to descending order.
-func (c *Client) GetAccountOrders(accountNumber string, query OrdersQuery) ([]Order, error) {
+func (c *Client) GetAccountOrders(accountNumber string, query OrdersQuery) ([]Order, Pagination, error) {
 	path := fmt.Sprintf("/accounts/%s/orders", accountNumber)
 
 	type ordersResponse struct {
 		Data struct {
 			Orders []Order `json:"items"`
 		} `json:"data"`
+		Pagination Pagination `json:"pagination"`
 	}
 
 	ordersRes := new(ordersResponse)
 
 	err := c.request(http.MethodGet, path, query, nil, ordersRes)
 	if err != nil {
-		return []Order{}, err
+		return []Order{}, Pagination{}, err
 	}
 
-	return ordersRes.Data.Orders, nil
+	return ordersRes.Data.Orders, ordersRes.Pagination, nil
 }
 
 // Runs through preflights for cancel-replace and edit without routing.

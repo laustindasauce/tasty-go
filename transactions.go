@@ -9,23 +9,24 @@ import (
 // Returns a paginated list of the account's transactions (as identified by
 // the provided authentication token) based on sort param. If no sort is
 // passed in, it defaults to descending order.
-func (c *Client) GetAccountTransactions(accountNumber string, query TransactionsQuery) ([]Transaction, error) {
+func (c *Client) GetAccountTransactions(accountNumber string, query TransactionsQuery) ([]Transaction, Pagination, error) {
 	path := fmt.Sprintf("/accounts/%s/transactions", accountNumber)
 
 	type accountResponse struct {
 		Data struct {
 			Transactions []Transaction `json:"items"`
 		} `json:"data"`
+		Pagination Pagination `json:"pagination"`
 	}
 
 	transactionsRes := new(accountResponse)
 
 	err := c.request(http.MethodGet, path, query, nil, transactionsRes)
 	if err != nil {
-		return []Transaction{}, err
+		return []Transaction{}, Pagination{}, err
 	}
 
-	return transactionsRes.Data.Transactions, nil
+	return transactionsRes.Data.Transactions, transactionsRes.Pagination, nil
 }
 
 // Retrieve a transaction by account number and ID.

@@ -6,6 +6,7 @@ import (
 	"testing"
 	"time"
 
+	"github.com/shopspring/decimal"
 	"github.com/stretchr/testify/require"
 )
 
@@ -32,23 +33,23 @@ func TestGetFuturesOptionChains(t *testing.T) {
 	require.Equal(t, "2023-07-28", fo.ExpirationDate)
 	require.Equal(t, "/ES", fo.RootSymbol)
 	require.Equal(t, "EW4", fo.OptionRootSymbol)
-	require.Equal(t, StringToFloat32(3990), fo.StrikePrice)
+	require.True(t, fo.StrikePrice.Equal(decimal.NewFromInt(3990)))
 	require.Equal(t, "CME", fo.Exchange)
 	require.Equal(t, "EW4N3 C3990", fo.ExchangeSymbol)
 	require.Equal(t, Call, fo.OptionType)
 	require.Equal(t, "American", fo.ExerciseStyle)
 	require.True(t, fo.IsVanilla)
 	require.True(t, fo.IsPrimaryDeliverable)
-	require.Equal(t, StringToFloat32(1), fo.FuturePriceRatio)
-	require.Equal(t, StringToFloat32(1), fo.Multiplier)
-	require.Equal(t, StringToFloat32(1), fo.UnderlyingCount)
+	require.True(t, fo.FuturePriceRatio.Equal(decimal.NewFromInt(1)))
+	require.True(t, fo.Multiplier.Equal(decimal.NewFromInt(1)))
+	require.True(t, fo.UnderlyingCount.Equal(decimal.NewFromInt(1)))
 	require.True(t, fo.IsConfirmed)
-	require.Equal(t, StringToFloat32(.5), fo.NotionalValue)
-	require.Equal(t, StringToFloat32(.01), fo.DisplayFactor)
+	require.Equal(t, decimal.NewFromFloat(.5), fo.NotionalValue)
+	require.Equal(t, decimal.NewFromFloat(.01), fo.DisplayFactor)
 	require.Equal(t, "2", fo.SecurityExchange)
 	require.Equal(t, "0", fo.SxID)
 	require.Equal(t, "Future", fo.SettlementType)
-	require.Equal(t, StringToFloat32(1), fo.StrikeFactor)
+	require.True(t, fo.StrikeFactor.Equal(decimal.NewFromInt(1)))
 	require.Equal(t, "2023-07-28", fo.MaturityDate)
 	require.True(t, fo.IsExercisableWeekly)
 	require.Equal(t, "0", fo.LastTradeTime)
@@ -67,8 +68,8 @@ func TestGetFuturesOptionChains(t *testing.T) {
 	require.Equal(t, "EW4", fop.ClearportCode)
 	require.Equal(t, "W4", fop.ClearingCode)
 	require.Equal(t, "9C", fop.ClearingExchangeCode)
-	require.Equal(t, StringToFloat32(1), fop.ClearingPriceMultiplier)
-	require.Equal(t, StringToFloat32(.01), fop.DisplayFactor)
+	require.True(t, fop.ClearingPriceMultiplier.Equal(decimal.NewFromInt(1)))
+	require.Equal(t, decimal.NewFromFloat(.01), fop.DisplayFactor)
 	require.Equal(t, "CME", fop.Exchange)
 	require.Equal(t, "Physical", fop.ProductType)
 	require.Equal(t, "Weekly", fop.ExpirationType)
@@ -133,20 +134,20 @@ func TestGetNestedFuturesOptionChains(t *testing.T) {
 	require.Equal(t, 47, exp.DaysToExpiration)
 	require.Equal(t, "Weekly", exp.ExpirationType)
 	require.Equal(t, "PM", exp.SettlementType)
-	require.Equal(t, StringToFloat32(0.5), exp.NotionalValue)
-	require.Equal(t, StringToFloat32(0.01), exp.DisplayFactor)
-	require.Equal(t, StringToFloat32(1), exp.StrikeFactor)
+	require.Equal(t, decimal.NewFromFloat(0.5), exp.NotionalValue)
+	require.Equal(t, decimal.NewFromFloat(0.01), exp.DisplayFactor)
+	require.True(t, exp.StrikeFactor.Equal(decimal.NewFromInt(1)))
 	require.Equal(t, "2023-07-28T20:00:00Z", exp.StopsTradingAt.Format(time.RFC3339))
 	require.Equal(t, "2023-07-28T20:00:00Z", exp.ExpiresAt.Format(time.RFC3339))
 
 	tick := exp.TickSizes[0]
 
-	require.Equal(t, StringToFloat32(0.05), tick.Value)
-	require.Equal(t, StringToFloat32(5), tick.Threshold)
+	require.Equal(t, decimal.NewFromFloat(0.05), tick.Value)
+	require.True(t, tick.Threshold.Equal(decimal.NewFromFloat(5)))
 
 	strike := exp.Strikes[0]
 
-	require.Equal(t, StringToFloat32(3990), strike.StrikePrice)
+	require.True(t, strike.StrikePrice.Equal(decimal.NewFromInt(3990)))
 	require.Equal(t, "./ESU3 EW4N3 230728C3990", strike.Call)
 	require.Equal(t, "./EW4N23C3990:XCME", strike.CallStreamerSymbol)
 	require.Equal(t, "./ESU3 EW4N3 230728P3990", strike.Put)
@@ -188,7 +189,7 @@ func TestGetEquityOptionChains(t *testing.T) {
 	require.Equal(t, "AAPL  230616C00060000", eo.Symbol)
 	require.Equal(t, EquityOptionIT, eo.InstrumentType)
 	require.True(t, eo.Active)
-	require.Equal(t, StringToFloat32(60), eo.StrikePrice)
+	require.True(t, eo.StrikePrice.Equal(decimal.NewFromInt(60)))
 	require.Equal(t, symbol, eo.RootSymbol)
 	require.Equal(t, symbol, eo.UnderlyingSymbol)
 	require.Equal(t, "2023-06-16", eo.ExpirationDate)
@@ -243,8 +244,8 @@ func TestGetNestedEquityOptionChains(t *testing.T) {
 
 	tick := eo.TickSizes[0]
 
-	require.Equal(t, StringToFloat32(0.01), tick.Value)
-	require.Equal(t, StringToFloat32(3.0), tick.Threshold)
+	require.Equal(t, decimal.NewFromFloat(0.01), tick.Value)
+	require.True(t, tick.Threshold.Equal(decimal.NewFromInt(3)))
 
 	del := eo.Deliverables[0]
 
@@ -252,10 +253,10 @@ func TestGetNestedEquityOptionChains(t *testing.T) {
 	require.Equal(t, symbol, del.RootSymbol)
 	require.Equal(t, "Shares", del.DeliverableType)
 	require.Equal(t, "100 shares of AAPL", del.Description)
-	require.Equal(t, StringToFloat32(100), del.Amount)
+	require.True(t, del.Amount.Equal(decimal.NewFromInt(100)))
 	require.Equal(t, symbol, del.Symbol)
 	require.Equal(t, EquityIT, del.InstrumentType)
-	require.Equal(t, StringToFloat32(100), del.Percent)
+	require.True(t, del.Percent.Equal(decimal.NewFromInt(100)))
 
 	exp := eo.Expirations[0]
 
@@ -266,7 +267,7 @@ func TestGetNestedEquityOptionChains(t *testing.T) {
 
 	strike := exp.Strikes[0]
 
-	require.Equal(t, StringToFloat32(60), strike.StrikePrice)
+	require.True(t, strike.StrikePrice.Equal(decimal.NewFromInt(60)))
 	require.Equal(t, "AAPL  230616C00060000", strike.Call)
 	require.Equal(t, ".AAPL230616C60", strike.CallStreamerSymbol)
 	require.Equal(t, "AAPL  230616P00060000", strike.Put)
@@ -314,10 +315,10 @@ func TestGetCompactEquityOptionChains(t *testing.T) {
 	require.Equal(t, symbol, del.RootSymbol)
 	require.Equal(t, "Shares", del.DeliverableType)
 	require.Equal(t, "100 shares of AAPL", del.Description)
-	require.Equal(t, StringToFloat32(100), del.Amount)
+	require.True(t, del.Amount.Equal(decimal.NewFromInt(100)))
 	require.Equal(t, symbol, del.Symbol)
 	require.Equal(t, EquityIT, del.InstrumentType)
-	require.Equal(t, StringToFloat32(100), del.Percent)
+	require.True(t, del.Percent.Equal(decimal.NewFromInt(100)))
 
 	// symbols
 	require.Equal(t, "AAPL  230616C00060000", eo.Symbols[0])

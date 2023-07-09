@@ -6,6 +6,7 @@ import (
 	"testing"
 	"time"
 
+	"github.com/shopspring/decimal"
 	"github.com/stretchr/testify/require"
 )
 
@@ -52,7 +53,7 @@ func TestSubmitMarketOrderDryRun(t *testing.T) {
 	require.True(t, o.Cancellable)
 	require.True(t, o.Editable)
 	require.False(t, o.Edited)
-	require.Zero(t, o.UpdatedAt)
+	require.Zero(t, o.UpdatedAt, "hello")
 
 	ol := o.Legs[0]
 
@@ -67,31 +68,31 @@ func TestSubmitMarketOrderDryRun(t *testing.T) {
 
 	bpe := resp.BuyingPowerEffect
 
-	require.Equal(t, StringToFloat32(183.08), bpe.ChangeInMarginRequirement)
+	require.Equal(t, decimal.NewFromFloat(183.08), bpe.ChangeInMarginRequirement)
 	require.Equal(t, Debit, bpe.ChangeInMarginRequirementEffect)
-	require.Equal(t, StringToFloat32(183.081), bpe.ChangeInBuyingPower)
+	require.Equal(t, decimal.NewFromFloat(183.081), bpe.ChangeInBuyingPower)
 	require.Equal(t, Debit, bpe.ChangeInBuyingPowerEffect)
-	require.Equal(t, StringToFloat32(241.62), bpe.CurrentBuyingPower)
+	require.Equal(t, decimal.NewFromFloat(241.62), bpe.CurrentBuyingPower)
 	require.Equal(t, Credit, bpe.CurrentBuyingPowerEffect)
-	require.Equal(t, StringToFloat32(58.539), bpe.NewBuyingPower)
+	require.Equal(t, decimal.NewFromFloat(58.539), bpe.NewBuyingPower)
 	require.Equal(t, Credit, bpe.NewBuyingPowerEffect)
-	require.Equal(t, StringToFloat32(183.08), bpe.IsolatedOrderMarginRequirement)
+	require.Equal(t, decimal.NewFromFloat(183.08), bpe.IsolatedOrderMarginRequirement)
 	require.Equal(t, Debit, bpe.IsolatedOrderMarginRequirementEffect)
 	require.False(t, bpe.IsSpread)
-	require.Equal(t, StringToFloat32(183.081), bpe.Impact)
+	require.Equal(t, decimal.NewFromFloat(183.081), bpe.Impact)
 	require.Equal(t, Debit, bpe.Effect)
 
 	fee := resp.FeeCalculation
 
-	require.Zero(t, fee.RegulatoryFees)
+	require.True(t, fee.RegulatoryFees.Equal(decimal.Zero), "regulatory fees")
 	require.Equal(t, None, fee.RegulatoryFeesEffect)
-	require.Equal(t, StringToFloat32(0.001), fee.ClearingFees)
+	require.Equal(t, decimal.NewFromFloat(0.001), fee.ClearingFees)
 	require.Equal(t, Debit, fee.ClearingFeesEffect)
-	require.Equal(t, StringToFloat32(0.0), fee.Commission)
+	require.True(t, fee.Commission.Equal(decimal.Zero))
 	require.Equal(t, None, fee.CommissionEffect)
-	require.Equal(t, StringToFloat32(0.0), fee.ProprietaryIndexOptionFees)
+	require.True(t, fee.ProprietaryIndexOptionFees.Equal(decimal.Zero))
 	require.Equal(t, None, fee.ProprietaryIndexOptionFeesEffect)
-	require.Equal(t, StringToFloat32(0.001), fee.TotalFees)
+	require.Equal(t, decimal.NewFromFloat(0.001), fee.TotalFees)
 	require.Equal(t, Debit, fee.TotalFeesEffect)
 }
 
@@ -185,7 +186,7 @@ func TestSubmitGTCOrderDryRun(t *testing.T) {
 	require.Equal(t, 1, o.Size)
 	require.Equal(t, symbol, o.UnderlyingSymbol)
 	require.Equal(t, EquityIT, o.UnderlyingInstrumentType)
-	require.Equal(t, StringToFloat32(price), o.Price)
+	require.Equal(t, decimal.NewFromFloat32(price), o.Price)
 	require.Equal(t, Credit, o.PriceEffect)
 	require.Equal(t, Contingent, o.Status)
 	require.Equal(t, "Pending Condition", o.ContingentStatus)
@@ -207,18 +208,18 @@ func TestSubmitGTCOrderDryRun(t *testing.T) {
 
 	bpe := resp.BuyingPowerEffect
 
-	require.Equal(t, StringToFloat32(123.965), bpe.ChangeInMarginRequirement)
+	require.Equal(t, decimal.NewFromFloat(123.965), bpe.ChangeInMarginRequirement)
 	require.Equal(t, Credit, bpe.ChangeInMarginRequirementEffect)
-	require.Equal(t, StringToFloat32(124.538855), bpe.ChangeInBuyingPower)
+	require.Equal(t, decimal.NewFromFloat(124.538855), bpe.ChangeInBuyingPower)
 	require.Equal(t, Credit, bpe.ChangeInBuyingPowerEffect)
-	require.Equal(t, StringToFloat32(241.62), bpe.CurrentBuyingPower)
+	require.Equal(t, decimal.NewFromFloat(241.62), bpe.CurrentBuyingPower)
 	require.Equal(t, Credit, bpe.CurrentBuyingPowerEffect)
-	require.Equal(t, StringToFloat32(366.158855), bpe.NewBuyingPower)
+	require.Equal(t, decimal.NewFromFloat(366.158855), bpe.NewBuyingPower)
 	require.Equal(t, Credit, bpe.NewBuyingPowerEffect)
-	require.Equal(t, StringToFloat32(123.965), bpe.IsolatedOrderMarginRequirement)
+	require.Equal(t, decimal.NewFromFloat(123.965), bpe.IsolatedOrderMarginRequirement)
 	require.Equal(t, Debit, bpe.IsolatedOrderMarginRequirementEffect)
 	require.False(t, bpe.IsSpread)
-	require.Equal(t, StringToFloat32(124.538855), bpe.Impact)
+	require.Equal(t, decimal.NewFromFloat(124.538855), bpe.Impact)
 	require.Equal(t, Credit, bpe.Effect)
 }
 
@@ -288,18 +289,18 @@ func TestSubmitErrorOrderDryRun(t *testing.T) {
 
 	bpe := resp.BuyingPowerEffect
 
-	require.Equal(t, StringToFloat32(1828.8), bpe.ChangeInMarginRequirement)
+	require.Equal(t, decimal.NewFromFloat(1828.8), bpe.ChangeInMarginRequirement)
 	require.Equal(t, Debit, bpe.ChangeInMarginRequirementEffect)
-	require.Equal(t, StringToFloat32(1829.008), bpe.ChangeInBuyingPower)
+	require.Equal(t, decimal.NewFromFloat(1829.008), bpe.ChangeInBuyingPower)
 	require.Equal(t, Debit, bpe.ChangeInBuyingPowerEffect)
-	require.Equal(t, StringToFloat32(241.62), bpe.CurrentBuyingPower)
+	require.Equal(t, decimal.NewFromFloat(241.62), bpe.CurrentBuyingPower)
 	require.Equal(t, Credit, bpe.CurrentBuyingPowerEffect)
-	require.Equal(t, StringToFloat32(1587.388), bpe.NewBuyingPower)
+	require.Equal(t, decimal.NewFromFloat(1587.388), bpe.NewBuyingPower)
 	require.Equal(t, Debit, bpe.NewBuyingPowerEffect)
-	require.Equal(t, StringToFloat32(1828.8), bpe.IsolatedOrderMarginRequirement)
+	require.Equal(t, decimal.NewFromFloat(1828.8), bpe.IsolatedOrderMarginRequirement)
 	require.Equal(t, Debit, bpe.IsolatedOrderMarginRequirementEffect)
 	require.False(t, bpe.IsSpread)
-	require.Equal(t, StringToFloat32(1829.008), bpe.Impact)
+	require.Equal(t, decimal.NewFromFloat(1829.008), bpe.Impact)
 	require.Equal(t, Debit, bpe.Effect)
 
 	require.Equal(t, "preflight_check_failure", orderErr.Code)
@@ -397,7 +398,7 @@ func TestSubmitOrder(t *testing.T) {
 	require.Equal(t, 1, o.Size)
 	require.Equal(t, symbol, o.UnderlyingSymbol)
 	require.Equal(t, EquityIT, o.UnderlyingInstrumentType)
-	require.Equal(t, StringToFloat32(0.04), o.Price)
+	require.Equal(t, decimal.NewFromFloat(0.04), o.Price)
 	require.Equal(t, Debit, o.PriceEffect)
 	require.Equal(t, Contingent, o.Status)
 	require.Equal(t, "Pending Condition", o.ContingentStatus)
@@ -424,7 +425,7 @@ func TestSubmitOrder(t *testing.T) {
 	require.Equal(t, EquityIT, oc.InstrumentType)
 	require.Equal(t, Last, oc.Indicator)
 	require.Equal(t, LTE, oc.Comparator)
-	require.Equal(t, StringToFloat32(0.01), oc.Threshold)
+	require.Equal(t, decimal.NewFromFloat(0.01), oc.Threshold)
 	require.False(t, oc.IsThresholdBasedOnNotional)
 
 	pc := oc.PriceComponents[0]
@@ -441,31 +442,31 @@ func TestSubmitOrder(t *testing.T) {
 
 	bpe := resp.BuyingPowerEffect
 
-	require.Equal(t, StringToFloat32(0.0), bpe.ChangeInMarginRequirement)
+	require.True(t, bpe.ChangeInMarginRequirement.Equal(decimal.Zero))
 	require.Equal(t, None, bpe.ChangeInMarginRequirementEffect)
-	require.Equal(t, StringToFloat32(4.13), bpe.ChangeInBuyingPower)
+	require.Equal(t, decimal.NewFromFloat(4.13), bpe.ChangeInBuyingPower)
 	require.Equal(t, Debit, bpe.ChangeInBuyingPowerEffect)
-	require.Equal(t, StringToFloat32(241.62), bpe.CurrentBuyingPower)
+	require.Equal(t, decimal.NewFromFloat(241.62), bpe.CurrentBuyingPower)
 	require.Equal(t, Credit, bpe.CurrentBuyingPowerEffect)
-	require.Equal(t, StringToFloat32(237.49), bpe.NewBuyingPower)
+	require.Equal(t, decimal.NewFromFloat(237.49), bpe.NewBuyingPower)
 	require.Equal(t, Credit, bpe.NewBuyingPowerEffect)
-	require.Equal(t, StringToFloat32(0.0), bpe.IsolatedOrderMarginRequirement)
+	require.True(t, bpe.IsolatedOrderMarginRequirement.Equal(decimal.Zero))
 	require.Equal(t, None, bpe.IsolatedOrderMarginRequirementEffect)
 	require.False(t, bpe.IsSpread)
-	require.Equal(t, StringToFloat32(4.13), bpe.Impact)
+	require.Equal(t, decimal.NewFromFloat(4.13), bpe.Impact)
 	require.Equal(t, Debit, bpe.Effect)
 
 	fee := resp.FeeCalculation
 
-	require.Equal(t, StringToFloat32(.03), fee.RegulatoryFees)
+	require.Equal(t, decimal.NewFromFloat(.03), fee.RegulatoryFees)
 	require.Equal(t, Debit, fee.RegulatoryFeesEffect)
-	require.Equal(t, StringToFloat32(0.1), fee.ClearingFees)
+	require.Equal(t, decimal.NewFromFloat(0.1), fee.ClearingFees)
 	require.Equal(t, Debit, fee.ClearingFeesEffect)
-	require.Equal(t, StringToFloat32(0.0), fee.Commission)
+	require.True(t, fee.Commission.Equal(decimal.Zero))
 	require.Equal(t, None, fee.CommissionEffect)
-	require.Equal(t, StringToFloat32(0.0), fee.ProprietaryIndexOptionFees)
+	require.True(t, fee.ProprietaryIndexOptionFees.Equal(decimal.Zero))
 	require.Equal(t, None, fee.ProprietaryIndexOptionFeesEffect)
-	require.Equal(t, StringToFloat32(0.13), fee.TotalFees)
+	require.Equal(t, decimal.NewFromFloat(0.13), fee.TotalFees)
 	require.Equal(t, Debit, fee.TotalFeesEffect)
 }
 
@@ -541,7 +542,7 @@ func TestGetAccountLiveOrders(t *testing.T) {
 	require.Equal(t, 1, o.Size)
 	require.Equal(t, "RIVN", o.UnderlyingSymbol)
 	require.Equal(t, EquityIT, o.UnderlyingInstrumentType)
-	require.Equal(t, StringToFloat32(0.04), o.Price)
+	require.Equal(t, decimal.NewFromFloat(0.04), o.Price)
 	require.Equal(t, Debit, o.PriceEffect)
 	require.Equal(t, Contingent, o.Status)
 	require.Equal(t, "Pending Condition", o.ContingentStatus)
@@ -568,7 +569,7 @@ func TestGetAccountLiveOrders(t *testing.T) {
 	require.Equal(t, EquityIT, oc.InstrumentType)
 	require.Equal(t, Last, oc.Indicator)
 	require.Equal(t, LTE, oc.Comparator)
-	require.Equal(t, StringToFloat32(0.01), oc.Threshold)
+	require.Equal(t, decimal.NewFromFloat(0.01), oc.Threshold)
 	require.False(t, oc.IsThresholdBasedOnNotional)
 
 	pc := oc.PriceComponents[0]
@@ -604,10 +605,12 @@ func TestGetAccountOrders(t *testing.T) {
 		fmt.Fprint(writer, accountOrdersResp)
 	})
 
-	resp, err := client.GetAccountOrders(accountNumber, OrdersQuery{PerPage: 2})
+	resp, pagination, err := client.GetAccountOrders(accountNumber, OrdersQuery{PerPage: 2})
 	require.Nil(t, err)
 
 	require.Equal(t, 2, len(resp))
+
+	require.Equal(t, 2, pagination.PerPage)
 }
 
 func TestGetAccountOrdersError(t *testing.T) {
@@ -621,7 +624,7 @@ func TestGetAccountOrdersError(t *testing.T) {
 		fmt.Fprint(writer, tastyUnauthorizedError)
 	})
 
-	_, err := client.GetAccountOrders(accountNumber, OrdersQuery{PerPage: 2})
+	_, _, err := client.GetAccountOrders(accountNumber, OrdersQuery{PerPage: 2})
 	expectedUnauthorized(t, err)
 }
 
@@ -654,7 +657,7 @@ func TestSubmitOrderECRDryRun(t *testing.T) {
 	require.Equal(t, 1, o.Size)
 	require.Equal(t, "AAPL", o.UnderlyingSymbol)
 	require.Equal(t, EquityIT, o.UnderlyingInstrumentType)
-	require.Equal(t, StringToFloat32(185.45), o.Price)
+	require.Equal(t, decimal.NewFromFloat(185.45), o.Price)
 	require.Equal(t, Debit, o.PriceEffect)
 	require.Equal(t, Contingent, o.Status)
 	require.Equal(t, "Pending Order", o.ContingentStatus)
@@ -707,7 +710,7 @@ func TestGetOrder(t *testing.T) {
 	require.Equal(t, 1, o.Size)
 	require.Equal(t, "AAPL", o.UnderlyingSymbol)
 	require.Equal(t, EquityIT, o.UnderlyingInstrumentType)
-	require.Equal(t, StringToFloat32(124.55), o.Price)
+	require.Equal(t, decimal.NewFromFloat(124.55), o.Price)
 	require.Equal(t, Debit, o.PriceEffect)
 	require.Equal(t, Contingent, o.Status)
 	require.Equal(t, "Pending Condition", o.ContingentStatus)
@@ -753,7 +756,7 @@ func TestCancelOrder(t *testing.T) {
 	require.Equal(t, 1, o.Size)
 	require.Equal(t, "AAPL", o.UnderlyingSymbol)
 	require.Equal(t, EquityIT, o.UnderlyingInstrumentType)
-	require.Equal(t, StringToFloat32(186.99), o.Price)
+	require.Equal(t, decimal.NewFromFloat(186.99), o.Price)
 	require.Equal(t, Debit, o.PriceEffect)
 	require.Equal(t, Cancelled, o.Status)
 	require.False(t, o.Cancellable)
@@ -809,7 +812,7 @@ func TestReplaceOrder(t *testing.T) {
 	require.Equal(t, 1, o.Size)
 	require.Equal(t, "AAPL", o.UnderlyingSymbol)
 	require.Equal(t, EquityIT, o.UnderlyingInstrumentType)
-	require.Equal(t, StringToFloat32(185.45), o.Price)
+	require.Equal(t, decimal.NewFromFloat(185.45), o.Price)
 	require.Equal(t, Debit, o.PriceEffect)
 	require.Equal(t, Contingent, o.Status)
 	require.Equal(t, "Pending Condition", o.ContingentStatus)
@@ -871,7 +874,7 @@ func TestPatchOrder(t *testing.T) {
 	require.Equal(t, 1, o.Size)
 	require.Equal(t, "AAPL", o.UnderlyingSymbol)
 	require.Equal(t, EquityIT, o.UnderlyingInstrumentType)
-	require.Equal(t, StringToFloat32(187.45), o.Price)
+	require.Equal(t, decimal.NewFromFloat(187.45), o.Price)
 	require.Equal(t, Debit, o.PriceEffect)
 	require.Equal(t, Contingent, o.Status)
 	require.Equal(t, "Pending Condition", o.ContingentStatus)
@@ -927,7 +930,7 @@ func TestGetCustomerLiveOrders(t *testing.T) {
 	require.Equal(t, 1, o.Size)
 	require.Equal(t, "RIVN", o.UnderlyingSymbol)
 	require.Equal(t, EquityIT, o.UnderlyingInstrumentType)
-	require.Equal(t, StringToFloat32(0.01), o.Price)
+	require.Equal(t, decimal.NewFromFloat(0.01), o.Price)
 	require.Equal(t, Debit, o.PriceEffect)
 	require.Equal(t, Filled, o.Status)
 	require.False(t, o.Cancellable)
@@ -948,7 +951,7 @@ func TestGetCustomerLiveOrders(t *testing.T) {
 	require.Equal(t, "90305", fi.ExtExecID)
 	require.Equal(t, "3_OPT850090305", fi.FillID)
 	require.Equal(t, float32(1), fi.Quantity)
-	require.Equal(t, StringToFloat32(0.01), fi.FillPrice)
+	require.Equal(t, decimal.NewFromFloat(0.01), fi.FillPrice)
 	require.Equal(t, "2023-06-23T14:12:04.214Z", fi.FilledAt.Format(time.RFC3339Nano))
 	require.Equal(t, "CITADEL_OPTIONS_A", fi.DestinationVenue)
 }
@@ -996,7 +999,7 @@ func TestGetCustomerOrders(t *testing.T) {
 	require.Equal(t, 1, o.Size)
 	require.Equal(t, "RIVN", o.UnderlyingSymbol)
 	require.Equal(t, EquityIT, o.UnderlyingInstrumentType)
-	require.Equal(t, StringToFloat32(0.01), o.Price)
+	require.Equal(t, decimal.NewFromFloat(0.01), o.Price)
 	require.Equal(t, Debit, o.PriceEffect)
 	require.Equal(t, Filled, o.Status)
 	require.False(t, o.Cancellable)
@@ -1017,7 +1020,7 @@ func TestGetCustomerOrders(t *testing.T) {
 	require.Equal(t, "90305", fi.ExtExecID)
 	require.Equal(t, "3_OPT850090305", fi.FillID)
 	require.Equal(t, float32(1), fi.Quantity)
-	require.Equal(t, StringToFloat32(0.01), fi.FillPrice)
+	require.Equal(t, decimal.NewFromFloat(0.01), fi.FillPrice)
 	require.Equal(t, "2023-06-23T14:12:04.214Z", fi.FilledAt.Format(time.RFC3339Nano))
 	require.Equal(t, "CITADEL_OPTIONS_A", fi.DestinationVenue)
 }

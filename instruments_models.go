@@ -2,6 +2,8 @@ package tasty
 
 import (
 	"time"
+
+	"github.com/shopspring/decimal"
 )
 
 type DestinationVenueSymbol struct {
@@ -21,14 +23,14 @@ type CryptocurrencyInfo struct {
 	Description             string                   `json:"description"`
 	IsClosingOnly           bool                     `json:"is-closing-only"`
 	Active                  bool                     `json:"active"`
-	TickSize                StringToFloat32          `json:"tick-size"`
+	TickSize                decimal.Decimal          `json:"tick-size"`
 	StreamerSymbol          string                   `json:"streamer-symbol"`
 	DestinationVenueSymbols []DestinationVenueSymbol `json:"destination-venue-symbols"`
 }
 
 type TickSize struct {
-	Value     StringToFloat32 `json:"value"`
-	Threshold StringToFloat32 `json:"threshold"`
+	Value     decimal.Decimal `json:"value"`
+	Threshold decimal.Decimal `json:"threshold"`
 	Symbol    string          `json:"symbol"`
 }
 
@@ -42,7 +44,7 @@ type Equity struct {
 	ListedMarket                   string          `json:"listed-market"`
 	Description                    string          `json:"description"`
 	Lendability                    string          `json:"lendability"`
-	BorrowRate                     StringToFloat32 `json:"borrow-rate"`
+	BorrowRate                     decimal.Decimal `json:"borrow-rate"`
 	HaltedAt                       string          `json:"halted-at"`
 	StopsTradingAt                 time.Time       `json:"stops-trading-at"`
 	MarketTimeInstrumentCollection string          `json:"market-time-instrument-collection"`
@@ -62,7 +64,7 @@ type EquityOption struct {
 	InstrumentType                 InstrumentType  `json:"instrument-type"`
 	Active                         bool            `json:"active"`
 	ListedMarket                   string          `json:"listed-market"`
-	StrikePrice                    StringToFloat32 `json:"strike-price"`
+	StrikePrice                    decimal.Decimal `json:"strike-price"`
 	RootSymbol                     string          `json:"root-symbol"`
 	UnderlyingSymbol               string          `json:"underlying-symbol"`
 	ExpirationDate                 string          `json:"expiration-date"`
@@ -98,12 +100,12 @@ type Roll struct {
 type Future struct {
 	Symbol                       string              `json:"symbol"`
 	ProductCode                  string              `json:"product-code"`
-	ContractSize                 StringToFloat32     `json:"contract-size"`
-	TickSize                     StringToFloat32     `json:"tick-size"`
-	NotionalMultiplier           StringToFloat32     `json:"notional-multiplier"`
-	MainFraction                 StringToFloat32     `json:"main-fraction"`
-	SubFraction                  StringToFloat32     `json:"sub-fraction"`
-	DisplayFactor                StringToFloat32     `json:"display-factor"`
+	ContractSize                 decimal.Decimal     `json:"contract-size"`
+	TickSize                     decimal.Decimal     `json:"tick-size"`
+	NotionalMultiplier           decimal.Decimal     `json:"notional-multiplier"`
+	MainFraction                 decimal.Decimal     `json:"main-fraction"`
+	SubFraction                  decimal.Decimal     `json:"sub-fraction"`
+	DisplayFactor                decimal.Decimal     `json:"display-factor"`
 	LastTradeDate                string              `json:"last-trade-date"`
 	ExpirationDate               string              `json:"expiration-date"`
 	ClosingOnlyDate              string              `json:"closing-only-date"`
@@ -137,8 +139,8 @@ type FutureOptionProduct struct {
 	ClearportCode           string          `json:"clearport-code"`
 	ClearingCode            string          `json:"clearing-code"`
 	ClearingExchangeCode    string          `json:"clearing-exchange-code"`
-	ClearingPriceMultiplier StringToFloat32 `json:"clearing-price-multiplier"`
-	DisplayFactor           StringToFloat32 `json:"display-factor"`
+	ClearingPriceMultiplier decimal.Decimal `json:"clearing-price-multiplier"`
+	DisplayFactor           decimal.Decimal `json:"display-factor"`
 	Exchange                string          `json:"exchange"`
 	ProductType             string          `json:"product-type"`
 	ExpirationType          string          `json:"expiration-type"`
@@ -162,9 +164,9 @@ type FutureProduct struct {
 	ProductType                  string                `json:"product-type"`
 	ListedMonths                 []string              `json:"listed-months"`
 	ActiveMonths                 []string              `json:"active-months"`
-	NotionalMultiplier           StringToFloat32       `json:"notional-multiplier"`
-	TickSize                     StringToFloat32       `json:"tick-size"`
-	DisplayFactor                StringToFloat32       `json:"display-factor"`
+	NotionalMultiplier           decimal.Decimal       `json:"notional-multiplier"`
+	TickSize                     decimal.Decimal       `json:"tick-size"`
+	DisplayFactor                decimal.Decimal       `json:"display-factor"`
 	BaseTick                     int                   `json:"base-tick"`
 	SubTick                      int                   `json:"sub-tick"`
 	StreamerExchangeCode         string                `json:"streamer-exchange-code"`
@@ -188,7 +190,7 @@ type FutureOption struct {
 	ExpirationDate       string              `json:"expiration-date"`
 	RootSymbol           string              `json:"root-symbol"`
 	OptionRootSymbol     string              `json:"option-root-symbol"`
-	StrikePrice          StringToFloat32     `json:"strike-price"`
+	StrikePrice          decimal.Decimal     `json:"strike-price"`
 	Exchange             string              `json:"exchange"`
 	ExchangeSymbol       string              `json:"exchange-symbol"`
 	StreamerSymbol       string              `json:"streamer-symbol"`
@@ -196,16 +198,16 @@ type FutureOption struct {
 	ExerciseStyle        string              `json:"exercise-style"`
 	IsVanilla            bool                `json:"is-vanilla"`
 	IsPrimaryDeliverable bool                `json:"is-primary-deliverable"`
-	FuturePriceRatio     StringToFloat32     `json:"future-price-ratio"`
-	Multiplier           StringToFloat32     `json:"multiplier"`
-	UnderlyingCount      StringToFloat32     `json:"underlying-count"`
+	FuturePriceRatio     decimal.Decimal     `json:"future-price-ratio"`
+	Multiplier           decimal.Decimal     `json:"multiplier"`
+	UnderlyingCount      decimal.Decimal     `json:"underlying-count"`
 	IsConfirmed          bool                `json:"is-confirmed"`
-	NotionalValue        StringToFloat32     `json:"notional-value"`
-	DisplayFactor        StringToFloat32     `json:"display-factor"`
+	NotionalValue        decimal.Decimal     `json:"notional-value"`
+	DisplayFactor        decimal.Decimal     `json:"display-factor"`
 	SecurityExchange     string              `json:"security-exchange"`
 	SxID                 string              `json:"sx-id"`
 	SettlementType       string              `json:"settlement-type"`
-	StrikeFactor         StringToFloat32     `json:"strike-factor"`
+	StrikeFactor         decimal.Decimal     `json:"strike-factor"`
 	MaturityDate         string              `json:"maturity-date"`
 	IsExercisableWeekly  bool                `json:"is-exercisable-weekly"`
 	LastTradeTime        string              `json:"last-trade-time"`
@@ -235,7 +237,7 @@ type Warrant struct {
 }
 
 type Strike struct {
-	StrikePrice        StringToFloat32 `json:"strike-price"`
+	StrikePrice        decimal.Decimal `json:"strike-price"`
 	Call               string          `json:"call"`
 	CallStreamerSymbol string          `json:"call-streamer-symbol"`
 	Put                string          `json:"put"`
@@ -252,9 +254,9 @@ type FuturesExpiration struct {
 	DaysToExpiration     int             `json:"days-to-expiration"`
 	ExpirationType       string          `json:"expiration-type"`
 	SettlementType       string          `json:"settlement-type"`
-	NotionalValue        StringToFloat32 `json:"notional-value"`
-	DisplayFactor        StringToFloat32 `json:"display-factor"`
-	StrikeFactor         StringToFloat32 `json:"strike-factor"`
+	NotionalValue        decimal.Decimal `json:"notional-value"`
+	DisplayFactor        decimal.Decimal `json:"display-factor"`
+	StrikeFactor         decimal.Decimal `json:"strike-factor"`
 	StopsTradingAt       time.Time       `json:"stops-trading-at"`
 	ExpiresAt            time.Time       `json:"expires-at"`
 	TickSizes            []TickSize      `json:"tick-sizes"`
@@ -297,10 +299,10 @@ type Deliverable struct {
 	RootSymbol      string          `json:"root-symbol"`
 	DeliverableType string          `json:"deliverable-type"`
 	Description     string          `json:"description"`
-	Amount          StringToFloat32 `json:"amount"`
+	Amount          decimal.Decimal `json:"amount"`
 	Symbol          string          `json:"symbol"`
 	InstrumentType  InstrumentType  `json:"instrument-type"`
-	Percent         StringToFloat32 `json:"percent"`
+	Percent         decimal.Decimal `json:"percent"`
 }
 
 type NestedOptionChains struct {

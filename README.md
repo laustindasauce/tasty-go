@@ -5,7 +5,7 @@
 [![Go Report Card](https://goreportcard.com/badge/github.com/austinbspencer/tasty-go)](https://goreportcard.com/report/github.com/austinbspencer/tasty-go)
 [![codecov](https://codecov.io/gh/austinbspencer/tasty-go/branch/main/graph/badge.svg?token=ZVVJF2RFQO)](https://codecov.io/gh/austinbspencer/tasty-go)
 
-This library provides unofficial Go clients for [TastyTrade API](https://tastytrade.com).
+This library provides `unofficial` Go clients for [TastyTrade API](https://tastytrade.com).
 
 > You will need to opt into TastyTrade's API [here](https://developer.tastytrade.com)
 
@@ -14,6 +14,14 @@ This library provides unofficial Go clients for [TastyTrade API](https://tastytr
 [TastyTrade](https://tastytrade.com/about-us/) pioneered options trading technology for retail traders.
 
 [Create your account](https://start.tastytrade.com/#/login?referralCode=MS53QAT6DS) if you don't already have one to begin trading with TastyTrade.
+
+## Dependencies
+
+There are very few dependencies for this lightweight API wrapper.
+
+- [decimal](https://github.com/shopspring/decimal)
+- [go-querystring](https://github.com/google/go-querystring)
+- [testify](https://github.com/stretchr/testify) `for testing`
 
 ## TO-DO
 

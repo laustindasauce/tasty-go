@@ -6,6 +6,7 @@ import (
 	"testing"
 	"time"
 
+	"github.com/shopspring/decimal"
 	"github.com/stretchr/testify/require"
 )
 
@@ -33,7 +34,7 @@ func TestGetActiveEquities(t *testing.T) {
 	require.Equal(t, "XNYS", equity.ListedMarket)
 	require.Equal(t, "Full Truck Alliance Co. Ltd. American Depositary Shares (each representing 20 Class A Ordinary Shares)", equity.Description)
 	require.Equal(t, "Easy To Borrow", equity.Lendability)
-	require.Equal(t, StringToFloat32(0.0), equity.BorrowRate)
+	require.True(t, decimal.Zero.Equal(equity.BorrowRate))
 	require.Equal(t, "Equity", equity.MarketTimeInstrumentCollection)
 	require.False(t, equity.IsClosingOnly)
 	require.False(t, equity.IsOptionsClosingOnly)
@@ -45,13 +46,13 @@ func TestGetActiveEquities(t *testing.T) {
 
 	tickSize := equity.TickSizes[0]
 
-	require.Equal(t, StringToFloat32(0.0001), tickSize.Value)
-	require.Equal(t, StringToFloat32(1.0), tickSize.Threshold)
+	require.True(t, tickSize.Value.Equal(decimal.NewFromFloat(0.0001)))
+	require.True(t, decimal.NewFromInt(1).Equal(tickSize.Threshold))
 
 	optionTickSize := equity.OptionTickSizes[0]
 
-	require.Equal(t, StringToFloat32(0.05), optionTickSize.Value)
-	require.Equal(t, StringToFloat32(3.0), optionTickSize.Threshold)
+	require.True(t, optionTickSize.Value.Equal(decimal.NewFromFloat(0.05)))
+	require.True(t, decimal.NewFromInt(3).Equal(optionTickSize.Threshold))
 
 	// Pagination
 	require.Equal(t, 4, pagination.PerPage)
@@ -101,7 +102,7 @@ func TestGetEquities(t *testing.T) {
 	require.Equal(t, "XNAS", equity.ListedMarket)
 	require.Equal(t, "APPLE INC", equity.Description)
 	require.Equal(t, "Easy To Borrow", equity.Lendability)
-	require.Equal(t, StringToFloat32(0.0), equity.BorrowRate)
+	require.True(t, decimal.Zero.Equal(equity.BorrowRate))
 	require.Equal(t, "Equity", equity.MarketTimeInstrumentCollection)
 	require.False(t, equity.IsClosingOnly)
 	require.False(t, equity.IsOptionsClosingOnly)
@@ -113,13 +114,13 @@ func TestGetEquities(t *testing.T) {
 
 	tickSize := equity.TickSizes[0]
 
-	require.Equal(t, StringToFloat32(0.0001), tickSize.Value)
-	require.Equal(t, StringToFloat32(1.0), tickSize.Threshold)
+	require.True(t, tickSize.Value.Equal(decimal.NewFromFloat(0.0001)))
+	require.True(t, tickSize.Threshold.Equal(decimal.NewFromInt(1)))
 
 	optionTickSize := equity.OptionTickSizes[0]
 
-	require.Equal(t, StringToFloat32(0.01), optionTickSize.Value)
-	require.Equal(t, StringToFloat32(3.0), optionTickSize.Threshold)
+	require.Equal(t, decimal.NewFromFloat(0.01), optionTickSize.Value)
+	require.True(t, optionTickSize.Threshold.Equal(decimal.NewFromInt(3)))
 }
 
 func TestGetEquitiesError(t *testing.T) {
@@ -156,7 +157,7 @@ func TestGetEquity(t *testing.T) {
 	require.Equal(t, "XNAS", equity.ListedMarket)
 	require.Equal(t, "APPLE INC", equity.Description)
 	require.Equal(t, "Easy To Borrow", equity.Lendability)
-	require.Equal(t, StringToFloat32(0.0), equity.BorrowRate)
+	require.True(t, decimal.Zero.Equal(equity.BorrowRate))
 	require.Equal(t, "Equity", equity.MarketTimeInstrumentCollection)
 	require.False(t, equity.IsClosingOnly)
 	require.False(t, equity.IsOptionsClosingOnly)
@@ -168,13 +169,13 @@ func TestGetEquity(t *testing.T) {
 
 	tickSize := equity.TickSizes[0]
 
-	require.Equal(t, StringToFloat32(0.0001), tickSize.Value)
-	require.Equal(t, StringToFloat32(1.0), tickSize.Threshold)
+	require.True(t, tickSize.Value.Equal(decimal.NewFromFloat(0.0001)))
+	require.True(t, tickSize.Threshold.Equal(decimal.NewFromInt(1)))
 
 	optionTickSize := equity.OptionTickSizes[0]
 
-	require.Equal(t, StringToFloat32(0.01), optionTickSize.Value)
-	require.Equal(t, StringToFloat32(3.0), optionTickSize.Threshold)
+	require.Equal(t, decimal.NewFromFloat(0.01), optionTickSize.Value)
+	require.True(t, optionTickSize.Threshold.Equal(decimal.NewFromInt(3)))
 }
 
 func TestGetEquityError(t *testing.T) {
@@ -221,7 +222,7 @@ func TestGetEquityOptions(t *testing.T) {
 	require.Equal(t, occSymbol, equity.Symbol)
 	require.Equal(t, EquityOptionIT, equity.InstrumentType)
 	require.True(t, equity.Active)
-	require.Equal(t, StringToFloat32(185.0), equity.StrikePrice)
+	require.True(t, equity.StrikePrice.Equal(decimal.NewFromInt(185)))
 	require.Equal(t, symbol, equity.RootSymbol)
 	require.Equal(t, symbol, equity.UnderlyingSymbol)
 	require.Equal(t, "2023-06-16", equity.ExpirationDate)
@@ -288,7 +289,7 @@ func TestGetEquityOption(t *testing.T) {
 	require.Equal(t, occSymbol, equity.Symbol)
 	require.Equal(t, EquityOptionIT, equity.InstrumentType)
 	require.True(t, equity.Active)
-	require.Equal(t, StringToFloat32(185.0), equity.StrikePrice)
+	require.True(t, equity.StrikePrice.Equal(decimal.NewFromInt(185)))
 	require.Equal(t, symbol, equity.RootSymbol)
 	require.Equal(t, symbol, equity.UnderlyingSymbol)
 	require.Equal(t, "2023-06-16", equity.ExpirationDate)

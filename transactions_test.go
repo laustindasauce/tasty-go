@@ -6,6 +6,7 @@ import (
 	"testing"
 	"time"
 
+	"github.com/shopspring/decimal"
 	"github.com/stretchr/testify/require"
 )
 
@@ -20,7 +21,7 @@ func TestGetAccountTransactions(t *testing.T) {
 		fmt.Fprint(writer, transactionsResp)
 	})
 
-	resp, err := client.GetAccountTransactions(accountNumber, query)
+	resp, pagination, err := client.GetAccountTransactions(accountNumber, query)
 	require.Nil(t, err)
 
 	require.Equal(t, 3, len(resp))
@@ -36,21 +37,21 @@ func TestGetAccountTransactions(t *testing.T) {
 	require.Equal(t, STO, tr.TransactionSubType)
 	require.Equal(t, "Sold 40 RIVN 06/23/23 Call 15.00 @ 0.47", tr.Description)
 	require.Equal(t, STO, tr.Action)
-	require.Equal(t, StringToFloat32(40), tr.Quantity)
-	require.Equal(t, StringToFloat32(.47), tr.Price)
+	require.True(t, tr.Quantity.Equal(decimal.NewFromInt(40)), "quantity")
+	require.Equal(t, decimal.NewFromFloat(.47), tr.Price)
 	require.Equal(t, "2023-06-12T13:53:08.199Z", tr.ExecutedAt.Format(time.RFC3339Nano))
 	require.Equal(t, "2023-06-12", tr.TransactionDate)
-	require.Equal(t, StringToFloat32(1880), tr.Value)
+	require.True(t, tr.Value.Equal(decimal.NewFromInt(1880)))
 	require.Equal(t, Credit, tr.ValueEffect)
-	require.Equal(t, StringToFloat32(0.042), tr.RegulatoryFees)
+	require.Equal(t, decimal.NewFromFloat(0.042), tr.RegulatoryFees)
 	require.Equal(t, Debit, tr.RegulatoryFeesEffect)
-	require.Equal(t, StringToFloat32(0.4), tr.ClearingFees)
+	require.True(t, decimal.NewFromFloat(0.4).Equal(tr.ClearingFees), "clearing fees")
 	require.Equal(t, Debit, tr.ClearingFeesEffect)
-	require.Equal(t, StringToFloat32(1878.858), tr.NetValue)
+	require.Equal(t, decimal.NewFromFloat(1878.858), tr.NetValue)
 	require.Equal(t, Credit, tr.NetValueEffect)
-	require.Equal(t, StringToFloat32(40), tr.Commission)
+	require.True(t, tr.Commission.Equal(decimal.NewFromInt(40)), "commission")
 	require.Equal(t, Debit, tr.CommissionEffect)
-	require.Equal(t, StringToFloat32(0), tr.ProprietaryIndexOptionFees)
+	require.True(t, tr.ProprietaryIndexOptionFees.Equal(decimal.Zero))
 	require.Equal(t, None, tr.ProprietaryIndexOptionFeesEffect)
 	require.True(t, tr.IsEstimatedFee)
 	require.Equal(t, "6309579568813", tr.ExtExchangeOrderNumber)
@@ -64,6 +65,16 @@ func TestGetAccountTransactions(t *testing.T) {
 	require.Equal(t, "", tr.ExchangeAffiliationIDentifier)
 	require.Equal(t, 1, tr.LegCount)
 	require.Equal(t, "WOLVERINE_OPTIONS_A", tr.DestinationVenue)
+
+	require.Equal(t, 3, pagination.PerPage)
+	require.Equal(t, 0, pagination.PageOffset)
+	require.Equal(t, 0, pagination.ItemOffset)
+	require.Equal(t, 71, pagination.TotalItems)
+	require.Equal(t, 24, pagination.TotalPages)
+	require.Equal(t, 3, pagination.CurrentItemCount)
+	require.Nil(t, pagination.PreviousLink)
+	require.Nil(t, pagination.NextLink)
+	require.Nil(t, pagination.PagingLinkTemplate)
 }
 
 func TestGetAccountTransactionsError(t *testing.T) {
@@ -78,7 +89,7 @@ func TestGetAccountTransactionsError(t *testing.T) {
 		fmt.Fprint(writer, tastyUnauthorizedError)
 	})
 
-	_, err := client.GetAccountTransactions(accountNumber, query)
+	_, _, err := client.GetAccountTransactions(accountNumber, query)
 	expectedUnauthorized(t, err)
 }
 
@@ -105,21 +116,21 @@ func TestGetAccountTransaction(t *testing.T) {
 	require.Equal(t, STO, tr.TransactionSubType)
 	require.Equal(t, "Sold 40 RIVN 06/23/23 Call 15.00 @ 0.47", tr.Description)
 	require.Equal(t, STO, tr.Action)
-	require.Equal(t, StringToFloat32(40), tr.Quantity)
-	require.Equal(t, StringToFloat32(.47), tr.Price)
+	require.True(t, tr.Quantity.Equal(decimal.NewFromInt(40)))
+	require.Equal(t, decimal.NewFromFloat(.47), tr.Price)
 	require.Equal(t, "2023-06-12T13:53:08.199Z", tr.ExecutedAt.Format(time.RFC3339Nano))
 	require.Equal(t, "2023-06-12", tr.TransactionDate)
-	require.Equal(t, StringToFloat32(1880), tr.Value)
+	require.True(t, tr.Value.Equal(decimal.NewFromInt(1880)))
 	require.Equal(t, Credit, tr.ValueEffect)
-	require.Equal(t, StringToFloat32(0.042), tr.RegulatoryFees)
+	require.Equal(t, decimal.NewFromFloat(0.042), tr.RegulatoryFees)
 	require.Equal(t, Debit, tr.RegulatoryFeesEffect)
-	require.Equal(t, StringToFloat32(0.4), tr.ClearingFees)
+	require.True(t, decimal.NewFromFloat(0.4).Equal(tr.ClearingFees))
 	require.Equal(t, Debit, tr.ClearingFeesEffect)
-	require.Equal(t, StringToFloat32(1878.858), tr.NetValue)
+	require.Equal(t, decimal.NewFromFloat(1878.858), tr.NetValue)
 	require.Equal(t, Credit, tr.NetValueEffect)
-	require.Equal(t, StringToFloat32(40), tr.Commission)
+	require.True(t, tr.Commission.Equal(decimal.NewFromInt(40)))
 	require.Equal(t, Debit, tr.CommissionEffect)
-	require.Equal(t, StringToFloat32(0), tr.ProprietaryIndexOptionFees)
+	require.True(t, tr.ProprietaryIndexOptionFees.Equal(decimal.Zero))
 	require.Equal(t, None, tr.ProprietaryIndexOptionFeesEffect)
 	require.True(t, tr.IsEstimatedFee)
 	require.Equal(t, "6309579568813", tr.ExtExchangeOrderNumber)
@@ -164,7 +175,7 @@ func TestGetAccountTransactionFees(t *testing.T) {
 	fees, err := client.GetAccountTransactionFees(accountNumber, nil)
 	require.Nil(t, err)
 
-	require.Equal(t, StringToFloat32(0), fees.TotalFees)
+	require.True(t, fees.TotalFees.Equal(decimal.Zero))
 	require.Equal(t, None, fees.TotalFeesEffect)
 }
 
@@ -183,7 +194,7 @@ func TestGetAccountTransactionFeesWithParams(t *testing.T) {
 	fees, err := client.GetAccountTransactionFees(accountNumber, &queryDate)
 	require.Nil(t, err)
 
-	require.Equal(t, StringToFloat32(0), fees.TotalFees)
+	require.True(t, fees.TotalFees.Equal(decimal.Zero))
 	require.Equal(t, None, fees.TotalFeesEffect)
 }
 
