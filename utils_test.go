@@ -48,6 +48,11 @@ func TestNewFSFromString(t *testing.T) {
 	require.Equal(t, December, sym.MonthCode)
 	require.Equal(t, "ES", sym.ProductCode)
 
+	_, err = NewFSFromString("/ESA")
+	require.Error(t, err)
+
+	require.Equal(t, "invalid futures symbol", err.Error())
+
 	_, err = NewFSFromString("/ESA9")
 	require.Error(t, err)
 
