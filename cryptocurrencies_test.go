@@ -5,6 +5,7 @@ import (
 	"net/http"
 	"testing"
 
+	"github.com/shopspring/decimal"
 	"github.com/stretchr/testify/require"
 )
 
@@ -30,7 +31,7 @@ func TestGetCryptocurrencies(t *testing.T) {
 	require.Equal(t, "Bitcoin to USD", btc.Description)
 	require.False(t, btc.IsClosingOnly)
 	require.True(t, btc.Active)
-	require.Equal(t, StringToFloat32(0.01), btc.TickSize)
+	require.Equal(t, decimal.NewFromFloat(0.01), btc.TickSize)
 	require.Equal(t, "BTC/USD:CXTALP", btc.StreamerSymbol)
 
 	venueSymbol := btc.DestinationVenueSymbols[0]
@@ -74,7 +75,7 @@ func TestGetCryptocurrency(t *testing.T) {
 	require.Equal(t, "Bitcoin to USD", btc.Description)
 	require.False(t, btc.IsClosingOnly)
 	require.True(t, btc.Active)
-	require.Equal(t, StringToFloat32(0.01), btc.TickSize)
+	require.Equal(t, decimal.NewFromFloat(0.01), btc.TickSize)
 	require.Equal(t, "BTC/USD:CXTALP", btc.StreamerSymbol)
 
 	venueSymbol := btc.DestinationVenueSymbols[0]

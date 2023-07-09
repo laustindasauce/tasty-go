@@ -2,6 +2,8 @@ package tasty
 
 import (
 	"time"
+
+	"github.com/shopspring/decimal"
 )
 
 type Order struct {
@@ -13,11 +15,11 @@ type Order struct {
 	Size                     int             `json:"size"`
 	UnderlyingSymbol         string          `json:"underlying-symbol"`
 	UnderlyingInstrumentType InstrumentType  `json:"underlying-instrument-type"`
-	Price                    StringToFloat32 `json:"price"`
+	Price                    decimal.Decimal `json:"price"`
 	PriceEffect              PriceEffect     `json:"price-effect"`
-	Value                    StringToFloat32 `json:"value"`
+	Value                    decimal.Decimal `json:"value"`
 	ValueEffect              PriceEffect     `json:"value-effect"`
-	StopTrigger              StringToFloat32 `json:"stop-trigger"`
+	StopTrigger              decimal.Decimal `json:"stop-trigger"`
 	Status                   OrderStatus     `json:"status"`
 	ContingentStatus         string          `json:"contingent-status"`
 	ConfirmationStatus       string          `json:"confirmation-status"`
@@ -52,7 +54,7 @@ type ComplexOrder struct {
 	AccountNumber                        string          `json:"account-number"`
 	Type                                 string          `json:"type"`
 	TerminalAt                           string          `json:"terminal-at"`
-	RatioPriceThreshold                  StringToFloat32 `json:"ratio-price-threshold"`
+	RatioPriceThreshold                  decimal.Decimal `json:"ratio-price-threshold"`
 	RatioPriceComparator                 string          `json:"ratio-price-comparator"`
 	RatioPriceIsThresholdBasedOnNotional bool            `json:"ratio-price-is-threshold-based-on-notional"`
 	// RelatedOrders Non-current orders. This includes replaced orders, unfilled orders, and terminal orders.
@@ -92,7 +94,7 @@ type OrderFill struct {
 	ExtExecID        string          `json:"ext-exec-id"`
 	FillID           string          `json:"fill-id"`
 	Quantity         float32         `json:"quantity"`
-	FillPrice        StringToFloat32 `json:"fill-price"`
+	FillPrice        decimal.Decimal `json:"fill-price"`
 	FilledAt         time.Time       `json:"filled-at"`
 	DestinationVenue string          `json:"destination-venue"`
 }
@@ -112,10 +114,10 @@ type OrderCondition struct {
 	InstrumentType             InstrumentType        `json:"instrument-type"`
 	Indicator                  Indicator             `json:"indicator"`
 	Comparator                 Comparator            `json:"comparator"`
-	Threshold                  StringToFloat32       `json:"threshold"`
+	Threshold                  decimal.Decimal       `json:"threshold"`
 	IsThresholdBasedOnNotional bool                  `json:"is-threshold-based-on-notional"`
 	TriggeredAt                string                `json:"triggered-at"`
-	TriggeredValue             StringToFloat32       `json:"triggered-value"`
+	TriggeredValue             decimal.Decimal       `json:"triggered-value"`
 	PriceComponents            []OrderPriceComponent `json:"price-components"`
 }
 
@@ -154,31 +156,31 @@ type NewOrderLeg struct {
 }
 
 type FeeCalculation struct {
-	RegulatoryFees                   StringToFloat32 `json:"regulatory-fees"`
+	RegulatoryFees                   decimal.Decimal `json:"regulatory-fees"`
 	RegulatoryFeesEffect             PriceEffect     `json:"regulatory-fees-effect"`
-	ClearingFees                     StringToFloat32 `json:"clearing-fees"`
+	ClearingFees                     decimal.Decimal `json:"clearing-fees"`
 	ClearingFeesEffect               PriceEffect     `json:"clearing-fees-effect"`
-	Commission                       StringToFloat32 `json:"commission"`
+	Commission                       decimal.Decimal `json:"commission"`
 	CommissionEffect                 PriceEffect     `json:"commission-effect"`
-	ProprietaryIndexOptionFees       StringToFloat32 `json:"proprietary-index-option-fees"`
+	ProprietaryIndexOptionFees       decimal.Decimal `json:"proprietary-index-option-fees"`
 	ProprietaryIndexOptionFeesEffect PriceEffect     `json:"proprietary-index-option-fees-effect"`
-	TotalFees                        StringToFloat32 `json:"total-fees"`
+	TotalFees                        decimal.Decimal `json:"total-fees"`
 	TotalFeesEffect                  PriceEffect     `json:"total-fees-effect"`
 }
 
 type BuyingPowerEffect struct {
-	ChangeInMarginRequirement            StringToFloat32 `json:"change-in-margin-requirement"`
+	ChangeInMarginRequirement            decimal.Decimal `json:"change-in-margin-requirement"`
 	ChangeInMarginRequirementEffect      PriceEffect     `json:"change-in-margin-requirement-effect"`
-	ChangeInBuyingPower                  StringToFloat32 `json:"change-in-buying-power"`
+	ChangeInBuyingPower                  decimal.Decimal `json:"change-in-buying-power"`
 	ChangeInBuyingPowerEffect            PriceEffect     `json:"change-in-buying-power-effect"`
-	CurrentBuyingPower                   StringToFloat32 `json:"current-buying-power"`
+	CurrentBuyingPower                   decimal.Decimal `json:"current-buying-power"`
 	CurrentBuyingPowerEffect             PriceEffect     `json:"current-buying-power-effect"`
-	NewBuyingPower                       StringToFloat32 `json:"new-buying-power"`
+	NewBuyingPower                       decimal.Decimal `json:"new-buying-power"`
 	NewBuyingPowerEffect                 PriceEffect     `json:"new-buying-power-effect"`
-	IsolatedOrderMarginRequirement       StringToFloat32 `json:"isolated-order-margin-requirement"`
+	IsolatedOrderMarginRequirement       decimal.Decimal `json:"isolated-order-margin-requirement"`
 	IsolatedOrderMarginRequirementEffect PriceEffect     `json:"isolated-order-margin-requirement-effect"`
 	IsSpread                             bool            `json:"is-spread"`
-	Impact                               StringToFloat32 `json:"impact"`
+	Impact                               decimal.Decimal `json:"impact"`
 	Effect                               PriceEffect     `json:"effect"`
 }
 
@@ -205,11 +207,11 @@ type OrderReplacement struct {
 	GtcDate     string      `json:"gtc-date"`
 	// OrderType The type of order in regards to the price.
 	OrderType   OrderType       `json:"order-type"`
-	StopTrigger StringToFloat32 `json:"stop-trigger,omitempty"`
-	Price       StringToFloat32 `json:"price,omitempty"`
+	StopTrigger decimal.Decimal `json:"stop-trigger,omitempty"`
+	Price       decimal.Decimal `json:"price,omitempty"`
 	// PriceEffect If pay or receive payment for placing the order.
 	PriceEffect PriceEffect     `json:"price-effect,omitempty"`
-	Value       StringToFloat32 `json:"value,omitempty"`
+	Value       decimal.Decimal `json:"value,omitempty"`
 	// ValueEffect If pay or receive payment for placing the notional market order.
 	ValueEffect  PriceEffect `json:"value-effect,omitempty"`
 	Source       string      `json:"source,omitempty"`

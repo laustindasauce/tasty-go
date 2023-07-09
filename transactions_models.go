@@ -2,13 +2,15 @@ package tasty
 
 import (
 	"time"
+
+	"github.com/shopspring/decimal"
 )
 
 type Lot struct {
 	ID                string          `json:"id"`
 	TransactionID     int             `json:"transaction-id"`
-	Quantity          StringToFloat32 `json:"quantity"`
-	Price             StringToFloat32 `json:"price"`
+	Quantity          decimal.Decimal `json:"quantity"`
+	Price             decimal.Decimal `json:"price"`
 	QuantityDirection string          `json:"quantity-direction"`
 	ExecutedAt        time.Time       `json:"executed-at"`
 	TransactionDate   string          `json:"transaction-date"`
@@ -24,24 +26,24 @@ type Transaction struct {
 	TransactionSubType               OrderAction     `json:"transaction-sub-type"`
 	Description                      string          `json:"description"`
 	Action                           OrderAction     `json:"action"`
-	Quantity                         StringToFloat32 `json:"quantity"`
-	Price                            StringToFloat32 `json:"price"`
+	Quantity                         decimal.Decimal `json:"quantity"`
+	Price                            decimal.Decimal `json:"price"`
 	ExecutedAt                       time.Time       `json:"executed-at"`
 	TransactionDate                  string          `json:"transaction-date"`
-	Value                            StringToFloat32 `json:"value"`
+	Value                            decimal.Decimal `json:"value"`
 	ValueEffect                      PriceEffect     `json:"value-effect"`
-	RegulatoryFees                   StringToFloat32 `json:"regulatory-fees"`
+	RegulatoryFees                   decimal.Decimal `json:"regulatory-fees"`
 	RegulatoryFeesEffect             PriceEffect     `json:"regulatory-fees-effect"`
-	ClearingFees                     StringToFloat32 `json:"clearing-fees"`
+	ClearingFees                     decimal.Decimal `json:"clearing-fees"`
 	ClearingFeesEffect               PriceEffect     `json:"clearing-fees-effect"`
-	OtherCharge                      StringToFloat32 `json:"other-charge"`
+	OtherCharge                      decimal.Decimal `json:"other-charge"`
 	OtherChargeEffect                PriceEffect     `json:"other-charge-effect"`
 	OtherChargeDescription           string          `json:"other-charge-description"`
-	NetValue                         StringToFloat32 `json:"net-value"`
+	NetValue                         decimal.Decimal `json:"net-value"`
 	NetValueEffect                   PriceEffect     `json:"net-value-effect"`
-	Commission                       StringToFloat32 `json:"commission"`
+	Commission                       decimal.Decimal `json:"commission"`
 	CommissionEffect                 PriceEffect     `json:"commission-effect"`
-	ProprietaryIndexOptionFees       StringToFloat32 `json:"proprietary-index-option-fees"`
+	ProprietaryIndexOptionFees       decimal.Decimal `json:"proprietary-index-option-fees"`
 	ProprietaryIndexOptionFeesEffect PriceEffect     `json:"proprietary-index-option-fees-effect"`
 	IsEstimatedFee                   bool            `json:"is-estimated-fee"`
 	ExtExchangeOrderNumber           string          `json:"ext-exchange-order-number"`
@@ -58,12 +60,12 @@ type Transaction struct {
 	Lots                             []Lot           `json:"lots"`
 	LegCount                         int             `json:"leg-count"`
 	DestinationVenue                 string          `json:"destination-venue"`
-	AgencyPrice                      StringToFloat32 `json:"agency-price"`
-	PrincipalPrice                   StringToFloat32 `json:"principal-price"`
+	AgencyPrice                      decimal.Decimal `json:"agency-price"`
+	PrincipalPrice                   decimal.Decimal `json:"principal-price"`
 }
 
 type TransactionFees struct {
-	TotalFees       StringToFloat32 `json:"total-fees"`
+	TotalFees       decimal.Decimal `json:"total-fees"`
 	TotalFeesEffect PriceEffect     `json:"total-fees-effect"`
 }
 

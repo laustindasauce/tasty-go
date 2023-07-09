@@ -2,6 +2,8 @@ package tasty
 
 import (
 	"time"
+
+	"github.com/shopspring/decimal"
 )
 
 type Account struct {
@@ -40,7 +42,7 @@ type AccountTradingStatus struct {
 	DayTradeCount                            int             `json:"day-trade-count"`
 	EquitiesMarginCalculationType            string          `json:"equities-margin-calculation-type"`
 	FeeScheduleName                          string          `json:"fee-schedule-name"`
-	FuturesMarginRateMultiplier              StringToFloat32 `json:"futures-margin-rate-multiplier"`
+	FuturesMarginRateMultiplier              decimal.Decimal `json:"futures-margin-rate-multiplier"`
 	HasIntradayEquitiesMargin                bool            `json:"has-intraday-equities-margin"`
 	ID                                       int             `json:"id"`
 	IsAggregatedAtClearing                   bool            `json:"is-aggregated-at-clearing"`
@@ -64,7 +66,7 @@ type AccountTradingStatus struct {
 	OptionsLevel                             string          `json:"options-level"`
 	PdtResetOn                               string          `json:"pdt-reset-on"`
 	ShortCallsEnabled                        bool            `json:"short-calls-enabled"`
-	SmallNotionalFuturesMarginRateMultiplier StringToFloat32 `json:"small-notional-futures-margin-rate-multiplier"`
+	SmallNotionalFuturesMarginRateMultiplier decimal.Decimal `json:"small-notional-futures-margin-rate-multiplier"`
 	CMTAOverride                             int             `json:"cmta-override"`
 	IsEquityOfferingEnabled                  bool            `json:"is-equity-offering-enabled"`
 	IsEquityOfferingClosingOnly              bool            `json:"is-equity-offering-closing-only"`
@@ -74,53 +76,53 @@ type AccountTradingStatus struct {
 
 type AccountBalance struct {
 	AccountNumber                      string          `json:"account-number"`
-	CashBalance                        StringToFloat32 `json:"cash-balance"`
-	LongEquityValue                    StringToFloat32 `json:"long-equity-value"`
-	ShortEquityValue                   StringToFloat32 `json:"short-equity-value"`
-	LongDerivativeValue                StringToFloat32 `json:"long-derivative-value"`
-	ShortDerivativeValue               StringToFloat32 `json:"short-derivative-value"`
-	LongFuturesValue                   StringToFloat32 `json:"long-futures-value"`
-	ShortFuturesValue                  StringToFloat32 `json:"short-futures-value"`
-	LongFuturesDerivativeValue         StringToFloat32 `json:"long-futures-derivative-value"`
-	ShortFuturesDerivativeValue        StringToFloat32 `json:"short-futures-derivative-value"`
-	LongMargineableValue               StringToFloat32 `json:"long-margineable-value"`
-	ShortMargineableValue              StringToFloat32 `json:"short-margineable-value"`
-	MarginEquity                       StringToFloat32 `json:"margin-equity"`
-	EquityBuyingPower                  StringToFloat32 `json:"equity-buying-power"`
-	DerivativeBuyingPower              StringToFloat32 `json:"derivative-buying-power"`
-	DayTradingBuyingPower              StringToFloat32 `json:"day-trading-buying-power"`
-	FuturesMarginRequirement           StringToFloat32 `json:"futures-margin-requirement"`
-	AvailableTradingFunds              StringToFloat32 `json:"available-trading-funds"`
-	MaintenanceRequirement             StringToFloat32 `json:"maintenance-requirement"`
-	MaintenanceCallValue               StringToFloat32 `json:"maintenance-call-value"`
-	RegTCallValue                      StringToFloat32 `json:"reg-t-call-value"`
-	DayTradingCallValue                StringToFloat32 `json:"day-trading-call-value"`
-	DayEquityCallValue                 StringToFloat32 `json:"day-equity-call-value"`
-	NetLiquidatingValue                StringToFloat32 `json:"net-liquidating-value"`
-	CashAvailableToWithdraw            StringToFloat32 `json:"cash-available-to-withdraw"`
-	DayTradeExcess                     StringToFloat32 `json:"day-trade-excess"`
-	PendingCash                        StringToFloat32 `json:"pending-cash"`
+	CashBalance                        decimal.Decimal `json:"cash-balance"`
+	LongEquityValue                    decimal.Decimal `json:"long-equity-value"`
+	ShortEquityValue                   decimal.Decimal `json:"short-equity-value"`
+	LongDerivativeValue                decimal.Decimal `json:"long-derivative-value"`
+	ShortDerivativeValue               decimal.Decimal `json:"short-derivative-value"`
+	LongFuturesValue                   decimal.Decimal `json:"long-futures-value"`
+	ShortFuturesValue                  decimal.Decimal `json:"short-futures-value"`
+	LongFuturesDerivativeValue         decimal.Decimal `json:"long-futures-derivative-value"`
+	ShortFuturesDerivativeValue        decimal.Decimal `json:"short-futures-derivative-value"`
+	LongMargineableValue               decimal.Decimal `json:"long-margineable-value"`
+	ShortMargineableValue              decimal.Decimal `json:"short-margineable-value"`
+	MarginEquity                       decimal.Decimal `json:"margin-equity"`
+	EquityBuyingPower                  decimal.Decimal `json:"equity-buying-power"`
+	DerivativeBuyingPower              decimal.Decimal `json:"derivative-buying-power"`
+	DayTradingBuyingPower              decimal.Decimal `json:"day-trading-buying-power"`
+	FuturesMarginRequirement           decimal.Decimal `json:"futures-margin-requirement"`
+	AvailableTradingFunds              decimal.Decimal `json:"available-trading-funds"`
+	MaintenanceRequirement             decimal.Decimal `json:"maintenance-requirement"`
+	MaintenanceCallValue               decimal.Decimal `json:"maintenance-call-value"`
+	RegTCallValue                      decimal.Decimal `json:"reg-t-call-value"`
+	DayTradingCallValue                decimal.Decimal `json:"day-trading-call-value"`
+	DayEquityCallValue                 decimal.Decimal `json:"day-equity-call-value"`
+	NetLiquidatingValue                decimal.Decimal `json:"net-liquidating-value"`
+	CashAvailableToWithdraw            decimal.Decimal `json:"cash-available-to-withdraw"`
+	DayTradeExcess                     decimal.Decimal `json:"day-trade-excess"`
+	PendingCash                        decimal.Decimal `json:"pending-cash"`
 	PendingCashEffect                  PriceEffect     `json:"pending-cash-effect"`
-	LongCryptocurrencyValue            StringToFloat32 `json:"long-cryptocurrency-value"`
-	ShortCryptocurrencyValue           StringToFloat32 `json:"short-cryptocurrency-value"`
-	CryptocurrencyMarginRequirement    StringToFloat32 `json:"cryptocurrency-margin-requirement"`
-	UnsettledCryptocurrencyFiatAmount  StringToFloat32 `json:"unsettled-cryptocurrency-fiat-amount"`
+	LongCryptocurrencyValue            decimal.Decimal `json:"long-cryptocurrency-value"`
+	ShortCryptocurrencyValue           decimal.Decimal `json:"short-cryptocurrency-value"`
+	CryptocurrencyMarginRequirement    decimal.Decimal `json:"cryptocurrency-margin-requirement"`
+	UnsettledCryptocurrencyFiatAmount  decimal.Decimal `json:"unsettled-cryptocurrency-fiat-amount"`
 	UnsettledCryptocurrencyFiatEffect  PriceEffect     `json:"unsettled-cryptocurrency-fiat-effect"`
-	ClosedLoopAvailableBalance         StringToFloat32 `json:"closed-loop-available-balance"`
-	EquityOfferingMarginRequirement    StringToFloat32 `json:"equity-offering-margin-requirement"`
-	LongBondValue                      StringToFloat32 `json:"long-bond-value"`
-	BondMarginRequirement              StringToFloat32 `json:"bond-margin-requirement"`
+	ClosedLoopAvailableBalance         decimal.Decimal `json:"closed-loop-available-balance"`
+	EquityOfferingMarginRequirement    decimal.Decimal `json:"equity-offering-margin-requirement"`
+	LongBondValue                      decimal.Decimal `json:"long-bond-value"`
+	BondMarginRequirement              decimal.Decimal `json:"bond-margin-requirement"`
 	SnapshotDate                       string          `json:"snapshot-date"`
 	TimeOfDay                          string          `json:"time-of-day"`
-	RegTMarginRequirement              StringToFloat32 `json:"reg-t-margin-requirement"`
-	FuturesOvernightMarginRequirement  StringToFloat32 `json:"futures-overnight-margin-requirement"`
-	FuturesIntradayMarginRequirement   StringToFloat32 `json:"futures-intraday-margin-requirement"`
-	MaintenanceExcess                  StringToFloat32 `json:"maintenance-excess"`
-	PendingMarginInterest              StringToFloat32 `json:"pending-margin-interest"`
-	ApexStartingDayMarginEquity        StringToFloat32 `json:"apex-starting-day-margin-equity"`
-	BuyingPowerAdjustment              StringToFloat32 `json:"buying-power-adjustment"`
+	RegTMarginRequirement              decimal.Decimal `json:"reg-t-margin-requirement"`
+	FuturesOvernightMarginRequirement  decimal.Decimal `json:"futures-overnight-margin-requirement"`
+	FuturesIntradayMarginRequirement   decimal.Decimal `json:"futures-intraday-margin-requirement"`
+	MaintenanceExcess                  decimal.Decimal `json:"maintenance-excess"`
+	PendingMarginInterest              decimal.Decimal `json:"pending-margin-interest"`
+	ApexStartingDayMarginEquity        decimal.Decimal `json:"apex-starting-day-margin-equity"`
+	BuyingPowerAdjustment              decimal.Decimal `json:"buying-power-adjustment"`
 	BuyingPowerAdjustmentEffect        PriceEffect     `json:"buying-power-adjustment-effect"`
-	EffectiveCryptocurrencyBuyingPower StringToFloat32 `json:"effective-cryptocurrency-buying-power"`
+	EffectiveCryptocurrencyBuyingPower decimal.Decimal `json:"effective-cryptocurrency-buying-power"`
 	UpdatedAt                          time.Time       `json:"updated-at"`
 }
 
@@ -131,24 +133,24 @@ type AccountPosition struct {
 	UnderlyingSymbol              string          `json:"underlying-symbol"`
 	Quantity                      int             `json:"quantity"`
 	QuantityDirection             Direction       `json:"quantity-direction"`
-	ClosePrice                    StringToFloat32 `json:"close-price"`
-	AverageOpenPrice              StringToFloat32 `json:"average-open-price"`
-	AverageYearlyMarketClosePrice StringToFloat32 `json:"average-yearly-market-close-price"`
-	AverageDailyMarketClosePrice  StringToFloat32 `json:"average-daily-market-close-price"`
-	Mark                          StringToFloat32 `json:"mark"`
-	MarkPrice                     StringToFloat32 `json:"mark-price"`
+	ClosePrice                    decimal.Decimal `json:"close-price"`
+	AverageOpenPrice              decimal.Decimal `json:"average-open-price"`
+	AverageYearlyMarketClosePrice decimal.Decimal `json:"average-yearly-market-close-price"`
+	AverageDailyMarketClosePrice  decimal.Decimal `json:"average-daily-market-close-price"`
+	Mark                          decimal.Decimal `json:"mark"`
+	MarkPrice                     decimal.Decimal `json:"mark-price"`
 	Multiplier                    int             `json:"multiplier"`
 	CostEffect                    PriceEffect     `json:"cost-effect"`
 	IsSuppressed                  bool            `json:"is-suppressed"`
 	IsFrozen                      bool            `json:"is-frozen"`
 	RestrictedQuantity            int             `json:"restricted-quantity"`
 	ExpiresAt                     time.Time       `json:"expires-at"`
-	FixingPrice                   StringToFloat32 `json:"fixing-price"`
+	FixingPrice                   decimal.Decimal `json:"fixing-price"`
 	DeliverableType               string          `json:"deliverable-type"`
-	RealizedDayGain               StringToFloat32 `json:"realized-day-gain"`
+	RealizedDayGain               decimal.Decimal `json:"realized-day-gain"`
 	RealizedDayGainEffect         PriceEffect     `json:"realized-day-gain-effect"`
 	RealizedDayGainDate           string          `json:"realized-day-gain-date"`
-	RealizedToday                 StringToFloat32 `json:"realized-today"`
+	RealizedToday                 decimal.Decimal `json:"realized-today"`
 	RealizedTodayEffect           PriceEffect     `json:"realized-today-effect"`
 	RealizedTodayDate             string          `json:"realized-today-date"`
 	CreatedAt                     time.Time       `json:"created-at"`
@@ -157,49 +159,49 @@ type AccountPosition struct {
 
 type AccountBalanceSnapshots struct {
 	AccountNumber                      string          `json:"account-number"`
-	CashBalance                        StringToFloat32 `json:"cash-balance"`
-	LongEquityValue                    StringToFloat32 `json:"long-equity-value"`
-	ShortEquityValue                   StringToFloat32 `json:"short-equity-value"`
-	LongDerivativeValue                StringToFloat32 `json:"long-derivative-value"`
-	ShortDerivativeValue               StringToFloat32 `json:"short-derivative-value"`
-	LongFuturesValue                   StringToFloat32 `json:"long-futures-value"`
-	ShortFuturesValue                  StringToFloat32 `json:"short-futures-value"`
-	LongFuturesDerivativeValue         StringToFloat32 `json:"long-futures-derivative-value"`
-	ShortFuturesDerivativeValue        StringToFloat32 `json:"short-futures-derivative-value"`
-	LongMargineableValue               StringToFloat32 `json:"long-margineable-value"`
-	ShortMargineableValue              StringToFloat32 `json:"short-margineable-value"`
-	MarginEquity                       StringToFloat32 `json:"margin-equity"`
-	EquityBuyingPower                  StringToFloat32 `json:"equity-buying-power"`
-	DerivativeBuyingPower              StringToFloat32 `json:"derivative-buying-power"`
-	DayTradingBuyingPower              StringToFloat32 `json:"day-trading-buying-power"`
-	FuturesMarginRequirement           StringToFloat32 `json:"futures-margin-requirement"`
-	AvailableTradingFunds              StringToFloat32 `json:"available-trading-funds"`
-	MaintenanceRequirement             StringToFloat32 `json:"maintenance-requirement"`
-	MaintenanceCallValue               StringToFloat32 `json:"maintenance-call-value"`
-	RegTCallValue                      StringToFloat32 `json:"reg-t-call-value"`
-	DayTradingCallValue                StringToFloat32 `json:"day-trading-call-value"`
-	DayEquityCallValue                 StringToFloat32 `json:"day-equity-call-value"`
-	NetLiquidatingValue                StringToFloat32 `json:"net-liquidating-value"`
-	CashAvailableToWithdraw            StringToFloat32 `json:"cash-available-to-withdraw"`
-	DayTradeExcess                     StringToFloat32 `json:"day-trade-excess"`
-	PendingCash                        StringToFloat32 `json:"pending-cash"`
+	CashBalance                        decimal.Decimal `json:"cash-balance"`
+	LongEquityValue                    decimal.Decimal `json:"long-equity-value"`
+	ShortEquityValue                   decimal.Decimal `json:"short-equity-value"`
+	LongDerivativeValue                decimal.Decimal `json:"long-derivative-value"`
+	ShortDerivativeValue               decimal.Decimal `json:"short-derivative-value"`
+	LongFuturesValue                   decimal.Decimal `json:"long-futures-value"`
+	ShortFuturesValue                  decimal.Decimal `json:"short-futures-value"`
+	LongFuturesDerivativeValue         decimal.Decimal `json:"long-futures-derivative-value"`
+	ShortFuturesDerivativeValue        decimal.Decimal `json:"short-futures-derivative-value"`
+	LongMargineableValue               decimal.Decimal `json:"long-margineable-value"`
+	ShortMargineableValue              decimal.Decimal `json:"short-margineable-value"`
+	MarginEquity                       decimal.Decimal `json:"margin-equity"`
+	EquityBuyingPower                  decimal.Decimal `json:"equity-buying-power"`
+	DerivativeBuyingPower              decimal.Decimal `json:"derivative-buying-power"`
+	DayTradingBuyingPower              decimal.Decimal `json:"day-trading-buying-power"`
+	FuturesMarginRequirement           decimal.Decimal `json:"futures-margin-requirement"`
+	AvailableTradingFunds              decimal.Decimal `json:"available-trading-funds"`
+	MaintenanceRequirement             decimal.Decimal `json:"maintenance-requirement"`
+	MaintenanceCallValue               decimal.Decimal `json:"maintenance-call-value"`
+	RegTCallValue                      decimal.Decimal `json:"reg-t-call-value"`
+	DayTradingCallValue                decimal.Decimal `json:"day-trading-call-value"`
+	DayEquityCallValue                 decimal.Decimal `json:"day-equity-call-value"`
+	NetLiquidatingValue                decimal.Decimal `json:"net-liquidating-value"`
+	CashAvailableToWithdraw            decimal.Decimal `json:"cash-available-to-withdraw"`
+	DayTradeExcess                     decimal.Decimal `json:"day-trade-excess"`
+	PendingCash                        decimal.Decimal `json:"pending-cash"`
 	PendingCashEffect                  PriceEffect     `json:"pending-cash-effect"`
-	LongCryptocurrencyValue            StringToFloat32 `json:"long-cryptocurrency-value"`
-	ShortCryptocurrencyValue           StringToFloat32 `json:"short-cryptocurrency-value"`
-	CryptocurrencyMarginRequirement    StringToFloat32 `json:"cryptocurrency-margin-requirement"`
-	UnsettledCryptocurrencyFiatAmount  StringToFloat32 `json:"unsettled-cryptocurrency-fiat-amount"`
+	LongCryptocurrencyValue            decimal.Decimal `json:"long-cryptocurrency-value"`
+	ShortCryptocurrencyValue           decimal.Decimal `json:"short-cryptocurrency-value"`
+	CryptocurrencyMarginRequirement    decimal.Decimal `json:"cryptocurrency-margin-requirement"`
+	UnsettledCryptocurrencyFiatAmount  decimal.Decimal `json:"unsettled-cryptocurrency-fiat-amount"`
 	UnsettledCryptocurrencyFiatEffect  PriceEffect     `json:"unsettled-cryptocurrency-fiat-effect"`
-	ClosedLoopAvailableBalance         StringToFloat32 `json:"closed-loop-available-balance"`
-	EquityOfferingMarginRequirement    StringToFloat32 `json:"equity-offering-margin-requirement"`
-	LongBondValue                      StringToFloat32 `json:"long-bond-value"`
-	BondMarginRequirement              StringToFloat32 `json:"bond-margin-requirement"`
+	ClosedLoopAvailableBalance         decimal.Decimal `json:"closed-loop-available-balance"`
+	EquityOfferingMarginRequirement    decimal.Decimal `json:"equity-offering-margin-requirement"`
+	LongBondValue                      decimal.Decimal `json:"long-bond-value"`
+	BondMarginRequirement              decimal.Decimal `json:"bond-margin-requirement"`
 	SnapshotDate                       string          `json:"snapshot-date"`
-	RegTMarginRequirement              StringToFloat32 `json:"reg-t-margin-requirement"`
-	FuturesOvernightMarginRequirement  StringToFloat32 `json:"futures-overnight-margin-requirement"`
-	FuturesIntradayMarginRequirement   StringToFloat32 `json:"futures-intraday-margin-requirement"`
-	MaintenanceExcess                  StringToFloat32 `json:"maintenance-excess"`
-	PendingMarginInterest              StringToFloat32 `json:"pending-margin-interest"`
-	EffectiveCryptocurrencyBuyingPower StringToFloat32 `json:"effective-cryptocurrency-buying-power"`
+	RegTMarginRequirement              decimal.Decimal `json:"reg-t-margin-requirement"`
+	FuturesOvernightMarginRequirement  decimal.Decimal `json:"futures-overnight-margin-requirement"`
+	FuturesIntradayMarginRequirement   decimal.Decimal `json:"futures-intraday-margin-requirement"`
+	MaintenanceExcess                  decimal.Decimal `json:"maintenance-excess"`
+	PendingMarginInterest              decimal.Decimal `json:"pending-margin-interest"`
+	EffectiveCryptocurrencyBuyingPower decimal.Decimal `json:"effective-cryptocurrency-buying-power"`
 	UpdatedAt                          time.Time       `json:"updated-at"`
 }
 
