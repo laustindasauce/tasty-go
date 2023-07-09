@@ -4,13 +4,13 @@ import (
 	"time"
 )
 
-type Lots struct {
+type Lot struct {
 	ID                string          `json:"id"`
 	TransactionID     int             `json:"transaction-id"`
 	Quantity          StringToFloat32 `json:"quantity"`
 	Price             StringToFloat32 `json:"price"`
 	QuantityDirection string          `json:"quantity-direction"`
-	ExecutedAt        string          `json:"executed-at"`
+	ExecutedAt        time.Time       `json:"executed-at"`
 	TransactionDate   string          `json:"transaction-date"`
 }
 
@@ -55,7 +55,7 @@ type Transaction struct {
 	ReversesID                       int             `json:"reverses-id"`
 	ExchangeAffiliationIDentifier    string          `json:"exchange-affiliation-identifier"`
 	CostBasisReconciliationDate      string          `json:"cost-basis-reconciliation-date"`
-	Lots                             Lots            `json:"lots"`
+	Lots                             []Lot           `json:"lots"`
 	LegCount                         int             `json:"leg-count"`
 	DestinationVenue                 string          `json:"destination-venue"`
 	AgencyPrice                      StringToFloat32 `json:"agency-price"`
