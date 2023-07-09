@@ -84,12 +84,14 @@ func main() {
 
 ```
 
-## Basic Usage:
+## Basic API Usage
+
+Check out TastyTrade's [documentation](https://developer.tastytrade.com/basic-api-usage/)
 
 <details>
 <summary>Auth Patterns (Token, session lifetime)</summary>
 
-Check out TastyTrade's [documentation](https://developer.tastytrade.com/#auth-patterns-token-session-lifetime)
+> [docs](https://developer.tastytrade.com/#auth-patterns-token-session-lifetime)
 
 - Create / validate / create from remember token
 
@@ -153,7 +155,7 @@ func main() {
 <details>
 <summary>User Management</summary>
 
-Check out TastyTrade's [documentation](https://developer.tastytrade.com/#user-management)
+> [docs](https://developer.tastytrade.com/basic-api-usage/#user-management)
 
 > Password Reset
 
@@ -217,7 +219,7 @@ func main() {
 <details>
 <summary>Customer Account Information</summary>
 
-Check out TastyTrade's [documentation](https://developer.tastytrade.com/#customer-account-information)
+> [docs](https://developer.tastytrade.com/basic-api-usage/#customer-account-information)
 
 ```go
 package main
@@ -264,61 +266,11 @@ func main() {
 </details>
 
 <details>
-<summary>Streaming Market Data</summary>
-
-**This requires using the DXFeed Streamer which isn't supported by TastyTrade or this unofficial TastyTrade API wrapper.**
-
-Check out TastyTrade's [documentation](https://developer.tastytrade.com/#streaming-market-data)
-
-```go
-package main
-
-import (
-	"log"
-	"net/http"
-	"os"
-	"time"
-
-	"github.com/austinbspencer/tasty-go"
-	_ "github.com/joho/godotenv/autoload" // load .env file automatically
-)
-
-var (
-	hClient   = http.Client{Timeout: time.Duration(30) * time.Second}
-	certCreds = tasty.LoginInfo{
-		Login:      os.Getenv("certUsername"),
-		Password:   os.Getenv("certPassword"),
-		RememberMe: true,
-	}
-)
-
-const accountNumber = "5WV48989"
-
-func main() {
-	client, _ := tasty.NewCertClient(&hClient)
-	_, err := client.CreateSession(certCreds, nil)
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	dxFeedData, err := client.GetQuoteStreamerTokens()
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	// Do something with the streamer data
-}
-
-```
-
-</details>
-
-<details>
-<summary>Position Retrieval</summary>
+<summary>Account Positions</summary>
 
 View all current account positions
 
-Check out TastyTrade's [documentation](https://developer.tastytrade.com/#position-retrieval)
+> [docs](https://developer.tastytrade.com/basic-api-usage/#account-positions)
 
 ```go
 package main
@@ -365,9 +317,9 @@ func main() {
 </details>
 
 <details>
-<summary>Balance Retrieval</summary>
+<summary>Account Balances</summary>
 
-Check out TastyTrade's [documentation](https://developer.tastytrade.com/#balance-retrieval)
+> [docs](https://developer.tastytrade.com/basic-api-usage/#account-balances)
 
 ```go
 package main
@@ -414,9 +366,11 @@ func main() {
 </details>
 
 <details>
-<summary>Public Watchlists</summary>
+<summary>Watchlists</summary>
 
-Check out TastyTrade's [documentation](https://developer.tastytrade.com/#watchlists)
+> [docs](https://developer.tastytrade.com/basic-api-usage/#watchlists)
+
+> Public Watchlists
 
 ```go
 package main
@@ -467,7 +421,7 @@ func main() {
 <details>
 <summary>Instruments</summary>
 
-Check out TastyTrade's [documentation](https://developer.tastytrade.com/#instruments) and [Open API Spec](https://developer.tastytrade.com/open-api-spec/instruments/)
+> [docs](https://developer.tastytrade.com/basic-api-usage/#instruments) and [Open API Spec](https://developer.tastytrade.com/open-api-spec/instruments/)
 
 > Equity Options
 
@@ -582,11 +536,175 @@ func main() {
 </details>
 
 <details>
-<summary>Order Management</summary>
+<summary>Transaction History</summary>
+All transactions impacting an accounts balances or positions are available at this endpoint.
 
-Check out TastyTrade's [documentation](https://developer.tastytrade.com/#order-management)
+> [docs](https://developer.tastytrade.com/basic-api-usage/#transaction-history)
 
-> Live Orders
+```go
+package main
+
+import (
+	"fmt"
+	"log"
+	"net/http"
+	"os"
+	"time"
+
+	"github.com/austinbspencer/tasty-go"
+	_ "github.com/joho/godotenv/autoload" // load .env file automatically
+)
+
+var (
+	hClient   = http.Client{Timeout: time.Duration(30) * time.Second}
+	certCreds = tasty.LoginInfo{
+		Login:      os.Getenv("certUsername"),
+		Password:   os.Getenv("certPassword"),
+		RememberMe: true,
+	}
+)
+
+const accountNumber = "5WV48989"
+
+func main() {
+	client, _ := tasty.NewCertClient(&hClient)
+	_, err := client.CreateSession(certCreds, nil)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	transactions, _, err := client.GetAccountTransactions(accountNumber, tasty.TransactionsQuery{PerPage: 2})
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	latest := transactions[0]
+
+	fmt.Printf("Your latest transaction was a %s of %s!", latest.TransactionType, latest.UnderlyingSymbol)
+}
+
+```
+
+> With Pagination Handling
+
+```go
+package main
+
+import (
+	"fmt"
+	"log"
+	"net/http"
+	"os"
+	"time"
+
+	"github.com/austinbspencer/tasty-go"
+	_ "github.com/joho/godotenv/autoload" // load .env file automatically
+)
+
+var (
+	hClient   = http.Client{Timeout: time.Duration(30) * time.Second}
+	certCreds = tasty.LoginInfo{
+		Login:      os.Getenv("certUsername"),
+		Password:   os.Getenv("certPassword"),
+		RememberMe: true,
+	}
+)
+
+const accountNumber = "5WV48989"
+
+func main() {
+	client, _ := tasty.NewCertClient(&hClient)
+	_, err := client.CreateSession(certCreds, nil)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	query := tasty.TransactionsQuery{PerPage: 25}
+
+	transactions, pagination, err := client.GetAccountTransactions(accountNumber, query)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	for pagination.PageOffset < (pagination.TotalPages - 1) {
+		query.PageOffset += 1
+		moreTransactions, newPagination, err := client.GetAccountTransactions(accountNumber, query)
+		if err != nil {
+			log.Fatal(err)
+		}
+
+		transactions = append(transactions, moreTransactions...)
+		pagination = newPagination
+	}
+
+	latest := transactions[0]
+
+	fmt.Printf("Your latest transaction was a %s of %s!", latest.TransactionType, latest.UnderlyingSymbol)
+}
+
+```
+
+</details>
+
+## Order Management
+
+Check out TastyTrade's [documentation](https://developer.tastytrade.com/order-management/)
+
+<details>
+<summary>Search Orders</summary>
+
+> [docs](https://developer.tastytrade.com/order-management/#search-orders)
+
+```go
+package main
+
+import (
+	"fmt"
+	"log"
+	"net/http"
+	"os"
+	"time"
+
+	"github.com/austinbspencer/tasty-go"
+	_ "github.com/joho/godotenv/autoload" // load .env file automatically
+)
+
+var (
+	hClient   = http.Client{Timeout: time.Duration(30) * time.Second}
+	certCreds = tasty.LoginInfo{
+		Login:      os.Getenv("certUsername"),
+		Password:   os.Getenv("certPassword"),
+		RememberMe: true,
+	}
+)
+
+const accountNumber = "5WV48989"
+
+func main() {
+	client, _ := tasty.NewCertClient(&hClient)
+	_, err := client.CreateSession(certCreds, nil)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	// Query for narrowing search of orders
+	query := tasty.OrdersQuery{Status: []tasty.OrderStatus{tasty.Filled}}
+
+	orders, _, err := client.GetAccountOrders(accountNumber, query)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	fmt.Printf("Your account has %d live orders!", len(orders))
+}
+```
+
+</details>
+
+<details>
+<summary>Search Orders</summary>
+
+> [docs](https://developer.tastytrade.com/order-management/#live-orders)
 
 ```go
 package main
@@ -630,7 +748,12 @@ func main() {
 
 ```
 
-> Dry Run
+</details>
+
+<details>
+<summary>Order Dry Run</summary>
+
+> [docs](https://developer.tastytrade.com/order-management/#order-dry-run)
 
 ```go
 package main
@@ -693,7 +816,12 @@ func main() {
 
 ```
 
-> Send Order
+</details>
+
+<details>
+<summary>Submit Order</summary>
+
+> [docs](https://developer.tastytrade.com/order-management/#submit-order)
 
 ```go
 package main
@@ -775,7 +903,61 @@ func main() {
 
 ```
 
-> Cancel Replace
+</details>
+
+<details>
+<summary>Cancel Order</summary>
+
+> [docs](https://developer.tastytrade.com/order-management/#cancel-order)
+
+```go
+package main
+
+import (
+	"fmt"
+	"log"
+	"net/http"
+	"os"
+	"time"
+
+	"github.com/austinbspencer/tasty-go"
+	_ "github.com/joho/godotenv/autoload" // load .env file automatically
+)
+
+var (
+	hClient   = http.Client{Timeout: time.Duration(30) * time.Second}
+	certCreds = tasty.LoginInfo{
+		Login:      os.Getenv("certUsername"),
+		Password:   os.Getenv("certPassword"),
+		RememberMe: true,
+	}
+)
+
+const accountNumber = "5WV48989"
+const orderID = 123456
+
+func main() {
+	client, _ := tasty.NewCertClient(&hClient)
+	_, err := client.CreateSession(certCreds, nil)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	if _, err := client.CancelOrder(accountNumber, orderID); err != nil {
+		log.Fatal(err)
+	}
+
+	fmt.Println("Order has been cancelled!")
+}
+
+```
+
+</details>
+
+<details>
+<summary>Cancel Replace</summary>
+
+> [docs](https://developer.tastytrade.com/order-management/#cancel-replace)
 
 ```go
 package main
@@ -832,9 +1014,9 @@ func main() {
 </details>
 
 <details>
-<summary>Example Order Requests</summary>
+<summary>Examples</summary>
 
-Check out TastyTrade's [documentation](https://developer.tastytrade.com/#example-order-requests)
+> [docs](https://developer.tastytrade.com/order-management/#example-order-requests)
 
 > Market Order
 
@@ -997,7 +1179,7 @@ order := tasty.NewOrder{
 
 - To determine if an equity can be fractionally traded, fetch the equity instrument and check the is-fractional-quantity-eligible field
 
-Check out TastyTrade's [documentation](https://developer.tastytrade.com/#example-order-requests)
+Check out TastyTrade's [documentation](https://developer.tastytrade.com/order-management/#example-order-requests)
 
 > Fractional Quantity Order
 
@@ -1040,17 +1222,21 @@ order := tasty.NewOrder{
 
 </details>
 
-<details>
-<summary>Example Order Requests</summary>
-All transactions impacting an accounts balances or positions are available at this endpoint.
+## Streaming Market Data
 
-Check out TastyTrade's [documentation](https://developer.tastytrade.com/#transaction-history)
+Check out TastyTrade's [documentation](https://developer.tastytrade.com/streaming-market-data/)
+
+<details>
+<summary>Get a Streamer Token</summary>
+
+**This requires using the DXFeed Streamer which isn't supported by TastyTrade or this unofficial TastyTrade API wrapper.**
+
+Check out TastyTrade's [documentation](https://developer.tastytrade.com/#streaming-market-data)
 
 ```go
 package main
 
 import (
-	"fmt"
 	"log"
 	"net/http"
 	"os"
@@ -1078,19 +1264,21 @@ func main() {
 		log.Fatal(err)
 	}
 
-	transactions, err := client.GetAccountTransactions(accountNumber, tasty.TransactionsQuery{PerPage: 2})
+	dxFeedData, err := client.GetQuoteStreamerTokens()
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	latest := transactions[0]
-
-	fmt.Printf("Your latest transaction was a %s of %s!", latest.TransactionType, latest.UnderlyingSymbol)
+	// Do something with the streamer data
 }
 
 ```
 
 </details>
+
+## Streaming Account Data
+
+Check out TastyTrade's [documentation](https://developer.tastytrade.com/streaming-account-data/)
 
 ## Testing
 
