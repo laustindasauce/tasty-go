@@ -20,7 +20,7 @@ func TestGetAccountTransactions(t *testing.T) {
 		fmt.Fprint(writer, transactionsResp)
 	})
 
-	resp, err := client.GetAccountTransactions(accountNumber, query)
+	resp, pagination, err := client.GetAccountTransactions(accountNumber, query)
 	require.Nil(t, err)
 
 	require.Equal(t, 3, len(resp))
@@ -64,6 +64,16 @@ func TestGetAccountTransactions(t *testing.T) {
 	require.Equal(t, "", tr.ExchangeAffiliationIDentifier)
 	require.Equal(t, 1, tr.LegCount)
 	require.Equal(t, "WOLVERINE_OPTIONS_A", tr.DestinationVenue)
+
+	require.Equal(t, 3, pagination.PerPage)
+	require.Equal(t, 0, pagination.PageOffset)
+	require.Equal(t, 0, pagination.ItemOffset)
+	require.Equal(t, 71, pagination.TotalItems)
+	require.Equal(t, 24, pagination.TotalPages)
+	require.Equal(t, 3, pagination.CurrentItemCount)
+	require.Nil(t, pagination.PreviousLink)
+	require.Nil(t, pagination.NextLink)
+	require.Nil(t, pagination.PagingLinkTemplate)
 }
 
 func TestGetAccountTransactionsError(t *testing.T) {
@@ -78,7 +88,7 @@ func TestGetAccountTransactionsError(t *testing.T) {
 		fmt.Fprint(writer, tastyUnauthorizedError)
 	})
 
-	_, err := client.GetAccountTransactions(accountNumber, query)
+	_, _, err := client.GetAccountTransactions(accountNumber, query)
 	expectedUnauthorized(t, err)
 }
 

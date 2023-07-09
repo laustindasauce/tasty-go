@@ -604,10 +604,12 @@ func TestGetAccountOrders(t *testing.T) {
 		fmt.Fprint(writer, accountOrdersResp)
 	})
 
-	resp, err := client.GetAccountOrders(accountNumber, OrdersQuery{PerPage: 2})
+	resp, pagination, err := client.GetAccountOrders(accountNumber, OrdersQuery{PerPage: 2})
 	require.Nil(t, err)
 
 	require.Equal(t, 2, len(resp))
+
+	require.Equal(t, 2, pagination.PerPage)
 }
 
 func TestGetAccountOrdersError(t *testing.T) {
@@ -621,7 +623,7 @@ func TestGetAccountOrdersError(t *testing.T) {
 		fmt.Fprint(writer, tastyUnauthorizedError)
 	})
 
-	_, err := client.GetAccountOrders(accountNumber, OrdersQuery{PerPage: 2})
+	_, _, err := client.GetAccountOrders(accountNumber, OrdersQuery{PerPage: 2})
 	expectedUnauthorized(t, err)
 }
 
