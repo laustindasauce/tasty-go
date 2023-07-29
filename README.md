@@ -23,13 +23,10 @@ There are very few dependencies for this lightweight API wrapper.
 - [go-querystring](https://github.com/google/go-querystring)
 - [testify](https://github.com/stretchr/testify) `for testing`
 
-## TO-DO
+## Untested endpoints
 
-- Untested endpoints
-  - Margin requirements dry-run
-    - Server is returning 500 error when sending what the documentation shows as expected request body.
-  - Order reconfirm
-    - TastyTrade API support has informed me that this endpoint is for Equity Offering orders only.
+- Order reconfirm
+  - TastyTrade API support has informed me that this endpoint is for Equity Offering orders only.
 
 ## Installation
 
