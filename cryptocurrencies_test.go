@@ -17,8 +17,9 @@ func TestGetCryptocurrencies(t *testing.T) {
 		fmt.Fprint(writer, cryptocurrenciesResp)
 	})
 
-	resp, err := client.GetCryptocurrencies([]string{"BTC/USD", "ETH/USD"})
+	resp, httpResp, err := client.GetCryptocurrencies([]string{"BTC/USD", "ETH/USD"})
 	require.Nil(t, err)
+	require.NotNil(t, httpResp)
 
 	require.Equal(t, 2, len(resp))
 
@@ -53,8 +54,9 @@ func TestGetCryptocurrenciesError(t *testing.T) {
 		fmt.Fprint(writer, tastyUnauthorizedError)
 	})
 
-	_, err := client.GetCryptocurrencies([]string{"BTC/USD", "ETH/USD"})
+	_, httpResp, err := client.GetCryptocurrencies([]string{"BTC/USD", "ETH/USD"})
 	expectedUnauthorized(t, err)
+	require.NotNil(t, httpResp)
 }
 
 func TestGetCryptocurrency(t *testing.T) {
@@ -65,8 +67,9 @@ func TestGetCryptocurrency(t *testing.T) {
 		fmt.Fprint(writer, cryptoResp)
 	})
 
-	btc, err := client.GetCryptocurrency(Bitcoin)
+	btc, httpResp, err := client.GetCryptocurrency(Bitcoin)
 	require.Nil(t, err)
+	require.NotNil(t, httpResp)
 
 	require.Equal(t, 1, btc.ID)
 	require.Equal(t, "BTC/USD", btc.Symbol)
@@ -97,8 +100,9 @@ func TestGetCryptocurrencyError(t *testing.T) {
 		fmt.Fprint(writer, tastyUnauthorizedError)
 	})
 
-	_, err := client.GetCryptocurrency(Bitcoin)
+	_, httpResp, err := client.GetCryptocurrency(Bitcoin)
 	expectedUnauthorized(t, err)
+	require.NotNil(t, httpResp)
 }
 
 const cryptocurrenciesResp = `{

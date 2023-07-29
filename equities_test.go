@@ -18,8 +18,9 @@ func TestGetActiveEquities(t *testing.T) {
 		fmt.Fprint(writer, activeEquitiesResp)
 	})
 
-	resp, pagination, err := client.GetActiveEquities(ActiveEquitiesQuery{PerPage: 4})
+	resp, pagination, httpResp, err := client.GetActiveEquities(ActiveEquitiesQuery{PerPage: 4})
 	require.Nil(t, err)
+	require.NotNil(t, httpResp)
 
 	require.Equal(t, 4, len(resp))
 
@@ -75,8 +76,9 @@ func TestGetActiveEquitiesError(t *testing.T) {
 		fmt.Fprint(writer, tastyUnauthorizedError)
 	})
 
-	_, _, err := client.GetActiveEquities(ActiveEquitiesQuery{PerPage: 4})
+	_, _, httpResp, err := client.GetActiveEquities(ActiveEquitiesQuery{PerPage: 4})
 	expectedUnauthorized(t, err)
+	require.NotNil(t, httpResp)
 }
 func TestGetEquities(t *testing.T) {
 	setup()
@@ -86,8 +88,9 @@ func TestGetEquities(t *testing.T) {
 		fmt.Fprint(writer, equitiesResp)
 	})
 
-	resp, err := client.GetEquities(EquitiesQuery{Symbols: []string{"AAPL", "TSLA"}})
+	resp, httpResp, err := client.GetEquities(EquitiesQuery{Symbols: []string{"AAPL", "TSLA"}})
 	require.Nil(t, err)
+	require.NotNil(t, httpResp)
 
 	require.Equal(t, 2, len(resp))
 
@@ -132,8 +135,9 @@ func TestGetEquitiesError(t *testing.T) {
 		fmt.Fprint(writer, tastyUnauthorizedError)
 	})
 
-	_, err := client.GetEquities(EquitiesQuery{Symbols: []string{"AAPL", "TSLA"}})
+	_, httpResp, err := client.GetEquities(EquitiesQuery{Symbols: []string{"AAPL", "TSLA"}})
 	expectedUnauthorized(t, err)
+	require.NotNil(t, httpResp)
 }
 func TestGetEquity(t *testing.T) {
 	setup()
@@ -145,8 +149,9 @@ func TestGetEquity(t *testing.T) {
 		fmt.Fprint(writer, equityResp)
 	})
 
-	equity, err := client.GetEquity(symbol)
+	equity, httpResp, err := client.GetEquity(symbol)
 	require.Nil(t, err)
+	require.NotNil(t, httpResp)
 
 	require.Equal(t, 726, equity.ID)
 	require.Equal(t, symbol, equity.Symbol)
@@ -189,8 +194,9 @@ func TestGetEquityError(t *testing.T) {
 		fmt.Fprint(writer, tastyUnauthorizedError)
 	})
 
-	_, err := client.GetEquity(symbol)
+	_, httpResp, err := client.GetEquity(symbol)
 	expectedUnauthorized(t, err)
+	require.NotNil(t, httpResp)
 }
 
 func TestGetEquityOptions(t *testing.T) {
@@ -212,8 +218,9 @@ func TestGetEquityOptions(t *testing.T) {
 	}
 	occSymbol := sym.Build()
 
-	resp, err := client.GetEquityOptions(EquityOptionsQuery{Symbols: []string{occSymbol}})
+	resp, httpResp, err := client.GetEquityOptions(EquityOptionsQuery{Symbols: []string{occSymbol}})
 	require.Nil(t, err)
+	require.NotNil(t, httpResp)
 
 	require.Equal(t, 1, len(resp))
 
@@ -260,8 +267,9 @@ func TestGetEquityOptionsError(t *testing.T) {
 	}
 	occSymbol := sym.Build()
 
-	_, err := client.GetEquityOptions(EquityOptionsQuery{Symbols: []string{occSymbol}})
+	_, httpResp, err := client.GetEquityOptions(EquityOptionsQuery{Symbols: []string{occSymbol}})
 	expectedUnauthorized(t, err)
+	require.NotNil(t, httpResp)
 }
 
 func TestGetEquityOption(t *testing.T) {
@@ -283,8 +291,9 @@ func TestGetEquityOption(t *testing.T) {
 		fmt.Fprint(writer, equityOptionResp)
 	})
 
-	equity, err := client.GetEquityOption(sym, true)
+	equity, httpResp, err := client.GetEquityOption(sym, true)
 	require.Nil(t, err)
+	require.NotNil(t, httpResp)
 
 	require.Equal(t, occSymbol, equity.Symbol)
 	require.Equal(t, EquityOptionIT, equity.InstrumentType)
@@ -327,8 +336,9 @@ func TestGetEquityOptionError(t *testing.T) {
 		fmt.Fprint(writer, tastyUnauthorizedError)
 	})
 
-	_, err := client.GetEquityOption(sym, true)
+	_, httpResp, err := client.GetEquityOption(sym, true)
 	expectedUnauthorized(t, err)
+	require.NotNil(t, httpResp)
 }
 
 const activeEquitiesResp = `{

@@ -110,9 +110,9 @@ func decodeError(resp *http.Response) *Error {
 }
 
 // customRequest handles any requests for the client with unique paths.
-func (c *Client) customRequest(method, path string, params, payload, result any) *Error {
+func (c *Client) customRequest(method, path string, params, payload, result any) (*http.Response, *Error) {
 	if c.Session.SessionToken == nil {
-		return &Error{Code: "invalid_session", Message: "Session is invalid: Session Token cannot be nil."}
+		return nil, &Error{Code: "invalid_session", Message: "Session is invalid: Session Token cannot be nil."}
 	}
 
 	r := new(http.Request)
@@ -127,7 +127,7 @@ func (c *Client) customRequest(method, path string, params, payload, result any)
 
 	body, err := json.Marshal(payload)
 	if err != nil {
-		return &Error{Message: fmt.Sprintf("Client Side Error: %v", err)}
+		return nil, &Error{Message: fmt.Sprintf("Client Side Error: %v", err)}
 	}
 
 	r.Body = io.NopCloser(bytes.NewBuffer(body))
@@ -139,58 +139,51 @@ func (c *Client) customRequest(method, path string, params, payload, result any)
 	if params != nil {
 		queryString, queryErr := query.Values(params)
 		if queryErr != nil {
-			return &Error{Message: fmt.Sprintf("Client Side Error: %v", err)}
+			return nil, &Error{Message: fmt.Sprintf("Client Side Error: %v", err)}
 		}
 		r.URL.RawQuery = queryString.Encode()
 	}
 
 	resp, err := c.httpClient.Do(r)
 	if err != nil {
-		return &Error{Message: fmt.Sprintf("Client Side Error: %v", err)}
+		return nil, &Error{Message: fmt.Sprintf("Client Side Error: %v", err)}
 	}
-
-	// body, err = ioutil.ReadAll(resp.Body)
-	// if err != nil {
-	// 	return &Error{Message: fmt.Sprintf("Client Side Error: %v", err)}
-	// }
-
-	// fmt.Println(string(body))
 
 	defer resp.Body.Close()
 
 	if resp.StatusCode == http.StatusNoContent {
-		return nil
+		return resp, nil
 	}
 	if containsInt(errorStatusCodes, resp.StatusCode) {
-		return decodeError(resp)
+		return resp, decodeError(resp)
 	}
 
 	if result != nil {
 		err = json.NewDecoder(resp.Body).Decode(result)
 		if err != nil {
-			return &Error{Message: fmt.Sprintf("Client Side Error: %v", err)}
+			return resp, &Error{Message: fmt.Sprintf("Client Side Error: %v", err)}
 		}
 	}
 
-	return nil
+	return resp, nil
 }
 
 // request handles any requests for the client.
-func (c *Client) request(method, path string, params, payload, result any) *Error {
+func (c *Client) request(method, path string, params, payload, result any) (*http.Response, *Error) {
 	if c.Session.SessionToken == nil {
-		return &Error{Code: "invalid_session", Message: "Session is invalid: Session Token cannot be nil."}
+		return nil, &Error{Code: "invalid_session", Message: "Session is invalid: Session Token cannot be nil."}
 	}
 
 	body, err := json.Marshal(payload)
 	if err != nil {
-		return &Error{Message: fmt.Sprintf("Client Side Error: %v", err)}
+		return nil, &Error{Message: fmt.Sprintf("Client Side Error: %v", err)}
 	}
 
 	fullURL := c.baseURL + path
 
 	r, err := http.NewRequest(method, fullURL, bytes.NewBuffer(body))
 	if err != nil {
-		return &Error{Message: fmt.Sprintf("Client Side Error: %v", err)}
+		return nil, &Error{Message: fmt.Sprintf("Client Side Error: %v", err)}
 	}
 
 	r.Header = http.Header{}
@@ -200,55 +193,47 @@ func (c *Client) request(method, path string, params, payload, result any) *Erro
 	if params != nil {
 		queryString, queryErr := query.Values(params)
 		if queryErr != nil {
-			return &Error{Message: fmt.Sprintf("Client Side Error: %v", err)}
+			return nil, &Error{Message: fmt.Sprintf("Client Side Error: %v", err)}
 		}
 		r.URL.RawQuery = queryString.Encode()
 	}
 
 	resp, err := c.httpClient.Do(r)
 	if err != nil {
-		return &Error{Message: fmt.Sprintf("Client Side Error: %v", err)}
+		return nil, &Error{Message: fmt.Sprintf("Client Side Error: %v", err)}
 	}
-
-	// body, err = ioutil.ReadAll(resp.Body)
-
-	// if err != nil {
-	// 	return &Error{Message: fmt.Sprintf("Client Side Error: %v", err)}
-	// }
-
-	// fmt.Println(string(body))
 
 	defer resp.Body.Close()
 
 	if resp.StatusCode == http.StatusNoContent {
-		return nil
+		return resp, nil
 	}
 	if containsInt(errorStatusCodes, resp.StatusCode) {
-		return decodeError(resp)
+		return resp, decodeError(resp)
 	}
 
 	if result != nil {
 		err = json.NewDecoder(resp.Body).Decode(result)
 		if err != nil {
-			return &Error{Message: fmt.Sprintf("Client Side Error: %v", err)}
+			return resp, &Error{Message: fmt.Sprintf("Client Side Error: %v", err)}
 		}
 	}
 
-	return nil
+	return resp, nil
 }
 
 // noAuthRequest handles any requests for the client without authentication.
-func (c *Client) noAuthRequest(method, path string, header http.Header, params, payload, result any) *Error {
+func (c *Client) noAuthRequest(method, path string, header http.Header, params, payload, result any) (*http.Response, *Error) {
 	body, err := json.Marshal(payload)
 	if err != nil {
-		return &Error{Message: fmt.Sprintf("Client Side Error: %v", err)}
+		return nil, &Error{Message: fmt.Sprintf("Client Side Error: %v", err)}
 	}
 
 	fullURL := c.baseURL + path
 
 	r, err := http.NewRequest(method, fullURL, bytes.NewBuffer(body))
 	if err != nil {
-		return &Error{Message: fmt.Sprintf("Client Side Error: %v", err)}
+		return nil, &Error{Message: fmt.Sprintf("Client Side Error: %v", err)}
 	}
 
 	if header == nil {
@@ -262,39 +247,31 @@ func (c *Client) noAuthRequest(method, path string, header http.Header, params, 
 	if params != nil {
 		queryString, queryErr := query.Values(params)
 		if queryErr != nil {
-			return &Error{Message: fmt.Sprintf("Client Side Error: %v", err)}
+			return nil, &Error{Message: fmt.Sprintf("Client Side Error: %v", err)}
 		}
 		r.URL.RawQuery = queryString.Encode()
 	}
 
 	resp, err := c.httpClient.Do(r)
 	if err != nil {
-		return &Error{Message: fmt.Sprintf("Client Side Error: %v", err)}
+		return nil, &Error{Message: fmt.Sprintf("Client Side Error: %v", err)}
 	}
-
-	// body, err = ioutil.ReadAll(resp.Body)
-
-	// if err != nil {
-	// 	return &Error{Message: fmt.Sprintf("Client Side Error: %v", err)}
-	// }
-
-	// fmt.Println(string(body))
 
 	defer resp.Body.Close()
 
 	if resp.StatusCode == http.StatusNoContent {
-		return nil
+		return resp, nil
 	}
 	if containsInt(errorStatusCodes, resp.StatusCode) {
-		return decodeError(resp)
+		return resp, decodeError(resp)
 	}
 
 	if result != nil {
 		err = json.NewDecoder(resp.Body).Decode(result)
 		if err != nil {
-			return &Error{Message: fmt.Sprintf("Client Side Error: %v", err)}
+			return resp, &Error{Message: fmt.Sprintf("Client Side Error: %v", err)}
 		}
 	}
 
-	return nil
+	return resp, nil
 }
