@@ -7,7 +7,7 @@ import (
 )
 
 // Returns all active equities in a paginated fashion.
-func (c *Client) GetActiveEquities(query ActiveEquitiesQuery) ([]Equity, Pagination, error) {
+func (c *Client) GetActiveEquities(query ActiveEquitiesQuery) ([]Equity, Pagination, *http.Response, error) {
 	path := "/instruments/equities/active"
 
 	type instrumentResponse struct {
@@ -19,16 +19,16 @@ func (c *Client) GetActiveEquities(query ActiveEquitiesQuery) ([]Equity, Paginat
 
 	instrumentRes := new(instrumentResponse)
 
-	err := c.request(http.MethodGet, path, query, nil, instrumentRes)
+	resp, err := c.request(http.MethodGet, path, query, nil, instrumentRes)
 	if err != nil {
-		return []Equity{}, Pagination{}, err
+		return []Equity{}, Pagination{}, resp, err
 	}
 
-	return instrumentRes.Data.ActiveEquities, instrumentRes.Pagination, nil
+	return instrumentRes.Data.ActiveEquities, instrumentRes.Pagination, resp, nil
 }
 
 // Returns a set of equity definitions given an array of one or more symbols.
-func (c *Client) GetEquities(query EquitiesQuery) ([]Equity, error) {
+func (c *Client) GetEquities(query EquitiesQuery) ([]Equity, *http.Response, error) {
 	path := "/instruments/equities"
 
 	type instrumentResponse struct {
@@ -39,16 +39,16 @@ func (c *Client) GetEquities(query EquitiesQuery) ([]Equity, error) {
 
 	instrumentRes := new(instrumentResponse)
 
-	err := c.request(http.MethodGet, path, query, nil, instrumentRes)
+	resp, err := c.request(http.MethodGet, path, query, nil, instrumentRes)
 	if err != nil {
-		return []Equity{}, err
+		return []Equity{}, resp, err
 	}
 
-	return instrumentRes.Data.Equities, nil
+	return instrumentRes.Data.Equities, resp, nil
 }
 
 // Returns a single equity definition for the provided symbol.
-func (c *Client) GetEquity(symbol string) (Equity, error) {
+func (c *Client) GetEquity(symbol string) (Equity, *http.Response, error) {
 	// url escape required for instances where "/" exists in symbol i.e. BRK/B
 	path := fmt.Sprintf("/instruments/equities/%s", url.PathEscape(symbol))
 
@@ -59,16 +59,16 @@ func (c *Client) GetEquity(symbol string) (Equity, error) {
 	instrumentRes := new(instrumentResponse)
 
 	// customRequest required for instances where "/" exists in symbol i.e. BRK/B
-	err := c.customRequest(http.MethodGet, path, nil, nil, instrumentRes)
+	resp, err := c.customRequest(http.MethodGet, path, nil, nil, instrumentRes)
 	if err != nil {
-		return Equity{}, err
+		return Equity{}, resp, err
 	}
 
-	return instrumentRes.Equity, nil
+	return instrumentRes.Equity, resp, nil
 }
 
 // Returns a set of equity options given one or more symbols.
-func (c *Client) GetEquityOptions(query EquityOptionsQuery) ([]EquityOption, error) {
+func (c *Client) GetEquityOptions(query EquityOptionsQuery) ([]EquityOption, *http.Response, error) {
 	path := "/instruments/equity-options"
 
 	type instrumentResponse struct {
@@ -79,16 +79,16 @@ func (c *Client) GetEquityOptions(query EquityOptionsQuery) ([]EquityOption, err
 
 	instrumentRes := new(instrumentResponse)
 
-	err := c.request(http.MethodGet, path, query, nil, instrumentRes)
+	resp, err := c.request(http.MethodGet, path, query, nil, instrumentRes)
 	if err != nil {
-		return []EquityOption{}, err
+		return []EquityOption{}, resp, err
 	}
 
-	return instrumentRes.Data.EquityOptions, nil
+	return instrumentRes.Data.EquityOptions, resp, nil
 }
 
 // Returns a set of equity options given one or more symbols.
-func (c *Client) GetEquityOption(sym EquityOptionsSymbology, active bool) (EquityOption, error) {
+func (c *Client) GetEquityOption(sym EquityOptionsSymbology, active bool) (EquityOption, *http.Response, error) {
 	occSymbol := sym.Build()
 
 	path := fmt.Sprintf("/instruments/equity-options/%s", occSymbol)
@@ -106,10 +106,10 @@ func (c *Client) GetEquityOption(sym EquityOptionsSymbology, active bool) (Equit
 
 	instrumentRes := new(instrumentResponse)
 
-	err := c.request(http.MethodGet, path, query, nil, instrumentRes)
+	resp, err := c.request(http.MethodGet, path, query, nil, instrumentRes)
 	if err != nil {
-		return EquityOption{}, err
+		return EquityOption{}, resp, err
 	}
 
-	return instrumentRes.EquityOption, nil
+	return instrumentRes.EquityOption, resp, nil
 }

@@ -7,7 +7,7 @@ import (
 )
 
 // Returns an array of symbol data.
-func (c *Client) SymbolSearch(symbol string) ([]SymbolData, error) {
+func (c *Client) SymbolSearch(symbol string) ([]SymbolData, *http.Response, error) {
 	// url escape required for instances where "/" exists in symbol i.e. BRK/B
 	symbol = url.PathEscape(symbol)
 
@@ -22,10 +22,10 @@ func (c *Client) SymbolSearch(symbol string) ([]SymbolData, error) {
 	symbolRes := new(symbolResponse)
 
 	// customRequest required for instances where "/" exists in symbol i.e. BRK/B
-	err := c.customRequest(http.MethodGet, path, nil, nil, symbolRes)
+	resp, err := c.customRequest(http.MethodGet, path, nil, nil, symbolRes)
 	if err != nil {
-		return []SymbolData{}, err
+		return []SymbolData{}, resp, err
 	}
 
-	return symbolRes.Data.SymbolData, nil
+	return symbolRes.Data.SymbolData, resp, nil
 }

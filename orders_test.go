@@ -36,8 +36,9 @@ func TestSubmitMarketOrderDryRun(t *testing.T) {
 		},
 	}
 
-	resp, orderErr, err := client.SubmitOrderDryRun(accountNumber, order)
+	resp, orderErr, httpResp, err := client.SubmitOrderDryRun(accountNumber, order)
 	require.Nil(t, err)
+	require.NotNil(t, httpResp)
 	require.Nil(t, orderErr)
 
 	o := resp.Order
@@ -123,8 +124,9 @@ func TestSubmitMarketOrderDryRunError(t *testing.T) {
 		},
 	}
 
-	_, _, err := client.SubmitOrderDryRun(accountNumber, order)
+	_, _, httpResp, err := client.SubmitOrderDryRun(accountNumber, order)
 	expectedUnauthorized(t, err)
+	require.NotNil(t, httpResp)
 }
 
 func TestReconfirmOrderError(t *testing.T) {
@@ -139,8 +141,9 @@ func TestReconfirmOrderError(t *testing.T) {
 		fmt.Fprint(writer, reconfirmResp)
 	})
 
-	_, err := client.ReconfirmOrder(accountNumber, orderID)
+	_, httpResp, err := client.ReconfirmOrder(accountNumber, orderID)
 	require.NotNil(t, err)
+	require.NotNil(t, httpResp)
 
 	require.Equal(t, "\nError in request 422;\nCode: cannot_reconfirm_order\nMessage: The order could not be reconfirmed.", err.Error())
 }
@@ -174,8 +177,9 @@ func TestSubmitGTCOrderDryRun(t *testing.T) {
 		},
 	}
 
-	resp, orderErr, err := client.SubmitOrderDryRun(accountNumber, order)
+	resp, orderErr, httpResp, err := client.SubmitOrderDryRun(accountNumber, order)
 	require.Nil(t, err)
+	require.NotNil(t, httpResp)
 	require.Nil(t, orderErr)
 
 	o := resp.Order
@@ -253,8 +257,9 @@ func TestSubmitGTCOrderDryRunError(t *testing.T) {
 		},
 	}
 
-	_, _, err := client.SubmitOrderDryRun(accountNumber, order)
+	_, _, httpResp, err := client.SubmitOrderDryRun(accountNumber, order)
 	expectedUnauthorized(t, err)
+	require.NotNil(t, httpResp)
 }
 
 func TestSubmitErrorOrderDryRun(t *testing.T) {
@@ -283,8 +288,9 @@ func TestSubmitErrorOrderDryRun(t *testing.T) {
 		},
 	}
 
-	resp, orderErr, err := client.SubmitOrderDryRun(accountNumber, order)
+	resp, orderErr, httpResp, err := client.SubmitOrderDryRun(accountNumber, order)
 	require.Nil(t, err)
+	require.NotNil(t, httpResp)
 	require.NotNil(t, orderErr)
 
 	bpe := resp.BuyingPowerEffect
@@ -336,8 +342,9 @@ func TestSubmitErrorOrderDryRunError(t *testing.T) {
 		},
 	}
 
-	_, _, err := client.SubmitOrderDryRun(accountNumber, order)
+	_, _, httpResp, err := client.SubmitOrderDryRun(accountNumber, order)
 	expectedUnauthorized(t, err)
+	require.NotNil(t, httpResp)
 }
 
 func TestSubmitOrder(t *testing.T) {
@@ -386,8 +393,9 @@ func TestSubmitOrder(t *testing.T) {
 		}},
 	}
 
-	resp, orderErr, err := client.SubmitOrder(accountNumber, order)
+	resp, orderErr, httpResp, err := client.SubmitOrder(accountNumber, order)
 	require.Nil(t, err)
+	require.NotNil(t, httpResp)
 	require.Nil(t, orderErr)
 
 	o := resp.Order
@@ -517,8 +525,9 @@ func TestSubmitOrderError(t *testing.T) {
 		}},
 	}
 
-	_, _, err := client.SubmitOrder(accountNumber, order)
+	_, _, httpResp, err := client.SubmitOrder(accountNumber, order)
 	expectedUnauthorized(t, err)
+	require.NotNil(t, httpResp)
 }
 
 func TestGetAccountLiveOrders(t *testing.T) {
@@ -531,8 +540,9 @@ func TestGetAccountLiveOrders(t *testing.T) {
 		fmt.Fprint(writer, liveOrdersResp)
 	})
 
-	resp, err := client.GetAccountLiveOrders(accountNumber)
+	resp, httpResp, err := client.GetAccountLiveOrders(accountNumber)
 	require.Nil(t, err)
+	require.NotNil(t, httpResp)
 
 	o := resp[0]
 
@@ -591,8 +601,9 @@ func TestGetAccountLiveOrdersError(t *testing.T) {
 		fmt.Fprint(writer, tastyUnauthorizedError)
 	})
 
-	_, err := client.GetAccountLiveOrders(accountNumber)
+	_, httpResp, err := client.GetAccountLiveOrders(accountNumber)
 	expectedUnauthorized(t, err)
+	require.NotNil(t, httpResp)
 }
 
 func TestGetAccountOrders(t *testing.T) {
@@ -605,8 +616,9 @@ func TestGetAccountOrders(t *testing.T) {
 		fmt.Fprint(writer, accountOrdersResp)
 	})
 
-	resp, pagination, err := client.GetAccountOrders(accountNumber, OrdersQuery{PerPage: 2})
+	resp, pagination, httpResp, err := client.GetAccountOrders(accountNumber, OrdersQuery{PerPage: 2})
 	require.Nil(t, err)
+	require.NotNil(t, httpResp)
 
 	require.Equal(t, 2, len(resp))
 
@@ -624,8 +636,9 @@ func TestGetAccountOrdersError(t *testing.T) {
 		fmt.Fprint(writer, tastyUnauthorizedError)
 	})
 
-	_, _, err := client.GetAccountOrders(accountNumber, OrdersQuery{PerPage: 2})
+	_, _, httpResp, err := client.GetAccountOrders(accountNumber, OrdersQuery{PerPage: 2})
 	expectedUnauthorized(t, err)
+	require.NotNil(t, httpResp)
 }
 
 func TestSubmitOrderECRDryRun(t *testing.T) {
@@ -646,8 +659,9 @@ func TestSubmitOrderECRDryRun(t *testing.T) {
 		PriceEffect: Debit,
 	}
 
-	resp, err := client.SubmitOrderECRDryRun(accountNumber, orderID, orderECR)
+	resp, httpResp, err := client.SubmitOrderECRDryRun(accountNumber, orderID, orderECR)
 	require.Nil(t, err)
+	require.NotNil(t, httpResp)
 
 	o := resp.Order
 
@@ -686,8 +700,9 @@ func TestSubmitOrderECRDryRunError(t *testing.T) {
 		PriceEffect: Debit,
 	}
 
-	_, err := client.SubmitOrderECRDryRun(accountNumber, orderID, orderECR)
+	_, httpResp, err := client.SubmitOrderECRDryRun(accountNumber, orderID, orderECR)
 	expectedUnauthorized(t, err)
+	require.NotNil(t, httpResp)
 }
 
 func TestGetOrder(t *testing.T) {
@@ -701,8 +716,9 @@ func TestGetOrder(t *testing.T) {
 		fmt.Fprint(writer, getOrderResp)
 	})
 
-	o, err := client.GetOrder(accountNumber, orderID)
+	o, httpResp, err := client.GetOrder(accountNumber, orderID)
 	require.Nil(t, err)
+	require.NotNil(t, httpResp)
 
 	require.Equal(t, accountNumber, o.AccountNumber)
 	require.Equal(t, Day, o.TimeInForce)
@@ -732,8 +748,9 @@ func TestGetOrderError(t *testing.T) {
 		fmt.Fprint(writer, tastyUnauthorizedError)
 	})
 
-	_, err := client.GetOrder(accountNumber, orderID)
+	_, httpResp, err := client.GetOrder(accountNumber, orderID)
 	expectedUnauthorized(t, err)
+	require.NotNil(t, httpResp)
 }
 
 func TestCancelOrder(t *testing.T) {
@@ -747,8 +764,9 @@ func TestCancelOrder(t *testing.T) {
 		fmt.Fprint(writer, cancelledOrderResp)
 	})
 
-	o, err := client.CancelOrder(accountNumber, orderID)
+	o, httpResp, err := client.CancelOrder(accountNumber, orderID)
 	require.Nil(t, err)
+	require.NotNil(t, httpResp)
 
 	require.Equal(t, accountNumber, o.AccountNumber)
 	require.Equal(t, Day, o.TimeInForce)
@@ -780,8 +798,9 @@ func TestCancelOrderError(t *testing.T) {
 		fmt.Fprint(writer, tastyUnauthorizedError)
 	})
 
-	_, err := client.CancelOrder(accountNumber, orderID)
+	_, httpResp, err := client.CancelOrder(accountNumber, orderID)
 	expectedUnauthorized(t, err)
+	require.NotNil(t, httpResp)
 }
 
 func TestReplaceOrder(t *testing.T) {
@@ -803,8 +822,9 @@ func TestReplaceOrder(t *testing.T) {
 		ValueEffect: Debit,
 	}
 
-	o, err := client.ReplaceOrder(accountNumber, orderID, orderECR)
+	o, httpResp, err := client.ReplaceOrder(accountNumber, orderID, orderECR)
 	require.Nil(t, err)
+	require.NotNil(t, httpResp)
 
 	require.Equal(t, accountNumber, o.AccountNumber)
 	require.Equal(t, Day, o.TimeInForce)
@@ -842,8 +862,9 @@ func TestReplaceOrderError(t *testing.T) {
 		ValueEffect: Debit,
 	}
 
-	_, err := client.ReplaceOrder(accountNumber, orderID, orderECR)
+	_, httpResp, err := client.ReplaceOrder(accountNumber, orderID, orderECR)
 	expectedUnauthorized(t, err)
+	require.NotNil(t, httpResp)
 }
 
 func TestPatchOrder(t *testing.T) {
@@ -865,8 +886,9 @@ func TestPatchOrder(t *testing.T) {
 		ValueEffect: Debit,
 	}
 
-	o, err := client.PatchOrder(accountNumber, orderID, orderECR)
+	o, httpResp, err := client.PatchOrder(accountNumber, orderID, orderECR)
 	require.Nil(t, err)
+	require.NotNil(t, httpResp)
 
 	require.Equal(t, accountNumber, o.AccountNumber)
 	require.Equal(t, Day, o.TimeInForce)
@@ -904,8 +926,9 @@ func TestPatchOrderError(t *testing.T) {
 		ValueEffect: Debit,
 	}
 
-	_, err := client.PatchOrder(accountNumber, orderID, orderECR)
+	_, httpResp, err := client.PatchOrder(accountNumber, orderID, orderECR)
 	expectedUnauthorized(t, err)
+	require.NotNil(t, httpResp)
 }
 
 func TestGetCustomerLiveOrders(t *testing.T) {
@@ -919,8 +942,9 @@ func TestGetCustomerLiveOrders(t *testing.T) {
 		fmt.Fprint(writer, customerLiveOrdersResp)
 	})
 
-	resp, err := client.GetCustomerLiveOrders(customerID, OrdersQuery{AccountNumbers: []string{accountNumber}})
+	resp, httpResp, err := client.GetCustomerLiveOrders(customerID, OrdersQuery{AccountNumbers: []string{accountNumber}})
 	require.Nil(t, err)
+	require.NotNil(t, httpResp)
 
 	o := resp[0]
 
@@ -967,8 +991,9 @@ func TestGetCustomerLiveOrdersError(t *testing.T) {
 		fmt.Fprint(writer, customerOrdersErrorResp)
 	})
 
-	_, err := client.GetCustomerLiveOrders(customerID, OrdersQuery{})
+	_, httpResp, err := client.GetCustomerLiveOrders(customerID, OrdersQuery{})
 	require.NotNil(t, err)
+	require.NotNil(t, httpResp)
 
 	require.Equal(t, "\nError in request 401;\nCode: validation_error\nMessage: Request validation failed", err.Error())
 	// require.Equal(t, "Request validation failed", err.Message)
@@ -988,8 +1013,9 @@ func TestGetCustomerOrders(t *testing.T) {
 		fmt.Fprint(writer, customerLiveOrdersResp)
 	})
 
-	resp, err := client.GetCustomerOrders(customerID, OrdersQuery{AccountNumbers: []string{accountNumber}})
+	resp, httpResp, err := client.GetCustomerOrders(customerID, OrdersQuery{AccountNumbers: []string{accountNumber}})
 	require.Nil(t, err)
+	require.NotNil(t, httpResp)
 
 	o := resp[0]
 
@@ -1036,8 +1062,9 @@ func TestGetCustomerOrdersError(t *testing.T) {
 		fmt.Fprint(writer, customerOrdersErrorResp)
 	})
 
-	_, err := client.GetCustomerOrders(customerID, OrdersQuery{})
+	_, httpResp, err := client.GetCustomerOrders(customerID, OrdersQuery{})
 	require.NotNil(t, err)
+	require.NotNil(t, httpResp)
 
 	require.Equal(t, "\nError in request 401;\nCode: validation_error\nMessage: Request validation failed", err.Error())
 	// require.Equal(t, "Request validation failed", err.Message)

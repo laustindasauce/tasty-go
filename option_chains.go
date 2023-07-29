@@ -7,7 +7,7 @@ import (
 )
 
 // Returns a futures option chain given a futures product code, i.e. ES.
-func (c *Client) GetFuturesOptionChains(productCode string) ([]FutureOption, error) {
+func (c *Client) GetFuturesOptionChains(productCode string) ([]FutureOption, *http.Response, error) {
 	path := fmt.Sprintf("/futures-option-chains/%s", productCode)
 
 	type instrumentResponse struct {
@@ -18,17 +18,17 @@ func (c *Client) GetFuturesOptionChains(productCode string) ([]FutureOption, err
 
 	instrumentRes := new(instrumentResponse)
 
-	err := c.request(http.MethodGet, path, nil, nil, instrumentRes)
+	resp, err := c.request(http.MethodGet, path, nil, nil, instrumentRes)
 	if err != nil {
-		return []FutureOption{}, err
+		return []FutureOption{}, resp, err
 	}
 
-	return instrumentRes.Data.FutureOptions, nil
+	return instrumentRes.Data.FutureOptions, resp, nil
 }
 
 // Returns a futures option chain given a futures product code in a nested form to minimize
 // redundant processing.
-func (c *Client) GetNestedFuturesOptionChains(productCode string) (NestedFuturesOptionChains, error) {
+func (c *Client) GetNestedFuturesOptionChains(productCode string) (NestedFuturesOptionChains, *http.Response, error) {
 	path := fmt.Sprintf("/futures-option-chains/%s/nested", productCode)
 
 	type instrumentResponse struct {
@@ -37,16 +37,16 @@ func (c *Client) GetNestedFuturesOptionChains(productCode string) (NestedFutures
 
 	instrumentRes := new(instrumentResponse)
 
-	err := c.request(http.MethodGet, path, nil, nil, instrumentRes)
+	resp, err := c.request(http.MethodGet, path, nil, nil, instrumentRes)
 	if err != nil {
-		return NestedFuturesOptionChains{}, err
+		return NestedFuturesOptionChains{}, resp, err
 	}
 
-	return instrumentRes.Chains, nil
+	return instrumentRes.Chains, resp, nil
 }
 
 // Returns an option chain given an underlying symbol, i.e. AAPL.
-func (c *Client) GetEquityOptionChains(symbol string) ([]EquityOption, error) {
+func (c *Client) GetEquityOptionChains(symbol string) ([]EquityOption, *http.Response, error) {
 	// url escape required for instances where "/" exists in symbol i.e. BRK/B
 	symbol = url.PathEscape(symbol)
 
@@ -61,17 +61,17 @@ func (c *Client) GetEquityOptionChains(symbol string) ([]EquityOption, error) {
 	instrumentRes := new(instrumentResponse)
 
 	// customRequest required for instances where "/" exists in symbol i.e. BRK/B
-	err := c.customRequest(http.MethodGet, path, nil, nil, instrumentRes)
+	resp, err := c.customRequest(http.MethodGet, path, nil, nil, instrumentRes)
 	if err != nil {
-		return []EquityOption{}, err
+		return []EquityOption{}, resp, err
 	}
 
-	return instrumentRes.Data.EquityOptions, nil
+	return instrumentRes.Data.EquityOptions, resp, nil
 }
 
 // Returns an option chain given an underlying symbol,
 // i.e. AAPL in a nested form to minimize redundant processing.
-func (c *Client) GetNestedEquityOptionChains(symbol string) ([]NestedOptionChains, error) {
+func (c *Client) GetNestedEquityOptionChains(symbol string) ([]NestedOptionChains, *http.Response, error) {
 	// url escape required for instances where "/" exists in symbol i.e. BRK/B
 	symbol = url.PathEscape(symbol)
 
@@ -86,17 +86,17 @@ func (c *Client) GetNestedEquityOptionChains(symbol string) ([]NestedOptionChain
 	instrumentRes := new(instrumentResponse)
 
 	// customRequest required for instances where "/" exists in symbol i.e. BRK/B
-	err := c.customRequest(http.MethodGet, path, nil, nil, instrumentRes)
+	resp, err := c.customRequest(http.MethodGet, path, nil, nil, instrumentRes)
 	if err != nil {
-		return []NestedOptionChains{}, err
+		return []NestedOptionChains{}, resp, err
 	}
 
-	return instrumentRes.Data.Chains, nil
+	return instrumentRes.Data.Chains, resp, nil
 }
 
 // Returns an option chain given an underlying symbol,
 // i.e. AAPL in a compact form to minimize content size.
-func (c *Client) GetCompactEquityOptionChains(symbol string) ([]CompactOptionChains, error) {
+func (c *Client) GetCompactEquityOptionChains(symbol string) ([]CompactOptionChains, *http.Response, error) {
 	// url escape required for instances where "/" exists in symbol i.e. BRK/B
 	symbol = url.PathEscape(symbol)
 
@@ -111,10 +111,10 @@ func (c *Client) GetCompactEquityOptionChains(symbol string) ([]CompactOptionCha
 	instrumentRes := new(instrumentResponse)
 
 	// customRequest required for instances where "/" exists in symbol i.e. BRK/B
-	err := c.customRequest(http.MethodGet, path, nil, nil, instrumentRes)
+	resp, err := c.customRequest(http.MethodGet, path, nil, nil, instrumentRes)
 	if err != nil {
-		return []CompactOptionChains{}, err
+		return []CompactOptionChains{}, resp, err
 	}
 
-	return instrumentRes.Data.Chains, nil
+	return instrumentRes.Data.Chains, resp, nil
 }

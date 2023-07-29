@@ -16,8 +16,9 @@ func TestCreateSession(t *testing.T) {
 		fmt.Fprint(writer, sessionResp)
 	})
 
-	resp, err := client.CreateSession(LoginInfo{Login: "default", Password: "Password"}, nil)
+	resp, httpResp, err := client.CreateSession(LoginInfo{Login: "default", Password: "Password"}, nil)
 	require.Nil(t, err)
+	require.NotNil(t, httpResp)
 
 	require.Equal(t, "default@gmail.com", resp.User.Email)
 	require.Equal(t, "default", resp.User.Username)
@@ -39,8 +40,9 @@ func TestCreateTwoFactorSession(t *testing.T) {
 		fmt.Fprint(writer, sessionResp)
 	})
 
-	resp, err := client.CreateSession(LoginInfo{Login: "default", Password: "Password"}, &twoFaCode)
+	resp, httpResp, err := client.CreateSession(LoginInfo{Login: "default", Password: "Password"}, &twoFaCode)
 	require.Nil(t, err)
+	require.NotNil(t, httpResp)
 
 	require.Equal(t, "default@gmail.com", resp.User.Email)
 	require.Equal(t, "default", resp.User.Username)
@@ -59,8 +61,9 @@ func TestCreateSessionError(t *testing.T) {
 		fmt.Fprint(writer, tastyInvalidCredentialsError)
 	})
 
-	_, err := client.CreateSession(LoginInfo{Login: "default", Password: "Password"}, nil)
+	_, httpResp, err := client.CreateSession(LoginInfo{Login: "default", Password: "Password"}, nil)
 	expectedInvalidCredentials(t, err)
+	require.NotNil(t, httpResp)
 }
 
 func TestValidateSession(t *testing.T) {
@@ -71,8 +74,9 @@ func TestValidateSession(t *testing.T) {
 		fmt.Fprint(writer, sessionValidateResp)
 	})
 
-	resp, err := client.ValidateSession()
+	resp, httpResp, err := client.ValidateSession()
 	require.Nil(t, err)
+	require.NotNil(t, httpResp)
 
 	require.Equal(t, "default@gmail.com", resp.Email)
 	require.Equal(t, "default", resp.Username)
@@ -89,8 +93,9 @@ func TestValidateSessionError(t *testing.T) {
 		fmt.Fprint(writer, tastyInvalidSessionError)
 	})
 
-	_, err := client.ValidateSession()
+	_, httpResp, err := client.ValidateSession()
 	expectedInvalidSession(t, err)
+	require.NotNil(t, httpResp)
 }
 
 func TestDestroySession(t *testing.T) {
@@ -101,8 +106,9 @@ func TestDestroySession(t *testing.T) {
 		fmt.Fprint(writer, sessionResp)
 	})
 
-	err := client.DestroySession()
+	httpResp, err := client.DestroySession()
 	require.Nil(t, err)
+	require.NotNil(t, httpResp)
 }
 
 func TestDestroySessionError(t *testing.T) {
@@ -114,8 +120,9 @@ func TestDestroySessionError(t *testing.T) {
 		fmt.Fprint(writer, tastyInvalidSessionError)
 	})
 
-	err := client.DestroySession()
+	httpResp, err := client.DestroySession()
 	expectedInvalidSession(t, err)
+	require.NotNil(t, httpResp)
 }
 
 func TestRequestPasswordResetEmail(t *testing.T) {
@@ -126,8 +133,9 @@ func TestRequestPasswordResetEmail(t *testing.T) {
 		writer.WriteHeader(200)
 	})
 
-	err := client.RequestPasswordResetEmail("some-email@domain.com")
+	httpResp, err := client.RequestPasswordResetEmail("some-email@domain.com")
 	require.Nil(t, err)
+	require.NotNil(t, httpResp)
 }
 
 func TestRequestPasswordResetEmailError(t *testing.T) {
@@ -139,8 +147,9 @@ func TestRequestPasswordResetEmailError(t *testing.T) {
 		fmt.Fprint(writer, passwordChangeRequestErrorResp)
 	})
 
-	err := client.RequestPasswordResetEmail("")
+	httpResp, err := client.RequestPasswordResetEmail("")
 	require.NotNil(t, err)
+	require.NotNil(t, httpResp)
 
 	require.Equal(t, "\nError in request 400;\nCode: validation_error\nMessage: Request validation failed", err.Error())
 }
@@ -153,13 +162,14 @@ func TestChangePassword(t *testing.T) {
 		writer.WriteHeader(200)
 	})
 
-	err := client.ChangePassword(
+	httpResp, err := client.ChangePassword(
 		PasswordReset{
 			Password:             "newPassword",
 			PasswordConfirmation: "newPassword",
 			ResetPasswordToken:   "test-token",
 		})
 	require.Nil(t, err)
+	require.NotNil(t, httpResp)
 }
 
 func TestChangePasswordError(t *testing.T) {
@@ -171,12 +181,13 @@ func TestChangePasswordError(t *testing.T) {
 		fmt.Fprint(writer, passwordResetErrorResp)
 	})
 
-	err := client.ChangePassword(
+	httpResp, err := client.ChangePassword(
 		PasswordReset{
 			Password:             "newPassword",
 			PasswordConfirmation: "newPassword",
 		})
 	require.NotNil(t, err)
+	require.NotNil(t, httpResp)
 
 	require.Equal(t, "\nError in request 400;\nCode: validation_error\nMessage: Request validation failed", err.Error())
 }

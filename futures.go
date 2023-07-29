@@ -6,7 +6,7 @@ import (
 )
 
 // Returns a set of outright futures given an array of one or more symbols.
-func (c *Client) GetFutures(query FuturesQuery) ([]Future, error) {
+func (c *Client) GetFutures(query FuturesQuery) ([]Future, *http.Response, error) {
 	path := "/instruments/futures"
 
 	type instrumentResponse struct {
@@ -17,16 +17,16 @@ func (c *Client) GetFutures(query FuturesQuery) ([]Future, error) {
 
 	instrumentRes := new(instrumentResponse)
 
-	err := c.request(http.MethodGet, path, query, nil, instrumentRes)
+	resp, err := c.request(http.MethodGet, path, query, nil, instrumentRes)
 	if err != nil {
-		return []Future{}, err
+		return []Future{}, resp, err
 	}
 
-	return instrumentRes.Data.Futures, nil
+	return instrumentRes.Data.Futures, resp, nil
 }
 
 // Returns an outright future given a symbol.
-func (c *Client) GetFuture(symbol string) (Future, error) {
+func (c *Client) GetFuture(symbol string) (Future, *http.Response, error) {
 	path := fmt.Sprintf("/instruments/futures/%s", symbol)
 
 	type instrumentResponse struct {
@@ -35,16 +35,16 @@ func (c *Client) GetFuture(symbol string) (Future, error) {
 
 	instrumentRes := new(instrumentResponse)
 
-	err := c.request(http.MethodGet, path, nil, nil, instrumentRes)
+	resp, err := c.request(http.MethodGet, path, nil, nil, instrumentRes)
 	if err != nil {
-		return Future{}, err
+		return Future{}, resp, err
 	}
 
-	return instrumentRes.Future, nil
+	return instrumentRes.Future, resp, nil
 }
 
 // Returns metadata for all supported future option products.
-func (c *Client) GetFutureOptionProducts() ([]FutureOptionProduct, error) {
+func (c *Client) GetFutureOptionProducts() ([]FutureOptionProduct, *http.Response, error) {
 	path := "/instruments/future-option-products"
 
 	type instrumentResponse struct {
@@ -55,16 +55,16 @@ func (c *Client) GetFutureOptionProducts() ([]FutureOptionProduct, error) {
 
 	instrumentRes := new(instrumentResponse)
 
-	err := c.request(http.MethodGet, path, nil, nil, instrumentRes)
+	resp, err := c.request(http.MethodGet, path, nil, nil, instrumentRes)
 	if err != nil {
-		return []FutureOptionProduct{}, err
+		return []FutureOptionProduct{}, resp, err
 	}
 
-	return instrumentRes.Data.FutureOptionProducts, nil
+	return instrumentRes.Data.FutureOptionProducts, resp, nil
 }
 
 // Get a future option product by exchange and root symbol.
-func (c *Client) GetFutureOptionProduct(exchange, rootSymbol string) (FutureOptionProduct, error) {
+func (c *Client) GetFutureOptionProduct(exchange, rootSymbol string) (FutureOptionProduct, *http.Response, error) {
 	path := fmt.Sprintf("/instruments/future-option-products/%s/%s", exchange, rootSymbol)
 
 	type instrumentResponse struct {
@@ -73,17 +73,17 @@ func (c *Client) GetFutureOptionProduct(exchange, rootSymbol string) (FutureOpti
 
 	instrumentRes := new(instrumentResponse)
 
-	err := c.request(http.MethodGet, path, nil, nil, instrumentRes)
+	resp, err := c.request(http.MethodGet, path, nil, nil, instrumentRes)
 	if err != nil {
-		return FutureOptionProduct{}, err
+		return FutureOptionProduct{}, resp, err
 	}
 
-	return instrumentRes.FutureOptionProduct, nil
+	return instrumentRes.FutureOptionProduct, resp, nil
 }
 
 // Returns a set of future option(s) given an array of one or more symbols.
 // Uses TW symbology: [./ESZ9 EW4U9 190927P2975].
-func (c *Client) GetFutureOptions(query FutureOptionsQuery) ([]FutureOption, error) {
+func (c *Client) GetFutureOptions(query FutureOptionsQuery) ([]FutureOption, *http.Response, error) {
 	path := "/instruments/future-options"
 
 	type instrumentResponse struct {
@@ -94,16 +94,16 @@ func (c *Client) GetFutureOptions(query FutureOptionsQuery) ([]FutureOption, err
 
 	instrumentRes := new(instrumentResponse)
 
-	err := c.request(http.MethodGet, path, query, nil, instrumentRes)
+	resp, err := c.request(http.MethodGet, path, query, nil, instrumentRes)
 	if err != nil {
-		return []FutureOption{}, err
+		return []FutureOption{}, resp, err
 	}
 
-	return instrumentRes.Data.FutureOptions, nil
+	return instrumentRes.Data.FutureOptions, resp, nil
 }
 
 // Returns a future option given a symbol. Uses TW symbology: ./ESZ9 EW4U9 190927P2975.
-func (c *Client) GetFutureOption(symbol string) (FutureOption, error) {
+func (c *Client) GetFutureOption(symbol string) (FutureOption, *http.Response, error) {
 	path := fmt.Sprintf("/instruments/future-options/%s", symbol)
 
 	type instrumentResponse struct {
@@ -113,16 +113,16 @@ func (c *Client) GetFutureOption(symbol string) (FutureOption, error) {
 
 	instrumentRes := new(instrumentResponse)
 
-	err := c.request(http.MethodGet, path, nil, nil, instrumentRes)
+	resp, err := c.request(http.MethodGet, path, nil, nil, instrumentRes)
 	if err != nil {
-		return FutureOption{}, err
+		return FutureOption{}, resp, err
 	}
 
-	return instrumentRes.FutureOption, nil
+	return instrumentRes.FutureOption, resp, nil
 }
 
 // Returns metadata for all supported futures products.
-func (c *Client) GetFutureProducts() ([]FutureProduct, error) {
+func (c *Client) GetFutureProducts() ([]FutureProduct, *http.Response, error) {
 	path := "/instruments/future-products"
 
 	type instrumentResponse struct {
@@ -133,16 +133,16 @@ func (c *Client) GetFutureProducts() ([]FutureProduct, error) {
 
 	instrumentRes := new(instrumentResponse)
 
-	err := c.request(http.MethodGet, path, nil, nil, instrumentRes)
+	resp, err := c.request(http.MethodGet, path, nil, nil, instrumentRes)
 	if err != nil {
-		return []FutureProduct{}, err
+		return []FutureProduct{}, resp, err
 	}
 
-	return instrumentRes.Data.FutureProducts, nil
+	return instrumentRes.Data.FutureProducts, resp, nil
 }
 
 // Get future product from exchange and product code.
-func (c *Client) GetFutureProduct(exchange Exchange, productCode string) (FutureProduct, error) {
+func (c *Client) GetFutureProduct(exchange Exchange, productCode string) (FutureProduct, *http.Response, error) {
 	path := fmt.Sprintf("/instruments/future-products/%s/%s", exchange, productCode)
 
 	type instrumentResponse struct {
@@ -151,10 +151,10 @@ func (c *Client) GetFutureProduct(exchange Exchange, productCode string) (Future
 
 	instrumentRes := new(instrumentResponse)
 
-	err := c.request(http.MethodGet, path, nil, nil, instrumentRes)
+	resp, err := c.request(http.MethodGet, path, nil, nil, instrumentRes)
 	if err != nil {
-		return FutureProduct{}, err
+		return FutureProduct{}, resp, err
 	}
 
-	return instrumentRes.FutureProduct, nil
+	return instrumentRes.FutureProduct, resp, nil
 }

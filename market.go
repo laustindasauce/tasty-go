@@ -8,7 +8,7 @@ import (
 )
 
 // Returns an array of volatility data for given symbols.
-func (c *Client) GetMarketMetrics(symbols []string) ([]MarketMetricVolatility, error) {
+func (c *Client) GetMarketMetrics(symbols []string) ([]MarketMetricVolatility, *http.Response, error) {
 	path := "/market-metrics"
 
 	type marketMetricResponse struct {
@@ -26,16 +26,16 @@ func (c *Client) GetMarketMetrics(symbols []string) ([]MarketMetricVolatility, e
 
 	query := marketMetrics{Symbols: symbols}
 
-	err := c.request(http.MethodGet, path, query, nil, marketMetricsRes)
+	resp, err := c.request(http.MethodGet, path, query, nil, marketMetricsRes)
 	if err != nil {
-		return []MarketMetricVolatility{}, err
+		return []MarketMetricVolatility{}, resp, err
 	}
 
-	return marketMetricsRes.Data.MarketMetrics, nil
+	return marketMetricsRes.Data.MarketMetrics, resp, nil
 }
 
 // Get historical dividend data.
-func (c *Client) GetHistoricDividends(symbol string) ([]DividendInfo, error) {
+func (c *Client) GetHistoricDividends(symbol string) ([]DividendInfo, *http.Response, error) {
 	// url escape required for instances where "/" exists in symbol i.e. BRK/B
 	path := fmt.Sprintf("/market-metrics/historic-corporate-events/dividends/%s", url.PathEscape(symbol))
 
@@ -47,16 +47,16 @@ func (c *Client) GetHistoricDividends(symbol string) ([]DividendInfo, error) {
 
 	marketMetricsRes := new(marketMetricResponse)
 
-	err := c.customRequest(http.MethodGet, path, nil, nil, marketMetricsRes)
+	resp, err := c.customRequest(http.MethodGet, path, nil, nil, marketMetricsRes)
 	if err != nil {
-		return []DividendInfo{}, err
+		return []DividendInfo{}, resp, err
 	}
 
-	return marketMetricsRes.Data.HistoricDividends, nil
+	return marketMetricsRes.Data.HistoricDividends, resp, nil
 }
 
 // Get historical earnings data.
-func (c *Client) GetHistoricEarnings(symbol string, startDate time.Time) ([]EarningsInfo, error) {
+func (c *Client) GetHistoricEarnings(symbol string, startDate time.Time) ([]EarningsInfo, *http.Response, error) {
 	// url escape required for instances where "/" exists in symbol i.e. BRK/B
 	path := fmt.Sprintf("/market-metrics/historic-corporate-events/earnings-reports/%s", url.PathEscape(symbol))
 
@@ -75,10 +75,10 @@ func (c *Client) GetHistoricEarnings(symbol string, startDate time.Time) ([]Earn
 
 	query := historicEarnings{StartDate: startDate}
 
-	err := c.customRequest(http.MethodGet, path, query, nil, marketMetricsRes)
+	resp, err := c.customRequest(http.MethodGet, path, query, nil, marketMetricsRes)
 	if err != nil {
-		return []EarningsInfo{}, err
+		return []EarningsInfo{}, resp, err
 	}
 
-	return marketMetricsRes.Data.HistoricEarnings, nil
+	return marketMetricsRes.Data.HistoricEarnings, resp, nil
 }

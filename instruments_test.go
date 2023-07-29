@@ -16,8 +16,9 @@ func TestGetQuantityDecimalPrecisions(t *testing.T) {
 		fmt.Fprint(writer, quantityDecimalPrecisionsResp)
 	})
 
-	resp, err := client.GetQuantityDecimalPrecisions()
+	resp, httpResp, err := client.GetQuantityDecimalPrecisions()
 	require.Nil(t, err)
+	require.NotNil(t, httpResp)
 
 	prec := resp[0]
 
@@ -36,7 +37,7 @@ func TestGetQuantityDecimalPrecisionsError(t *testing.T) {
 		fmt.Fprint(writer, tastyUnauthorizedError)
 	})
 
-	_, err := client.GetQuantityDecimalPrecisions()
+	_, _, err := client.GetQuantityDecimalPrecisions()
 	expectedUnauthorized(t, err)
 }
 
@@ -50,8 +51,9 @@ func TestGetWarrants(t *testing.T) {
 		fmt.Fprint(writer, warrantsResp)
 	})
 
-	resp, err := client.GetWarrants([]string{symbol})
+	resp, httpResp, err := client.GetWarrants([]string{symbol})
 	require.Nil(t, err)
+	require.NotNil(t, httpResp)
 
 	war := resp[0]
 
@@ -74,7 +76,7 @@ func TestGetWarrantsError(t *testing.T) {
 		fmt.Fprint(writer, tastyUnauthorizedError)
 	})
 
-	_, err := client.GetWarrants([]string{symbol})
+	_, _, err := client.GetWarrants([]string{symbol})
 	expectedUnauthorized(t, err)
 }
 
@@ -88,8 +90,9 @@ func TestGetWarrant(t *testing.T) {
 		fmt.Fprint(writer, warrantResp)
 	})
 
-	war, err := client.GetWarrant(symbol)
+	war, httpResp, err := client.GetWarrant(symbol)
 	require.Nil(t, err)
+	require.NotNil(t, httpResp)
 
 	require.Equal(t, symbol, war.Symbol)
 	require.Equal(t, WarrantIT, war.InstrumentType)
@@ -109,7 +112,7 @@ func TestGetWarrantError(t *testing.T) {
 		fmt.Fprint(writer, tastyUnauthorizedError)
 	})
 
-	_, err := client.GetWarrant(symbol)
+	_, _, err := client.GetWarrant(symbol)
 	expectedUnauthorized(t, err)
 }
 

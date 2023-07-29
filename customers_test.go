@@ -17,8 +17,9 @@ func TestGetMyCustomerInfo(t *testing.T) {
 		fmt.Fprint(writer, getCustomerResp)
 	})
 
-	resp, err := client.GetMyCustomerInfo()
+	resp, httpResp, err := client.GetMyCustomerInfo()
 	require.Nil(t, err)
+	require.NotNil(t, httpResp)
 
 	require.Equal(t, "me", resp.ID)
 	require.Equal(t, "Austin", resp.FirstName)
@@ -127,8 +128,9 @@ func TestGetMyCustomerInfoError(t *testing.T) {
 		fmt.Fprint(writer, tastyUnauthorizedError)
 	})
 
-	_, err := client.GetMyCustomerInfo()
+	_, httpResp, err := client.GetMyCustomerInfo()
 	expectedUnauthorized(t, err)
+	require.NotNil(t, httpResp)
 }
 
 func TestGetCustomer(t *testing.T) {
@@ -139,8 +141,9 @@ func TestGetCustomer(t *testing.T) {
 		fmt.Fprint(writer, getCustomerResp)
 	})
 
-	resp, err := client.GetCustomer("me")
+	resp, httpResp, err := client.GetCustomer("me")
 	require.Nil(t, err)
+	require.NotNil(t, httpResp)
 
 	require.Equal(t, "me", resp.ID)
 	require.Equal(t, "Austin", resp.FirstName)
@@ -248,8 +251,9 @@ func TestGetCustomerError(t *testing.T) {
 		fmt.Fprint(writer, tastyUnauthorizedError)
 	})
 
-	_, err := client.GetCustomer("me")
+	_, httpResp, err := client.GetCustomer("me")
 	expectedUnauthorized(t, err)
+	require.NotNil(t, httpResp)
 }
 
 func TestGetCustomerAccounts(t *testing.T) {
@@ -260,8 +264,9 @@ func TestGetCustomerAccounts(t *testing.T) {
 		fmt.Fprint(writer, myAccountsResp)
 	})
 
-	resp, err := client.GetCustomerAccounts("me")
+	resp, httpResp, err := client.GetCustomerAccounts("me")
 	require.Nil(t, err)
+	require.NotNil(t, httpResp)
 
 	require.Equal(t, 3, len(resp))
 
@@ -295,8 +300,9 @@ func TestGetCustomerAccountsError(t *testing.T) {
 		fmt.Fprint(writer, tastyUnauthorizedError)
 	})
 
-	_, err := client.GetCustomerAccounts("me")
+	_, httpResp, err := client.GetCustomerAccounts("me")
 	expectedUnauthorized(t, err)
+	require.NotNil(t, httpResp)
 }
 
 func TestGetCustomerAccount(t *testing.T) {
@@ -310,8 +316,9 @@ func TestGetCustomerAccount(t *testing.T) {
 		fmt.Fprint(writer, getCustomerAccountResp)
 	})
 
-	resp, err := client.GetCustomerAccount(customerID, accountNumber)
+	resp, httpResp, err := client.GetCustomerAccount(customerID, accountNumber)
 	require.Nil(t, err)
+	require.NotNil(t, httpResp)
 
 	require.Equal(t, "5WV48989", resp.AccountNumber)
 	require.Equal(t, "2023-06-13T23:00:29.903Z", resp.OpenedAt.Format(time.RFC3339Nano))
@@ -342,8 +349,9 @@ func TestGetCustomerAccountError(t *testing.T) {
 		fmt.Fprint(writer, tastyUnauthorizedError)
 	})
 
-	_, err := client.GetCustomerAccount(customerID, accountNumber)
+	_, httpResp, err := client.GetCustomerAccount(customerID, accountNumber)
 	expectedUnauthorized(t, err)
+	require.NotNil(t, httpResp)
 }
 
 func TestGetMyAccount(t *testing.T) {
@@ -356,8 +364,9 @@ func TestGetMyAccount(t *testing.T) {
 		fmt.Fprint(writer, getCustomerAccountResp)
 	})
 
-	resp, err := client.GetMyAccount(accountNumber)
+	resp, httpResp, err := client.GetMyAccount(accountNumber)
 	require.Nil(t, err)
+	require.NotNil(t, httpResp)
 
 	require.Equal(t, "5WV48989", resp.AccountNumber)
 	require.Equal(t, "2023-06-13T23:00:29.903Z", resp.OpenedAt.Format(time.RFC3339Nano))
@@ -387,8 +396,9 @@ func TestGetMyAccountError(t *testing.T) {
 		fmt.Fprint(writer, tastyUnauthorizedError)
 	})
 
-	_, err := client.GetMyAccount(accountNumber)
+	_, httpResp, err := client.GetMyAccount(accountNumber)
 	expectedUnauthorized(t, err)
+	require.NotNil(t, httpResp)
 }
 
 func TestGetQuoteStreamerTokens(t *testing.T) {
@@ -399,8 +409,9 @@ func TestGetQuoteStreamerTokens(t *testing.T) {
 		fmt.Fprint(writer, quoteStreamerTokensResp)
 	})
 
-	resp, err := client.GetQuoteStreamerTokens()
+	resp, httpResp, err := client.GetQuoteStreamerTokens()
 	require.Nil(t, err)
+	require.NotNil(t, httpResp)
 
 	require.Equal(t, "example-token-here", resp.Token)
 	require.Equal(t, "tasty-live.dxfeed.com:7301", resp.StreamerURL)
@@ -417,8 +428,9 @@ func TestGetQuoteStreamerTokensError(t *testing.T) {
 		fmt.Fprint(writer, tastyUnauthorizedError)
 	})
 
-	_, err := client.GetQuoteStreamerTokens()
+	_, httpResp, err := client.GetQuoteStreamerTokens()
 	expectedUnauthorized(t, err)
+	require.NotNil(t, httpResp)
 }
 
 const getCustomerResp = `{
