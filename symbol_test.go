@@ -18,8 +18,9 @@ func TestSymbolSearch(t *testing.T) {
 		fmt.Fprint(writer, symbolSearchResp)
 	})
 
-	resp, err := client.SymbolSearch(symbolSearch)
+	resp, httpResp, err := client.SymbolSearch(symbolSearch)
 	require.Nil(t, err)
+	require.NotNil(t, httpResp)
 
 	require.Equal(t, 2, len(resp))
 
@@ -40,8 +41,9 @@ func TestSymbolSearchError(t *testing.T) {
 		fmt.Fprint(writer, tastyUnauthorizedError)
 	})
 
-	_, err := client.SymbolSearch(symbolSearch)
+	_, httpResp, err := client.SymbolSearch(symbolSearch)
 	expectedUnauthorized(t, err)
+	require.NotNil(t, httpResp)
 }
 
 const symbolSearchResp = `{

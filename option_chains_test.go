@@ -20,8 +20,9 @@ func TestGetFuturesOptionChains(t *testing.T) {
 		fmt.Fprint(writer, futuresOptionChainsResp)
 	})
 
-	resp, err := client.GetFuturesOptionChains(productCode)
+	resp, httpResp, err := client.GetFuturesOptionChains(productCode)
 	require.Nil(t, err)
+	require.NotNil(t, httpResp)
 
 	require.Equal(t, 1, len(resp))
 
@@ -89,7 +90,7 @@ func TestGetFuturesOptionChainsError(t *testing.T) {
 		fmt.Fprint(writer, tastyUnauthorizedError)
 	})
 
-	_, err := client.GetFuturesOptionChains(productCode)
+	_, _, err := client.GetFuturesOptionChains(productCode)
 	expectedUnauthorized(t, err)
 }
 
@@ -103,8 +104,9 @@ func TestGetNestedFuturesOptionChains(t *testing.T) {
 		fmt.Fprint(writer, futuresOptionChainsNested)
 	})
 
-	resp, err := client.GetNestedFuturesOptionChains(productCode)
+	resp, httpResp, err := client.GetNestedFuturesOptionChains(productCode)
 	require.Nil(t, err)
+	require.NotNil(t, httpResp)
 
 	nestedFuture := resp.Futures[0]
 
@@ -165,7 +167,7 @@ func TestGetNestedFuturesOptionChainsError(t *testing.T) {
 		fmt.Fprint(writer, tastyUnauthorizedError)
 	})
 
-	_, err := client.GetNestedFuturesOptionChains(productCode)
+	_, _, err := client.GetNestedFuturesOptionChains(productCode)
 	expectedUnauthorized(t, err)
 }
 
@@ -179,8 +181,9 @@ func TestGetEquityOptionChains(t *testing.T) {
 		fmt.Fprint(writer, equityOptionChainsResp)
 	})
 
-	resp, err := client.GetEquityOptionChains(symbol)
+	resp, httpResp, err := client.GetEquityOptionChains(symbol)
 	require.Nil(t, err)
+	require.NotNil(t, httpResp)
 
 	require.Equal(t, 2, len(resp))
 
@@ -218,7 +221,7 @@ func TestGetEquityOptionChainsError(t *testing.T) {
 		fmt.Fprint(writer, tastyUnauthorizedError)
 	})
 
-	_, err := client.GetEquityOptionChains(symbol)
+	_, _, err := client.GetEquityOptionChains(symbol)
 	expectedUnauthorized(t, err)
 }
 
@@ -232,8 +235,9 @@ func TestGetNestedEquityOptionChains(t *testing.T) {
 		fmt.Fprint(writer, equityOptionChainsNestedResp)
 	})
 
-	resp, err := client.GetNestedEquityOptionChains(symbol)
+	resp, httpResp, err := client.GetNestedEquityOptionChains(symbol)
 	require.Nil(t, err)
+	require.NotNil(t, httpResp)
 
 	eo := resp[0]
 
@@ -285,7 +289,7 @@ func TestGetNestedEquityOptionChainsError(t *testing.T) {
 		fmt.Fprint(writer, tastyUnauthorizedError)
 	})
 
-	_, err := client.GetNestedEquityOptionChains(symbol)
+	_, _, err := client.GetNestedEquityOptionChains(symbol)
 	expectedUnauthorized(t, err)
 }
 
@@ -299,8 +303,9 @@ func TestGetCompactEquityOptionChains(t *testing.T) {
 		fmt.Fprint(writer, equityOptionChainsCompactResp)
 	})
 
-	resp, err := client.GetCompactEquityOptionChains(symbol)
+	resp, httpResp, err := client.GetCompactEquityOptionChains(symbol)
 	require.Nil(t, err)
+	require.NotNil(t, httpResp)
 
 	eo := resp[0]
 
@@ -337,7 +342,7 @@ func TestGetCompactEquityOptionChainsError(t *testing.T) {
 		fmt.Fprint(writer, tastyUnauthorizedError)
 	})
 
-	_, err := client.GetCompactEquityOptionChains(symbol)
+	_, _, err := client.GetCompactEquityOptionChains(symbol)
 	expectedUnauthorized(t, err)
 }
 

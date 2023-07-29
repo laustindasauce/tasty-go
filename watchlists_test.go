@@ -47,8 +47,9 @@ func TestGetMyWatchlists(t *testing.T) {
 		fmt.Fprint(writer, getWatchlistsResp)
 	})
 
-	resp, err := client.GetMyWatchlists()
+	resp, httpResp, err := client.GetMyWatchlists()
 	require.Nil(t, err)
+	require.NotNil(t, httpResp)
 	require.Equal(t, 1, len(resp))
 
 	w := resp[0]
@@ -70,8 +71,9 @@ func TestGetMyWatchlistsError(t *testing.T) {
 		fmt.Fprint(writer, tastyUnauthorizedError)
 	})
 
-	_, err := client.GetMyWatchlists()
+	_, httpResp, err := client.GetMyWatchlists()
 	expectedUnauthorized(t, err)
+	require.NotNil(t, httpResp)
 }
 
 func TestGetMyWatchlist(t *testing.T) {
@@ -82,8 +84,9 @@ func TestGetMyWatchlist(t *testing.T) {
 		fmt.Fprint(writer, getWatchlistResp)
 	})
 
-	w, err := client.GetMyWatchlist(watchlist.Name)
+	w, httpResp, err := client.GetMyWatchlist(watchlist.Name)
 	require.Nil(t, err)
+	require.NotNil(t, httpResp)
 
 	require.Equal(t, watchlist.Name, w.Name)
 	require.Equal(t, len(watchlist.WatchlistEntries), len(w.WatchlistEntries))
@@ -102,8 +105,9 @@ func TestGetMyWatchlistError(t *testing.T) {
 		fmt.Fprint(writer, tastyUnauthorizedError)
 	})
 
-	_, err := client.GetMyWatchlist(watchlist.Name)
+	_, httpResp, err := client.GetMyWatchlist(watchlist.Name)
 	expectedUnauthorized(t, err)
+	require.NotNil(t, httpResp)
 }
 
 func TestCreateWatchlist(t *testing.T) {
@@ -114,8 +118,9 @@ func TestCreateWatchlist(t *testing.T) {
 		fmt.Fprint(writer, createWatchlistResp)
 	})
 
-	w, err := client.CreateWatchlist(watchlist)
+	w, httpResp, err := client.CreateWatchlist(watchlist)
 	require.Nil(t, err)
+	require.NotNil(t, httpResp)
 
 	require.Equal(t, watchlist.Name, w.Name)
 	require.Equal(t, len(watchlist.WatchlistEntries), len(w.WatchlistEntries))
@@ -134,8 +139,9 @@ func TestCreateWatchlistError(t *testing.T) {
 		fmt.Fprint(writer, tastyUnauthorizedError)
 	})
 
-	_, err := client.CreateWatchlist(watchlist)
+	_, httpResp, err := client.CreateWatchlist(watchlist)
 	expectedUnauthorized(t, err)
+	require.NotNil(t, httpResp)
 }
 
 func TestEditWatchlist(t *testing.T) {
@@ -146,8 +152,9 @@ func TestEditWatchlist(t *testing.T) {
 		fmt.Fprint(writer, editedWatchlistResp)
 	})
 
-	w, err := client.EditWatchlist(watchlist.Name, newWatchlist)
+	w, httpResp, err := client.EditWatchlist(watchlist.Name, newWatchlist)
 	require.Nil(t, err)
+	require.NotNil(t, httpResp)
 
 	require.Equal(t, newWatchlist.Name, w.Name)
 	require.Equal(t, len(newWatchlist.WatchlistEntries), len(w.WatchlistEntries))
@@ -166,8 +173,9 @@ func TestEditWatchlistError(t *testing.T) {
 		fmt.Fprint(writer, tastyUnauthorizedError)
 	})
 
-	_, err := client.EditWatchlist(watchlist.Name, newWatchlist)
+	_, httpResp, err := client.EditWatchlist(watchlist.Name, newWatchlist)
 	expectedUnauthorized(t, err)
+	require.NotNil(t, httpResp)
 }
 
 func TestDeleteWatchlist(t *testing.T) {
@@ -178,8 +186,9 @@ func TestDeleteWatchlist(t *testing.T) {
 		fmt.Fprint(writer, deleteWatchlistResp)
 	})
 
-	w, err := client.DeleteWatchlist(newWatchlist.Name)
+	w, httpResp, err := client.DeleteWatchlist(newWatchlist.Name)
 	require.Nil(t, err)
+	require.NotNil(t, httpResp)
 
 	require.NotNil(t, w.ID)
 	require.Equal(t, 162, *w.ID)
@@ -205,8 +214,9 @@ func TestDeleteWatchlistError(t *testing.T) {
 		fmt.Fprint(writer, tastyUnauthorizedError)
 	})
 
-	_, err := client.DeleteWatchlist(newWatchlist.Name)
+	_, httpResp, err := client.DeleteWatchlist(newWatchlist.Name)
 	expectedUnauthorized(t, err)
+	require.NotNil(t, httpResp)
 }
 
 func TestGetPairsWatchlists(t *testing.T) {
@@ -217,8 +227,9 @@ func TestGetPairsWatchlists(t *testing.T) {
 		fmt.Fprint(writer, getPairsWatchlistsResp)
 	})
 
-	resp, err := client.GetPairsWatchlists()
+	resp, httpResp, err := client.GetPairsWatchlists()
 	require.Nil(t, err)
+	require.NotNil(t, httpResp)
 	require.Equal(t, 1, len(resp))
 
 	w := resp[0]
@@ -244,8 +255,9 @@ func TestGetPairsWatchlistsError(t *testing.T) {
 		fmt.Fprint(writer, tastyUnauthorizedError)
 	})
 
-	_, err := client.GetPairsWatchlists()
+	_, httpResp, err := client.GetPairsWatchlists()
 	expectedUnauthorized(t, err)
+	require.NotNil(t, httpResp)
 }
 
 func TestGetPairsWatchlist(t *testing.T) {
@@ -258,8 +270,9 @@ func TestGetPairsWatchlist(t *testing.T) {
 		fmt.Fprint(writer, getPairsWatchlistResp)
 	})
 
-	w, err := client.GetPairsWatchlist(name)
+	w, httpResp, err := client.GetPairsWatchlist(name)
 	require.Nil(t, err)
+	require.NotNil(t, httpResp)
 
 	pe := w.PairsEquations[0]
 
@@ -285,8 +298,9 @@ func TestGetPairsWatchlistError(t *testing.T) {
 		fmt.Fprint(writer, tastyUnauthorizedError)
 	})
 
-	_, err := client.GetPairsWatchlist(name)
+	_, httpResp, err := client.GetPairsWatchlist(name)
 	expectedUnauthorized(t, err)
+	require.NotNil(t, httpResp)
 }
 
 func TestGetPublicWatchlists(t *testing.T) {
@@ -299,8 +313,9 @@ func TestGetPublicWatchlists(t *testing.T) {
 
 	countsOnly := false
 
-	resp, err := client.GetPublicWatchlists(countsOnly)
+	resp, httpResp, err := client.GetPublicWatchlists(countsOnly)
 	require.Nil(t, err)
+	require.NotNil(t, httpResp)
 	require.Equal(t, 1, len(resp))
 
 	w := resp[0]
@@ -325,8 +340,9 @@ func TestGetPublicWatchlistsError(t *testing.T) {
 
 	countsOnly := false
 
-	_, err := client.GetPublicWatchlists(countsOnly)
+	_, httpResp, err := client.GetPublicWatchlists(countsOnly)
 	expectedUnauthorized(t, err)
+	require.NotNil(t, httpResp)
 }
 
 func TestGetPublicWatchlistsCounts(t *testing.T) {
@@ -339,8 +355,9 @@ func TestGetPublicWatchlistsCounts(t *testing.T) {
 
 	countsOnly := true
 
-	countsResp, err := client.GetPublicWatchlists(countsOnly)
+	countsResp, httpResp, err := client.GetPublicWatchlists(countsOnly)
 	require.Nil(t, err)
+	require.NotNil(t, httpResp)
 
 	require.Equal(t, 2, len(countsResp))
 
@@ -362,8 +379,9 @@ func TestGetPublicWatchlistsCountsError(t *testing.T) {
 
 	countsOnly := true
 
-	_, err := client.GetPublicWatchlists(countsOnly)
+	_, httpResp, err := client.GetPublicWatchlists(countsOnly)
 	expectedUnauthorized(t, err)
+	require.NotNil(t, httpResp)
 }
 
 func TestGetPublicWatchlist(t *testing.T) {
@@ -376,8 +394,9 @@ func TestGetPublicWatchlist(t *testing.T) {
 		fmt.Fprint(writer, getPublicWatchlistResp)
 	})
 
-	w, err := client.GetPublicWatchlist(name)
+	w, httpResp, err := client.GetPublicWatchlist(name)
 	require.Nil(t, err)
+	require.NotNil(t, httpResp)
 
 	pe := w.WatchlistEntries[0]
 
@@ -400,8 +419,9 @@ func TestGetPublicWatchlistError(t *testing.T) {
 		fmt.Fprint(writer, tastyUnauthorizedError)
 	})
 
-	_, err := client.GetPublicWatchlist(name)
+	_, httpResp, err := client.GetPublicWatchlist(name)
 	expectedUnauthorized(t, err)
+	require.NotNil(t, httpResp)
 }
 
 const getWatchlistsResp = `{
