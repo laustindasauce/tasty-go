@@ -149,13 +149,6 @@ func (c *Client) customRequest(method, path string, params, payload, result any)
 		return &Error{Message: fmt.Sprintf("Client Side Error: %v", err)}
 	}
 
-	// body, err = ioutil.ReadAll(resp.Body)
-	// if err != nil {
-	// 	return &Error{Message: fmt.Sprintf("Client Side Error: %v", err)}
-	// }
-
-	// fmt.Println(string(body))
-
 	defer resp.Body.Close()
 
 	if resp.StatusCode == http.StatusNoContent {
@@ -210,14 +203,6 @@ func (c *Client) request(method, path string, params, payload, result any) *Erro
 		return &Error{Message: fmt.Sprintf("Client Side Error: %v", err)}
 	}
 
-	// body, err = ioutil.ReadAll(resp.Body)
-
-	// if err != nil {
-	// 	return &Error{Message: fmt.Sprintf("Client Side Error: %v", err)}
-	// }
-
-	// fmt.Println(string(body))
-
 	defer resp.Body.Close()
 
 	if resp.StatusCode == http.StatusNoContent {
@@ -271,14 +256,6 @@ func (c *Client) noAuthRequest(method, path string, header http.Header, params, 
 	if err != nil {
 		return &Error{Message: fmt.Sprintf("Client Side Error: %v", err)}
 	}
-
-	// body, err = ioutil.ReadAll(resp.Body)
-
-	// if err != nil {
-	// 	return &Error{Message: fmt.Sprintf("Client Side Error: %v", err)}
-	// }
-
-	// fmt.Println(string(body))
 
 	defer resp.Body.Close()
 
