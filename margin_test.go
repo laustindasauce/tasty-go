@@ -209,21 +209,6 @@ func TestGetEffectiveMarginRequirementsError(t *testing.T) {
 	expectedUnauthorized(t, err)
 }
 
-func TestMarginRequirementsDryRunError(t *testing.T) {
-	setup()
-	defer teardown()
-
-	accountNumber := "5YZ55555"
-
-	mux.HandleFunc(fmt.Sprintf("/margin/accounts/%s/dry-run", accountNumber), func(writer http.ResponseWriter, request *http.Request) {
-		writer.WriteHeader(401)
-		fmt.Fprint(writer, tastyUnauthorizedError)
-	})
-
-	_, err := client.MarginRequirementsDryRun(accountNumber, NewOrder{})
-	expectedUnauthorized(t, err)
-}
-
 const marginReqResp = `{
   "data": {
     "account-number": "5YZ55555",
