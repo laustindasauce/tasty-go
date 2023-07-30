@@ -34,7 +34,7 @@ type Client struct {
 }
 
 // NewClient creates a new Tasty Client.
-func NewClient(httpClient *http.Client) (*Client, error) {
+func NewClient(httpClient *http.Client) *Client {
 	if httpClient == nil {
 		httpClient = defaultHTTPClient
 	}
@@ -44,11 +44,11 @@ func NewClient(httpClient *http.Client) (*Client, error) {
 		baseHost:   apiBaseHost,
 	}
 
-	return c, nil
+	return c
 }
 
 // NewCertClient creates a new Tasty Cert Client.
-func NewCertClient(httpClient *http.Client) (*Client, error) {
+func NewCertClient(httpClient *http.Client) *Client {
 	if httpClient == nil {
 		httpClient = defaultHTTPClient
 	}
@@ -58,7 +58,7 @@ func NewCertClient(httpClient *http.Client) (*Client, error) {
 		baseHost:   apiCertBaseHost,
 	}
 
-	return c, nil
+	return c
 }
 
 // Error reasoning given by TastyTrade.
