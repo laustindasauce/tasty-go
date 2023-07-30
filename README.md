@@ -5,15 +5,15 @@
 [![Go Report Card](https://goreportcard.com/badge/github.com/austinbspencer/tasty-go)](https://goreportcard.com/report/github.com/austinbspencer/tasty-go)
 [![codecov](https://codecov.io/gh/austinbspencer/tasty-go/branch/main/graph/badge.svg?token=ZVVJF2RFQO)](https://codecov.io/gh/austinbspencer/tasty-go)
 
-This library provides `unofficial` Go clients for [TastyTrade API](https://tastytrade.com).
+This library provides `unofficial` Go clients for [tastytrade API](https://tastytrade.com).
 
-> You will need to opt into TastyTrade's API [here](https://developer.tastytrade.com)
+> You will need to opt into tastytrade's API [here](https://developer.tastytrade.com)
 
-## TastyTrade
+## tastytrade
 
-[TastyTrade](https://tastytrade.com/about-us/) pioneered options trading technology for retail traders.
+[tastytrade](https://tastytrade.com/about-us/) pioneered options trading technology for retail traders.
 
-[Create your account](https://start.tastytrade.com/#/login?referralCode=MS53QAT6DS) if you don't already have one to begin trading with TastyTrade.
+[Create your account](https://start.tastytrade.com/#/login?referralCode=MS53QAT6DS) if you don't already have one to begin trading with tastytrade.
 
 ## Dependencies
 
@@ -23,13 +23,10 @@ There are very few dependencies for this lightweight API wrapper.
 - [go-querystring](https://github.com/google/go-querystring)
 - [testify](https://github.com/stretchr/testify) `for testing`
 
-## TO-DO
+## Untested endpoints
 
-- Untested endpoints
-  - Margin requirements dry-run
-    - Server is returning 500 error when sending what the documentation shows as expected request body.
-  - Order reconfirm
-    - TastyTrade API support has informed me that this endpoint is for Equity Offering orders only.
+- Order reconfirm
+  - tastytrade API support has informed me that this endpoint is for Equity Offering orders only.
 
 ## Installation
 
@@ -86,7 +83,7 @@ func main() {
 
 ## Basic API Usage
 
-Check out TastyTrade's [documentation](https://developer.tastytrade.com/basic-api-usage/)
+Check out tastytrade's [documentation](https://developer.tastytrade.com/basic-api-usage/)
 
 <details>
 <summary>Auth Patterns (Token, session lifetime)</summary>
@@ -648,7 +645,7 @@ func main() {
 
 ## Order Management
 
-Check out TastyTrade's [documentation](https://developer.tastytrade.com/order-management/)
+Check out tastytrade's [documentation](https://developer.tastytrade.com/order-management/)
 
 <details>
 <summary>Search Orders</summary>
@@ -1179,7 +1176,7 @@ order := tasty.NewOrder{
 
 - To determine if an equity can be fractionally traded, fetch the equity instrument and check the is-fractional-quantity-eligible field
 
-Check out TastyTrade's [documentation](https://developer.tastytrade.com/order-management/#example-order-requests)
+Check out tastytrade's [documentation](https://developer.tastytrade.com/order-management/#example-order-requests)
 
 > Fractional Quantity Order
 
@@ -1224,14 +1221,14 @@ order := tasty.NewOrder{
 
 ## Streaming Market Data
 
-Check out TastyTrade's [documentation](https://developer.tastytrade.com/streaming-market-data/)
+Check out tastytrade's [documentation](https://developer.tastytrade.com/streaming-market-data/)
 
 <details>
 <summary>Get a Streamer Token</summary>
 
-**This requires using the DXFeed Streamer which isn't supported by TastyTrade or this unofficial TastyTrade API wrapper.**
+**This requires using the DXFeed Streamer which isn't supported by tastytrade or this unofficial tastytrade API wrapper.**
 
-Check out TastyTrade's [documentation](https://developer.tastytrade.com/#streaming-market-data)
+Check out tastytrade's [documentation](https://developer.tastytrade.com/#streaming-market-data)
 
 ```go
 package main
@@ -1278,7 +1275,7 @@ func main() {
 
 ## Streaming Account Data
 
-Check out TastyTrade's [documentation](https://developer.tastytrade.com/streaming-account-data/)
+Check out tastytrade's [documentation](https://developer.tastytrade.com/streaming-account-data/)
 
 ## Testing
 

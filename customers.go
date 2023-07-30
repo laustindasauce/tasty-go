@@ -6,7 +6,7 @@ import (
 )
 
 // Get authenticated customer.
-func (c *Client) GetMyCustomerInfo() (Customer, error) {
+func (c *Client) GetMyCustomerInfo() (Customer, *http.Response, error) {
 	path := "/customers/me"
 
 	type customerResponse struct {
@@ -15,16 +15,16 @@ func (c *Client) GetMyCustomerInfo() (Customer, error) {
 
 	customersRes := new(customerResponse)
 
-	err := c.request(http.MethodGet, path, nil, nil, customersRes)
+	resp, err := c.request(http.MethodGet, path, nil, nil, customersRes)
 	if err != nil {
-		return Customer{}, err
+		return Customer{}, resp, err
 	}
 
-	return customersRes.Customer, nil
+	return customersRes.Customer, resp, nil
 }
 
 // Get a full customer resource.
-func (c *Client) GetCustomer(customerID string) (Customer, error) {
+func (c *Client) GetCustomer(customerID string) (Customer, *http.Response, error) {
 	path := fmt.Sprintf("/customers/%s", customerID)
 
 	type customerResponse struct {
@@ -33,16 +33,16 @@ func (c *Client) GetCustomer(customerID string) (Customer, error) {
 
 	customersRes := new(customerResponse)
 
-	err := c.request(http.MethodGet, path, nil, nil, customersRes)
+	resp, err := c.request(http.MethodGet, path, nil, nil, customersRes)
 	if err != nil {
-		return Customer{}, err
+		return Customer{}, resp, err
 	}
 
-	return customersRes.Customer, nil
+	return customersRes.Customer, resp, nil
 }
 
 // Get a list of all the customer account resources attached to the current customer.
-func (c *Client) GetCustomerAccounts(customerID string) ([]Account, error) {
+func (c *Client) GetCustomerAccounts(customerID string) ([]Account, *http.Response, error) {
 	path := fmt.Sprintf("/customers/%s/accounts", customerID)
 
 	type customerResponse struct {
@@ -55,9 +55,9 @@ func (c *Client) GetCustomerAccounts(customerID string) ([]Account, error) {
 
 	customersRes := new(customerResponse)
 
-	err := c.request(http.MethodGet, path, nil, nil, customersRes)
+	resp, err := c.request(http.MethodGet, path, nil, nil, customersRes)
 	if err != nil {
-		return []Account{}, err
+		return []Account{}, resp, err
 	}
 
 	var accounts []Account
@@ -66,11 +66,11 @@ func (c *Client) GetCustomerAccounts(customerID string) ([]Account, error) {
 		accounts = append(accounts, acct.Account)
 	}
 
-	return accounts, nil
+	return accounts, resp, nil
 }
 
 // Get a full customer account resource.
-func (c *Client) GetCustomerAccount(customerID, accountNumber string) (Account, error) {
+func (c *Client) GetCustomerAccount(customerID, accountNumber string) (Account, *http.Response, error) {
 	path := fmt.Sprintf("/customers/%s/accounts/%s", customerID, accountNumber)
 
 	type customerResponse struct {
@@ -79,16 +79,16 @@ func (c *Client) GetCustomerAccount(customerID, accountNumber string) (Account, 
 
 	customersRes := new(customerResponse)
 
-	err := c.request(http.MethodGet, path, nil, nil, customersRes)
+	resp, err := c.request(http.MethodGet, path, nil, nil, customersRes)
 	if err != nil {
-		return Account{}, err
+		return Account{}, resp, err
 	}
 
-	return customersRes.Account, nil
+	return customersRes.Account, resp, nil
 }
 
 // Get authenticated user's full account resource.
-func (c *Client) GetMyAccount(accountNumber string) (Account, error) {
+func (c *Client) GetMyAccount(accountNumber string) (Account, *http.Response, error) {
 	path := fmt.Sprintf("/customers/me/accounts/%s", accountNumber)
 
 	type customerResponse struct {
@@ -97,17 +97,17 @@ func (c *Client) GetMyAccount(accountNumber string) (Account, error) {
 
 	customersRes := new(customerResponse)
 
-	err := c.request(http.MethodGet, path, nil, nil, customersRes)
+	resp, err := c.request(http.MethodGet, path, nil, nil, customersRes)
 	if err != nil {
-		return Account{}, err
+		return Account{}, resp, err
 	}
 
-	return customersRes.Account, nil
+	return customersRes.Account, resp, nil
 }
 
 // Returns the appropriate quote streamer endpoint, level and identification token.
 // for the current customer to receive market data.
-func (c *Client) GetQuoteStreamerTokens() (QuoteStreamerTokenAuthResult, error) {
+func (c *Client) GetQuoteStreamerTokens() (QuoteStreamerTokenAuthResult, *http.Response, error) {
 	path := "/quote-streamer-tokens"
 
 	type customerResponse struct {
@@ -116,10 +116,10 @@ func (c *Client) GetQuoteStreamerTokens() (QuoteStreamerTokenAuthResult, error) 
 
 	customersRes := new(customerResponse)
 
-	err := c.request(http.MethodGet, path, nil, nil, customersRes)
+	resp, err := c.request(http.MethodGet, path, nil, nil, customersRes)
 	if err != nil {
-		return QuoteStreamerTokenAuthResult{}, err
+		return QuoteStreamerTokenAuthResult{}, resp, err
 	}
 
-	return customersRes.Streamer, nil
+	return customersRes.Streamer, resp, nil
 }

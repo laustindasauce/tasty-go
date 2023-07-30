@@ -18,8 +18,9 @@ func TestGetMyAccounts(t *testing.T) {
 		fmt.Fprint(writer, myAccountsResp)
 	})
 
-	resp, err := client.GetMyAccounts()
+	resp, httpResp, err := client.GetMyAccounts()
 	require.Nil(t, err)
+	require.NotNil(t, httpResp)
 
 	require.Equal(t, 3, len(resp))
 
@@ -53,8 +54,9 @@ func TestGetMyAccountsError(t *testing.T) {
 		fmt.Fprint(writer, tastyUnauthorizedError)
 	})
 
-	_, err := client.GetMyAccounts()
+	_, httpResp, err := client.GetMyAccounts()
 	expectedUnauthorized(t, err)
+	require.NotNil(t, httpResp)
 }
 
 func TestGetAccountTradingStatus(t *testing.T) {
@@ -67,8 +69,9 @@ func TestGetAccountTradingStatus(t *testing.T) {
 		fmt.Fprint(writer, accountTradingStatusResp)
 	})
 
-	resp, err := client.GetAccountTradingStatus(accountNumber)
+	resp, httpResp, err := client.GetAccountTradingStatus(accountNumber)
 	require.Nil(t, err)
+	require.NotNil(t, httpResp)
 
 	require.Equal(t, "5YZ55555", resp.AccountNumber)
 	require.Equal(t, 0, resp.DayTradeCount)
@@ -115,8 +118,9 @@ func TestGetAccountTradingStatusError(t *testing.T) {
 		fmt.Fprint(writer, tastyUnauthorizedError)
 	})
 
-	_, err := client.GetAccountTradingStatus(accountNumber)
+	_, httpResp, err := client.GetAccountTradingStatus(accountNumber)
 	expectedUnauthorized(t, err)
+	require.NotNil(t, httpResp)
 }
 
 func TestGetAccountBalances(t *testing.T) {
@@ -129,8 +133,9 @@ func TestGetAccountBalances(t *testing.T) {
 		fmt.Fprint(writer, accountBalancesResp)
 	})
 
-	resp, err := client.GetAccountBalances(accountNumber)
+	resp, httpResp, err := client.GetAccountBalances(accountNumber)
 	require.Nil(t, err)
+	require.NotNil(t, httpResp)
 
 	require.Equal(t, "5YZ55555", resp.AccountNumber)
 	require.Equal(t, decimal.NewFromFloat(51600.762), resp.CashBalance)
@@ -181,8 +186,9 @@ func TestGetAccountBalancesError(t *testing.T) {
 		fmt.Fprint(writer, tastyUnauthorizedError)
 	})
 
-	_, err := client.GetAccountBalances(accountNumber)
+	_, httpResp, err := client.GetAccountBalances(accountNumber)
 	expectedUnauthorized(t, err)
+	require.NotNil(t, httpResp)
 }
 
 func TestGetAccountPositions(t *testing.T) {
@@ -196,8 +202,9 @@ func TestGetAccountPositions(t *testing.T) {
 		fmt.Fprint(writer, accountPositionsResp)
 	})
 
-	resp, err := client.GetAccountPositions(accountNumber, query)
+	resp, httpResp, err := client.GetAccountPositions(accountNumber, query)
 	require.Nil(t, err)
+	require.NotNil(t, httpResp)
 
 	rivn := resp[0]
 
@@ -239,8 +246,9 @@ func TestGetAccountPositionsError(t *testing.T) {
 		fmt.Fprint(writer, tastyUnauthorizedError)
 	})
 
-	_, err := client.GetAccountPositions(accountNumber, query)
+	_, httpResp, err := client.GetAccountPositions(accountNumber, query)
 	expectedUnauthorized(t, err)
+	require.NotNil(t, httpResp)
 }
 
 func TestGetAccountBalanceSnapshots(t *testing.T) {
@@ -254,8 +262,9 @@ func TestGetAccountBalanceSnapshots(t *testing.T) {
 		fmt.Fprint(writer, balanceSnapshotsResp)
 	})
 
-	resp, err := client.GetAccountBalanceSnapshots(accountNumber, query)
+	resp, httpResp, err := client.GetAccountBalanceSnapshots(accountNumber, query)
 	require.Nil(t, err)
+	require.NotNil(t, httpResp)
 
 	snap := resp[0]
 
@@ -318,8 +327,9 @@ func TestGetAccountBalanceSnapshotsError(t *testing.T) {
 		fmt.Fprint(writer, tastyUnauthorizedError)
 	})
 
-	_, err := client.GetAccountBalanceSnapshots(accountNumber, query)
+	_, httpResp, err := client.GetAccountBalanceSnapshots(accountNumber, query)
 	expectedUnauthorized(t, err)
+	require.NotNil(t, httpResp)
 }
 
 func TestGetAccountNetLiqHistory(t *testing.T) {
@@ -333,8 +343,9 @@ func TestGetAccountNetLiqHistory(t *testing.T) {
 		fmt.Fprint(writer, netLiqHistoryResp)
 	})
 
-	resp, err := client.GetAccountNetLiqHistory(accountNumber, query)
+	resp, httpResp, err := client.GetAccountNetLiqHistory(accountNumber, query)
 	require.Nil(t, err)
+	require.NotNil(t, httpResp)
 
 	require.Equal(t, 3, len(resp))
 
@@ -367,8 +378,9 @@ func TestGetAccountNetLiqHistoryError(t *testing.T) {
 		fmt.Fprint(writer, tastyUnauthorizedError)
 	})
 
-	_, err := client.GetAccountNetLiqHistory(accountNumber, query)
+	_, httpResp, err := client.GetAccountNetLiqHistory(accountNumber, query)
 	expectedUnauthorized(t, err)
+	require.NotNil(t, httpResp)
 }
 
 func TestGetAccountPositionLimit(t *testing.T) {
@@ -381,8 +393,9 @@ func TestGetAccountPositionLimit(t *testing.T) {
 		fmt.Fprint(writer, positionLimitResp)
 	})
 
-	resp, err := client.GetAccountPositionLimit(accountNumber)
+	resp, httpResp, err := client.GetAccountPositionLimit(accountNumber)
 	require.Nil(t, err)
+	require.NotNil(t, httpResp)
 
 	require.Equal(t, accountNumber, resp.AccountNumber)
 	require.Equal(t, 50000, resp.EquityOrderSize)
@@ -407,8 +420,9 @@ func TestGetAccountPositionLimitError(t *testing.T) {
 		fmt.Fprint(writer, tastyUnauthorizedError)
 	})
 
-	_, err := client.GetAccountPositionLimit(accountNumber)
+	_, httpResp, err := client.GetAccountPositionLimit(accountNumber)
 	expectedUnauthorized(t, err)
+	require.NotNil(t, httpResp)
 }
 
 const myAccountsResp = `{

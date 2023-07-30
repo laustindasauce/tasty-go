@@ -19,8 +19,9 @@ func TestGetMarginRequirements(t *testing.T) {
 		fmt.Fprint(writer, marginReqResp)
 	})
 
-	resp, err := client.GetMarginRequirements(accountNumber)
+	resp, httpResp, err := client.GetMarginRequirements(accountNumber)
 	require.Nil(t, err)
+	require.NotNil(t, httpResp)
 
 	require.Equal(t, accountNumber, resp.AccountNumber)
 	require.Equal(t, "Total", resp.Description)
@@ -165,7 +166,7 @@ func TestGetMarginRequirementsError(t *testing.T) {
 		fmt.Fprint(writer, tastyUnauthorizedError)
 	})
 
-	_, err := client.GetMarginRequirements(accountNumber)
+	_, _, err := client.GetMarginRequirements(accountNumber)
 	expectedUnauthorized(t, err)
 }
 
@@ -180,8 +181,9 @@ func TestGetEffectiveMarginRequirements(t *testing.T) {
 		fmt.Fprint(writer, effectiveMarginRequirementsResp)
 	})
 
-	resp, err := client.GetEffectiveMarginRequirements(accountNumber, underlyingSymbol)
+	resp, httpResp, err := client.GetEffectiveMarginRequirements(accountNumber, underlyingSymbol)
 	require.Nil(t, err)
+	require.NotNil(t, httpResp)
 
 	require.Equal(t, underlyingSymbol, resp.UnderlyingSymbol)
 	require.Equal(t, decimal.NewFromFloat(.5), resp.LongEquityInitial)
@@ -205,22 +207,7 @@ func TestGetEffectiveMarginRequirementsError(t *testing.T) {
 		fmt.Fprint(writer, tastyUnauthorizedError)
 	})
 
-	_, err := client.GetEffectiveMarginRequirements(accountNumber, underlyingSymbol)
-	expectedUnauthorized(t, err)
-}
-
-func TestMarginRequirementsDryRunError(t *testing.T) {
-	setup()
-	defer teardown()
-
-	accountNumber := "5YZ55555"
-
-	mux.HandleFunc(fmt.Sprintf("/margin/accounts/%s/dry-run", accountNumber), func(writer http.ResponseWriter, request *http.Request) {
-		writer.WriteHeader(401)
-		fmt.Fprint(writer, tastyUnauthorizedError)
-	})
-
-	_, err := client.MarginRequirementsDryRun(accountNumber, NewOrder{})
+	_, _, err := client.GetEffectiveMarginRequirements(accountNumber, underlyingSymbol)
 	expectedUnauthorized(t, err)
 }
 

@@ -21,8 +21,9 @@ func TestGetAccountTransactions(t *testing.T) {
 		fmt.Fprint(writer, transactionsResp)
 	})
 
-	resp, pagination, err := client.GetAccountTransactions(accountNumber, query)
+	resp, pagination, httpResp, err := client.GetAccountTransactions(accountNumber, query)
 	require.Nil(t, err)
+	require.NotNil(t, httpResp)
 
 	require.Equal(t, 3, len(resp))
 
@@ -89,8 +90,9 @@ func TestGetAccountTransactionsError(t *testing.T) {
 		fmt.Fprint(writer, tastyUnauthorizedError)
 	})
 
-	_, _, err := client.GetAccountTransactions(accountNumber, query)
+	_, _, httpResp, err := client.GetAccountTransactions(accountNumber, query)
 	expectedUnauthorized(t, err)
+	require.NotNil(t, httpResp)
 }
 
 func TestGetAccountTransaction(t *testing.T) {
@@ -104,8 +106,9 @@ func TestGetAccountTransaction(t *testing.T) {
 		fmt.Fprint(writer, transactionResp)
 	})
 
-	tr, err := client.GetAccountTransaction(accountNumber, id)
+	tr, httpResp, err := client.GetAccountTransaction(accountNumber, id)
 	require.Nil(t, err)
+	require.NotNil(t, httpResp)
 
 	require.Equal(t, 2455333333, tr.ID)
 	require.Equal(t, accountNumber, tr.AccountNumber)
@@ -158,8 +161,9 @@ func TestGetAccountTransactionError(t *testing.T) {
 		fmt.Fprint(writer, tastyUnauthorizedError)
 	})
 
-	_, err := client.GetAccountTransaction(accountNumber, id)
+	_, httpResp, err := client.GetAccountTransaction(accountNumber, id)
 	expectedUnauthorized(t, err)
+	require.NotNil(t, httpResp)
 }
 
 func TestGetAccountTransactionFees(t *testing.T) {
@@ -172,8 +176,9 @@ func TestGetAccountTransactionFees(t *testing.T) {
 		fmt.Fprint(writer, transactionFeesResp)
 	})
 
-	fees, err := client.GetAccountTransactionFees(accountNumber, nil)
+	fees, httpResp, err := client.GetAccountTransactionFees(accountNumber, nil)
 	require.Nil(t, err)
+	require.NotNil(t, httpResp)
 
 	require.True(t, fees.TotalFees.Equal(decimal.Zero))
 	require.Equal(t, None, fees.TotalFeesEffect)
@@ -191,8 +196,9 @@ func TestGetAccountTransactionFeesWithParams(t *testing.T) {
 		require.Equal(t, "2023-06-16", request.URL.Query().Get("date"))
 	})
 
-	fees, err := client.GetAccountTransactionFees(accountNumber, &queryDate)
+	fees, httpResp, err := client.GetAccountTransactionFees(accountNumber, &queryDate)
 	require.Nil(t, err)
+	require.NotNil(t, httpResp)
 
 	require.True(t, fees.TotalFees.Equal(decimal.Zero))
 	require.Equal(t, None, fees.TotalFeesEffect)
@@ -209,8 +215,9 @@ func TestGetAccountTransactionFeesError(t *testing.T) {
 		fmt.Fprint(writer, tastyUnauthorizedError)
 	})
 
-	_, err := client.GetAccountTransactionFees(accountNumber, nil)
+	_, httpResp, err := client.GetAccountTransactionFees(accountNumber, nil)
 	expectedUnauthorized(t, err)
+	require.NotNil(t, httpResp)
 }
 
 const transactionsResp = `{

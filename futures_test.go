@@ -20,8 +20,9 @@ func TestGetFutures(t *testing.T) {
 
 	productCode := "ES"
 
-	resp, err := client.GetFutures(FuturesQuery{ProductCode: []string{productCode}})
+	resp, httpResp, err := client.GetFutures(FuturesQuery{ProductCode: []string{productCode}})
 	require.Nil(t, err)
+	require.NotNil(t, httpResp)
 
 	require.Equal(t, 1, len(resp))
 
@@ -109,8 +110,9 @@ func TestGetFuturesError(t *testing.T) {
 
 	productCode := "ES"
 
-	_, err := client.GetFutures(FuturesQuery{ProductCode: []string{productCode}})
+	_, httpResp, err := client.GetFutures(FuturesQuery{ProductCode: []string{productCode}})
 	expectedUnauthorized(t, err)
+	require.NotNil(t, httpResp)
 }
 
 func TestGetFuture(t *testing.T) {
@@ -125,8 +127,9 @@ func TestGetFuture(t *testing.T) {
 
 	productCode := "ES"
 
-	future, err := client.GetFuture(symbol)
+	future, httpResp, err := client.GetFuture(symbol)
 	require.Nil(t, err)
+	require.NotNil(t, httpResp)
 
 	require.Equal(t, "/ESM3", future.Symbol)
 	require.Equal(t, productCode, future.ProductCode)
@@ -210,8 +213,9 @@ func TestGetFutureError(t *testing.T) {
 		fmt.Fprint(writer, tastyUnauthorizedError)
 	})
 
-	_, err := client.GetFuture(symbol)
+	_, httpResp, err := client.GetFuture(symbol)
 	expectedUnauthorized(t, err)
+	require.NotNil(t, httpResp)
 }
 
 func TestGetFutureOptionProducts(t *testing.T) {
@@ -222,8 +226,9 @@ func TestGetFutureOptionProducts(t *testing.T) {
 		fmt.Fprint(writer, futureOptionsProducts)
 	})
 
-	resp, err := client.GetFutureOptionProducts()
+	resp, httpResp, err := client.GetFutureOptionProducts()
 	require.Nil(t, err)
+	require.NotNil(t, httpResp)
 
 	require.Equal(t, 2, len(resp))
 
@@ -290,8 +295,9 @@ func TestGetFutureOptionProductsError(t *testing.T) {
 		fmt.Fprint(writer, tastyUnauthorizedError)
 	})
 
-	_, err := client.GetFutureOptionProducts()
+	_, httpResp, err := client.GetFutureOptionProducts()
 	expectedUnauthorized(t, err)
+	require.NotNil(t, httpResp)
 }
 
 func TestGetFutureOptionProduct(t *testing.T) {
@@ -305,8 +311,9 @@ func TestGetFutureOptionProduct(t *testing.T) {
 		fmt.Fprint(writer, futureOptionProduct)
 	})
 
-	fop, err := client.GetFutureOptionProduct(exchange, rootSymbol)
+	fop, httpResp, err := client.GetFutureOptionProduct(exchange, rootSymbol)
 	require.Nil(t, err)
+	require.NotNil(t, httpResp)
 
 	require.Equal(t, "ECYM", fop.RootSymbol)
 	require.True(t, fop.CashSettled)
@@ -372,8 +379,9 @@ func TestGetFutureOptionProductError(t *testing.T) {
 		fmt.Fprint(writer, tastyUnauthorizedError)
 	})
 
-	_, err := client.GetFutureOptionProduct(exchange, rootSymbol)
+	_, httpResp, err := client.GetFutureOptionProduct(exchange, rootSymbol)
 	expectedUnauthorized(t, err)
+	require.NotNil(t, httpResp)
 }
 
 func TestGetFutureOptions(t *testing.T) {
@@ -401,8 +409,9 @@ func TestGetFutureOptions(t *testing.T) {
 		fmt.Fprint(writer, futureOptionsResp)
 	})
 
-	resp, err := client.GetFutureOptions(query)
+	resp, httpResp, err := client.GetFutureOptions(query)
 	require.Nil(t, err)
+	require.NotNil(t, httpResp)
 
 	require.Equal(t, 1, len(resp))
 
@@ -485,8 +494,9 @@ func TestGetFutureOptionsError(t *testing.T) {
 		fmt.Fprint(writer, tastyUnauthorizedError)
 	})
 
-	_, err := client.GetFutureOptions(query)
+	_, httpResp, err := client.GetFutureOptions(query)
 	expectedUnauthorized(t, err)
+	require.NotNil(t, httpResp)
 }
 
 func TestGetFutureOption(t *testing.T) {
@@ -511,8 +521,9 @@ func TestGetFutureOption(t *testing.T) {
 		fmt.Fprint(writer, futureOptionResp)
 	})
 
-	fo, err := client.GetFutureOption("test")
+	fo, httpResp, err := client.GetFutureOption("test")
 	require.Nil(t, err)
+	require.NotNil(t, httpResp)
 
 	require.Equal(t, symbol, fo.Symbol)
 	require.Equal(t, future.Build(), fo.UnderlyingSymbol)
@@ -575,8 +586,9 @@ func TestGetFutureOptionError(t *testing.T) {
 		fmt.Fprint(writer, tastyUnauthorizedError)
 	})
 
-	_, err := client.GetFutureOption("test")
+	_, httpResp, err := client.GetFutureOption("test")
 	expectedUnauthorized(t, err)
+	require.NotNil(t, httpResp)
 }
 
 func TestGetFutureProduct(t *testing.T) {
@@ -590,8 +602,9 @@ func TestGetFutureProduct(t *testing.T) {
 		fmt.Fprint(writer, futureProductResp)
 	})
 
-	fp, err := client.GetFutureProduct(exchange, code)
+	fp, httpResp, err := client.GetFutureProduct(exchange, code)
 	require.Nil(t, err)
+	require.NotNil(t, httpResp)
 
 	require.Equal(t, "/ES", fp.RootSymbol)
 	require.Equal(t, "ES", fp.Code)
@@ -655,8 +668,9 @@ func TestGetFutureProductError(t *testing.T) {
 		fmt.Fprint(writer, tastyUnauthorizedError)
 	})
 
-	_, err := client.GetFutureProduct(exchange, code)
+	_, httpResp, err := client.GetFutureProduct(exchange, code)
 	expectedUnauthorized(t, err)
+	require.NotNil(t, httpResp)
 }
 
 func TestGetFutureProducts(t *testing.T) {
@@ -667,8 +681,9 @@ func TestGetFutureProducts(t *testing.T) {
 		fmt.Fprint(writer, futureProductsResp)
 	})
 
-	resp, err := client.GetFutureProducts()
+	resp, httpResp, err := client.GetFutureProducts()
 	require.Nil(t, err)
+	require.NotNil(t, httpResp)
 
 	require.Equal(t, 1, len(resp))
 
@@ -733,8 +748,9 @@ func TestGetFutureProductsError(t *testing.T) {
 		fmt.Fprint(writer, tastyUnauthorizedError)
 	})
 
-	_, err := client.GetFutureProducts()
+	_, httpResp, err := client.GetFutureProducts()
 	expectedUnauthorized(t, err)
+	require.NotNil(t, httpResp)
 }
 
 const futuresResp = `{

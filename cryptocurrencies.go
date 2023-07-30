@@ -7,7 +7,7 @@ import (
 )
 
 // Retrieve a set of cryptocurrencies given an array of one or more symbols.
-func (c *Client) GetCryptocurrencies(symbols []string) ([]CryptocurrencyInfo, error) {
+func (c *Client) GetCryptocurrencies(symbols []string) ([]CryptocurrencyInfo, *http.Response, error) {
 	path := "/instruments/cryptocurrencies"
 
 	type instrumentResponse struct {
@@ -25,16 +25,16 @@ func (c *Client) GetCryptocurrencies(symbols []string) ([]CryptocurrencyInfo, er
 
 	instrumentRes := new(instrumentResponse)
 
-	err := c.request(http.MethodGet, path, query, nil, instrumentRes)
+	resp, err := c.request(http.MethodGet, path, query, nil, instrumentRes)
 	if err != nil {
-		return []CryptocurrencyInfo{}, err
+		return []CryptocurrencyInfo{}, resp, err
 	}
 
-	return instrumentRes.Data.Cryptocurrencies, nil
+	return instrumentRes.Data.Cryptocurrencies, resp, nil
 }
 
 // Retrieve a cryptocurrency given a symbol.
-func (c *Client) GetCryptocurrency(symbol Cryptocurrency) (CryptocurrencyInfo, error) {
+func (c *Client) GetCryptocurrency(symbol Cryptocurrency) (CryptocurrencyInfo, *http.Response, error) {
 	symbolString := url.PathEscape(string(symbol))
 
 	path := fmt.Sprintf("/instruments/cryptocurrencies/%s", symbolString)
@@ -45,10 +45,10 @@ func (c *Client) GetCryptocurrency(symbol Cryptocurrency) (CryptocurrencyInfo, e
 
 	instrumentRes := new(instrumentResponse)
 
-	err := c.customRequest(http.MethodGet, path, nil, nil, instrumentRes)
+	resp, err := c.customRequest(http.MethodGet, path, nil, nil, instrumentRes)
 	if err != nil {
-		return CryptocurrencyInfo{}, err
+		return CryptocurrencyInfo{}, resp, err
 	}
 
-	return instrumentRes.Crypto, nil
+	return instrumentRes.Crypto, resp, nil
 }

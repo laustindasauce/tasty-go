@@ -2,7 +2,6 @@ package tasty //nolint:testpackage // testing private field
 
 import (
 	"fmt"
-	"log"
 	"math"
 	"net/http"
 	"net/http/httptest"
@@ -23,11 +22,7 @@ var (
 func setup() {
 	mux = http.NewServeMux()
 	server = httptest.NewServer(mux)
-	var err error
-	client, err = NewClient(http.DefaultClient)
-	if err != nil {
-		log.Fatal(err)
-	}
+	client = NewClient(http.DefaultClient)
 	client.Session = Session{
 		SessionToken: &testToken,
 	}
@@ -41,30 +36,26 @@ func teardown() {
 }
 
 func TestTastyCertSession(t *testing.T) {
-	c, err := NewCertClient(nil)
-	require.NoError(t, err)
+	c := NewCertClient(nil)
 
 	require.NotNil(t, c.httpClient)
 	require.Equal(t, apiCertBaseURL, c.baseURL)
 	require.Equal(t, apiCertBaseHost, c.baseHost)
 
-	cWithHTTP, err := NewCertClient(&http.Client{Timeout: time.Duration(30) * time.Second})
-	require.NoError(t, err)
+	cWithHTTP := NewCertClient(&http.Client{Timeout: time.Duration(30) * time.Second})
 
 	require.NotNil(t, cWithHTTP.httpClient)
 	require.Equal(t, time.Duration(30)*time.Second, cWithHTTP.httpClient.Timeout)
 }
 
 func TestTastySession(t *testing.T) {
-	c, err := NewClient(nil)
-	require.NoError(t, err)
+	c := NewClient(nil)
 
 	require.NotNil(t, c.httpClient)
 	require.Equal(t, apiBaseURL, c.baseURL)
 	require.Equal(t, apiBaseHost, c.baseHost)
 
-	cWithHTTP, err := NewClient(&http.Client{Timeout: time.Duration(30) * time.Second})
-	require.NoError(t, err)
+	cWithHTTP := NewClient(&http.Client{Timeout: time.Duration(30) * time.Second})
 
 	require.NotNil(t, cWithHTTP.httpClient)
 	require.Equal(t, time.Duration(30)*time.Second, cWithHTTP.httpClient.Timeout)
@@ -98,30 +89,32 @@ func TestDecodeError(t *testing.T) {
 }
 
 func TestCustomRequest(t *testing.T) {
-	c, err := NewCertClient(&http.Client{Timeout: time.Duration(30) * time.Second})
-	require.NoError(t, err)
+	c := NewCertClient(&http.Client{Timeout: time.Duration(30) * time.Second})
 	c.Session.SessionToken = &testToken
 
 	// Test invalid payload
 	invalid := math.Inf(1)
-	tastyError := c.customRequest(http.MethodGet, "/test", nil, invalid, nil)
+	httpResp, tastyError := c.customRequest(http.MethodGet, "/test", nil, invalid, nil)
 	require.NotNil(t, tastyError)
+	require.Nil(t, httpResp, "payload error")
 
 	require.Equal(t,
 		"\nError in request 0;\nCode: \nMessage: Client Side Error: json: unsupported value: +Inf",
 		tastyError.Error())
 
 	// Test invalid query
-	tastyError = c.customRequest(http.MethodGet, "/test", invalid, nil, nil)
+	httpResp, tastyError = c.customRequest(http.MethodGet, "/test", invalid, nil, nil)
 	require.NotNil(t, tastyError)
+	require.Nil(t, httpResp, "invalid query")
 
 	require.Equal(t,
 		"\nError in request 0;\nCode: \nMessage: Client Side Error: <nil>",
 		tastyError.Error())
 
 	// Test invalid method
-	tastyError = c.customRequest(http.MethodGet+"/sdfl/", "/test", nil, nil, nil)
+	httpResp, tastyError = c.customRequest(http.MethodGet+"/sdfl/", "/test", nil, nil, nil)
 	require.NotNil(t, tastyError)
+	require.Nil(t, httpResp, "invalid method")
 
 	require.Equal(t,
 		"\nError in request 0;\nCode: \nMessage: Client Side Error: Get/sdfl/ \"https://api.cert.tastyworks.com/test\": net/http: invalid method \"GET/sdfl/\"",
@@ -129,11 +122,12 @@ func TestCustomRequest(t *testing.T) {
 }
 
 func TestRequest(t *testing.T) {
-	c, err := NewCertClient(&http.Client{Timeout: time.Duration(30) * time.Second})
-	require.NoError(t, err)
+	c := NewCertClient(&http.Client{Timeout: time.Duration(30) * time.Second})
 
-	tastyError := c.request(http.MethodGet, "/no-auth", nil, nil, nil)
+	httpResp, tastyError := c.request(http.MethodGet, "/no-auth", nil, nil, nil)
 	require.NotNil(t, tastyError)
+	require.Nil(t, httpResp)
+
 	require.Equal(t,
 		"\nError in request 0;\nCode: invalid_session\nMessage: Session is invalid: Session Token cannot be nil.",
 		tastyError.Error())
@@ -142,24 +136,27 @@ func TestRequest(t *testing.T) {
 
 	// Test invalid payload
 	invalid := math.Inf(1)
-	tastyError = c.request(http.MethodGet, "/test", nil, invalid, nil)
+	httpResp, tastyError = c.request(http.MethodGet, "/test", nil, invalid, nil)
 	require.NotNil(t, tastyError)
+	require.Nil(t, httpResp)
 
 	require.Equal(t,
 		"\nError in request 0;\nCode: \nMessage: Client Side Error: json: unsupported value: +Inf",
 		tastyError.Error())
 
 	// Test invalid query
-	tastyError = c.request(http.MethodGet, "/test", invalid, nil, nil)
+	httpResp, tastyError = c.request(http.MethodGet, "/test", invalid, nil, nil)
 	require.NotNil(t, tastyError)
+	require.Nil(t, httpResp)
 
 	require.Equal(t,
 		"\nError in request 0;\nCode: \nMessage: Client Side Error: <nil>",
 		tastyError.Error())
 
 	// Test invalid method
-	tastyError = c.request(http.MethodGet+"/sdfl/", "/test", nil, nil, nil)
+	httpResp, tastyError = c.request(http.MethodGet+"/sdfl/", "/test", nil, nil, nil)
 	require.NotNil(t, tastyError)
+	require.Nil(t, httpResp)
 
 	require.Equal(t,
 		"\nError in request 0;\nCode: \nMessage: Client Side Error: net/http: invalid method \"GET/sdfl/\"",
@@ -167,8 +164,9 @@ func TestRequest(t *testing.T) {
 
 	// Test invalid URL
 	c.baseURL = "invalid"
-	tastyError = c.request(http.MethodGet, "/test", nil, nil, nil)
+	httpResp, tastyError = c.request(http.MethodGet, "/test", nil, nil, nil)
 	require.NotNil(t, tastyError)
+	require.Nil(t, httpResp)
 
 	require.Equal(t,
 		"\nError in request 0;\nCode: \nMessage: Client Side Error: Get \"invalid/test\": unsupported protocol scheme \"\"",
@@ -176,29 +174,31 @@ func TestRequest(t *testing.T) {
 }
 
 func TestNoAuthRequest(t *testing.T) {
-	c, err := NewCertClient(&http.Client{Timeout: time.Duration(30) * time.Second})
-	require.NoError(t, err)
+	c := NewCertClient(&http.Client{Timeout: time.Duration(30) * time.Second})
 
 	// Test invalid payload
 	invalid := math.Inf(1)
-	tastyError := c.noAuthRequest(http.MethodGet, "/test", nil, nil, invalid, nil)
+	httpResp, tastyError := c.noAuthRequest(http.MethodGet, "/test", nil, nil, invalid, nil)
 	require.NotNil(t, tastyError)
+	require.Nil(t, httpResp)
 
 	require.Equal(t,
 		"\nError in request 0;\nCode: \nMessage: Client Side Error: json: unsupported value: +Inf",
 		tastyError.Error())
 
 	// Test invalid query
-	tastyError = c.noAuthRequest(http.MethodGet, "/test", nil, invalid, nil, nil)
+	httpResp, tastyError = c.noAuthRequest(http.MethodGet, "/test", nil, invalid, nil, nil)
 	require.NotNil(t, tastyError)
+	require.Nil(t, httpResp)
 
 	require.Equal(t,
 		"\nError in request 0;\nCode: \nMessage: Client Side Error: <nil>",
 		tastyError.Error())
 
 	// Test invalid method
-	tastyError = c.noAuthRequest(http.MethodGet+"/sdfl/", "/test", nil, nil, nil, nil)
+	httpResp, tastyError = c.noAuthRequest(http.MethodGet+"/sdfl/", "/test", nil, nil, nil, nil)
 	require.NotNil(t, tastyError)
+	require.Nil(t, httpResp)
 
 	require.Equal(t,
 		"\nError in request 0;\nCode: \nMessage: Client Side Error: net/http: invalid method \"GET/sdfl/\"",
@@ -206,8 +206,9 @@ func TestNoAuthRequest(t *testing.T) {
 
 	// Test invalid URL
 	c.baseURL = "invalid"
-	tastyError = c.noAuthRequest(http.MethodGet, "/test", nil, nil, nil, nil)
+	httpResp, tastyError = c.noAuthRequest(http.MethodGet, "/test", nil, nil, nil, nil)
 	require.NotNil(t, tastyError)
+	require.Nil(t, httpResp)
 
 	require.Equal(t,
 		"\nError in request 0;\nCode: \nMessage: Client Side Error: Get \"invalid/test\": unsupported protocol scheme \"\"",
@@ -222,8 +223,9 @@ func TestCustomRequestNoContent(t *testing.T) {
 		writer.WriteHeader(http.StatusNoContent)
 	})
 
-	err := client.customRequest(http.MethodGet, "/no-content", nil, nil, nil)
+	httpResp, err := client.customRequest(http.MethodGet, "/no-content", nil, nil, nil)
 	require.Nil(t, err)
+	require.NotNil(t, httpResp)
 }
 
 func TestRequestNoContent(t *testing.T) {
@@ -234,8 +236,9 @@ func TestRequestNoContent(t *testing.T) {
 		writer.WriteHeader(http.StatusNoContent)
 	})
 
-	err := client.request(http.MethodGet, "/no-content", nil, nil, nil)
+	httpResp, err := client.request(http.MethodGet, "/no-content", nil, nil, nil)
 	require.Nil(t, err)
+	require.NotNil(t, httpResp)
 }
 
 func TestNoAuthRequestNoContent(t *testing.T) {
@@ -246,8 +249,9 @@ func TestNoAuthRequestNoContent(t *testing.T) {
 		writer.WriteHeader(http.StatusNoContent)
 	})
 
-	err := client.noAuthRequest(http.MethodGet, "/no-content", nil, nil, nil, nil)
+	httpResp, err := client.noAuthRequest(http.MethodGet, "/no-content", nil, nil, nil, nil)
 	require.Nil(t, err)
+	require.NotNil(t, httpResp)
 }
 
 func TestCustomRequestErrorResponses(t *testing.T) {
@@ -260,8 +264,9 @@ func TestCustomRequestErrorResponses(t *testing.T) {
 			writer.WriteHeader(errCode)
 		})
 
-		err := client.customRequest(http.MethodGet, path, nil, nil, nil)
+		httpResp, err := client.customRequest(http.MethodGet, path, nil, nil, nil)
 		require.NotNil(t, err)
+		require.NotNil(t, httpResp)
 
 		require.Equal(t, errCode, err.StatusCode)
 	}
@@ -277,8 +282,9 @@ func TestRequestErrorResponses(t *testing.T) {
 			writer.WriteHeader(errCode)
 		})
 
-		err := client.request(http.MethodGet, path, nil, nil, nil)
+		httpResp, err := client.request(http.MethodGet, path, nil, nil, nil)
 		require.NotNil(t, err)
+		require.NotNil(t, httpResp)
 
 		require.Equal(t, errCode, err.StatusCode)
 	}
@@ -294,8 +300,9 @@ func TestNoAuthRequestErrorResponses(t *testing.T) {
 			writer.WriteHeader(errCode)
 		})
 
-		err := client.noAuthRequest(http.MethodGet, path, nil, nil, nil, nil)
+		httpResp, err := client.noAuthRequest(http.MethodGet, path, nil, nil, nil, nil)
 		require.NotNil(t, err)
+		require.NotNil(t, httpResp)
 
 		require.Equal(t, errCode, err.StatusCode)
 	}
@@ -309,8 +316,9 @@ func TestCustomRequestInvalidResult(t *testing.T) {
 		fmt.Fprint(writer, map[string]string{"test-key": "value"})
 	})
 
-	err := client.customRequest(http.MethodGet, "/invalid", nil, nil, math.Inf(1))
+	httpResp, err := client.customRequest(http.MethodGet, "/invalid", nil, nil, math.Inf(1))
 	require.NotNil(t, err)
+	require.NotNil(t, httpResp)
 }
 
 func TestRequestInvalidResult(t *testing.T) {
@@ -321,8 +329,9 @@ func TestRequestInvalidResult(t *testing.T) {
 		fmt.Fprint(writer, map[string]string{"test-key": "value"})
 	})
 
-	err := client.request(http.MethodGet, "/invalid", nil, nil, math.Inf(1))
+	httpResp, err := client.request(http.MethodGet, "/invalid", nil, nil, math.Inf(1))
 	require.NotNil(t, err)
+	require.NotNil(t, httpResp)
 }
 
 func TestNoAuthRequestInvalidResult(t *testing.T) {
@@ -333,16 +342,17 @@ func TestNoAuthRequestInvalidResult(t *testing.T) {
 		fmt.Fprint(writer, map[string]string{"test-key": "value"})
 	})
 
-	err := client.noAuthRequest(http.MethodGet, "/invalid", nil, nil, nil, math.Inf(1))
+	httpResp, err := client.noAuthRequest(http.MethodGet, "/invalid", nil, nil, nil, math.Inf(1))
 	require.NotNil(t, err)
+	require.NotNil(t, httpResp)
 }
 
 func TestCustomRequestMissingCredentials(t *testing.T) {
-	c, err := NewClient(&http.Client{Timeout: time.Duration(30) * time.Second})
-	require.NoError(t, err)
+	c := NewClient(&http.Client{Timeout: time.Duration(30) * time.Second})
 
-	tastyErr := c.customRequest(http.MethodGet, "/invalid", nil, nil, nil)
+	httpResp, tastyErr := c.customRequest(http.MethodGet, "/invalid", nil, nil, nil)
 	require.NotNil(t, tastyErr)
+	require.Nil(t, httpResp)
 
 	require.Equal(t,
 		"\nError in request 0;\nCode: invalid_session\nMessage: Session is invalid: Session Token cannot be nil.",
@@ -350,11 +360,11 @@ func TestCustomRequestMissingCredentials(t *testing.T) {
 }
 
 func TestRequestMissingCredentials(t *testing.T) {
-	c, err := NewClient(&http.Client{Timeout: time.Duration(30) * time.Second})
-	require.NoError(t, err)
+	c := NewClient(&http.Client{Timeout: time.Duration(30) * time.Second})
 
-	tastyErr := c.customRequest(http.MethodGet, "/invalid", nil, nil, nil)
+	httpResp, tastyErr := c.customRequest(http.MethodGet, "/invalid", nil, nil, nil)
 	require.NotNil(t, tastyErr)
+	require.Nil(t, httpResp)
 
 	require.Equal(t,
 		"\nError in request 0;\nCode: invalid_session\nMessage: Session is invalid: Session Token cannot be nil.",
@@ -370,8 +380,9 @@ func TestNoAuthRequestWithParams(t *testing.T) {
 		require.Equal(t, "true", request.URL.Query().Get("is-etf"))
 	})
 
-	err := client.noAuthRequest(http.MethodGet, "/with-params", nil, EquitiesQuery{IsETF: true}, nil, nil)
+	httpResp, err := client.noAuthRequest(http.MethodGet, "/with-params", nil, EquitiesQuery{IsETF: true}, nil, nil)
 	require.Nil(t, err)
+	require.NotNil(t, httpResp)
 }
 
 const tastyUnauthorizedError = `{

@@ -6,7 +6,7 @@ import (
 )
 
 // Retrieve all quantity decimal precisions.
-func (c *Client) GetQuantityDecimalPrecisions() ([]QuantityDecimalPrecision, error) {
+func (c *Client) GetQuantityDecimalPrecisions() ([]QuantityDecimalPrecision, *http.Response, error) {
 	path := "/instruments/quantity-decimal-precisions"
 
 	type instrumentResponse struct {
@@ -17,16 +17,16 @@ func (c *Client) GetQuantityDecimalPrecisions() ([]QuantityDecimalPrecision, err
 
 	instrumentRes := new(instrumentResponse)
 
-	err := c.request(http.MethodGet, path, nil, nil, instrumentRes)
+	resp, err := c.request(http.MethodGet, path, nil, nil, instrumentRes)
 	if err != nil {
-		return []QuantityDecimalPrecision{}, err
+		return []QuantityDecimalPrecision{}, resp, err
 	}
 
-	return instrumentRes.Data.QuantityDecimalPrecisions, nil
+	return instrumentRes.Data.QuantityDecimalPrecisions, resp, nil
 }
 
 // Returns a set of warrant definitions that can be filtered by parameters.
-func (c *Client) GetWarrants(symbols []string) ([]Warrant, error) {
+func (c *Client) GetWarrants(symbols []string) ([]Warrant, *http.Response, error) {
 	path := "/instruments/warrants"
 
 	type instrumentResponse struct {
@@ -44,16 +44,16 @@ func (c *Client) GetWarrants(symbols []string) ([]Warrant, error) {
 
 	instrumentRes := new(instrumentResponse)
 
-	err := c.request(http.MethodGet, path, query, nil, instrumentRes)
+	resp, err := c.request(http.MethodGet, path, query, nil, instrumentRes)
 	if err != nil {
-		return []Warrant{}, err
+		return []Warrant{}, resp, err
 	}
 
-	return instrumentRes.Data.Warrants, nil
+	return instrumentRes.Data.Warrants, resp, nil
 }
 
 // Returns a single warrant definition for the provided symbol.
-func (c *Client) GetWarrant(symbol string) (Warrant, error) {
+func (c *Client) GetWarrant(symbol string) (Warrant, *http.Response, error) {
 	path := fmt.Sprintf("/instruments/warrants/%s", symbol)
 
 	type instrumentResponse struct {
@@ -62,10 +62,10 @@ func (c *Client) GetWarrant(symbol string) (Warrant, error) {
 
 	instrumentRes := new(instrumentResponse)
 
-	err := c.request(http.MethodGet, path, nil, nil, instrumentRes)
+	resp, err := c.request(http.MethodGet, path, nil, nil, instrumentRes)
 	if err != nil {
-		return Warrant{}, err
+		return Warrant{}, resp, err
 	}
 
-	return instrumentRes.Warrant, nil
+	return instrumentRes.Warrant, resp, nil
 }

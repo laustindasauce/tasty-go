@@ -6,7 +6,7 @@ import (
 )
 
 // Get the accounts for the authenticated client.
-func (c *Client) GetMyAccounts() ([]Account, error) {
+func (c *Client) GetMyAccounts() ([]Account, *http.Response, error) {
 	path := "/customers/me/accounts"
 
 	type accountResponse struct {
@@ -19,9 +19,9 @@ func (c *Client) GetMyAccounts() ([]Account, error) {
 
 	accountsRes := new(accountResponse)
 
-	err := c.request(http.MethodGet, path, nil, nil, accountsRes)
+	resp, err := c.request(http.MethodGet, path, nil, nil, accountsRes)
 	if err != nil {
-		return []Account{}, err
+		return []Account{}, resp, err
 	}
 
 	var accounts []Account
@@ -30,11 +30,11 @@ func (c *Client) GetMyAccounts() ([]Account, error) {
 		accounts = append(accounts, acct.Account)
 	}
 
-	return accounts, nil
+	return accounts, resp, nil
 }
 
 // Returns current trading status for an account.
-func (c *Client) GetAccountTradingStatus(accountNumber string) (AccountTradingStatus, error) {
+func (c *Client) GetAccountTradingStatus(accountNumber string) (AccountTradingStatus, *http.Response, error) {
 	path := fmt.Sprintf("/accounts/%s/trading-status", accountNumber)
 
 	type tradingStatusRes struct {
@@ -42,16 +42,16 @@ func (c *Client) GetAccountTradingStatus(accountNumber string) (AccountTradingSt
 	}
 	accountsRes := new(tradingStatusRes)
 
-	err := c.request(http.MethodGet, path, nil, nil, accountsRes)
+	resp, err := c.request(http.MethodGet, path, nil, nil, accountsRes)
 	if err != nil {
-		return AccountTradingStatus{}, err
+		return AccountTradingStatus{}, resp, err
 	}
 
-	return accountsRes.AccountTradingStatus, nil
+	return accountsRes.AccountTradingStatus, resp, nil
 }
 
 // Returns the current balance values for an account.
-func (c *Client) GetAccountBalances(accountNumber string) (AccountBalance, error) {
+func (c *Client) GetAccountBalances(accountNumber string) (AccountBalance, *http.Response, error) {
 	path := fmt.Sprintf("/accounts/%s/balances", accountNumber)
 
 	type accountBalanceRes struct {
@@ -59,17 +59,17 @@ func (c *Client) GetAccountBalances(accountNumber string) (AccountBalance, error
 	}
 	accountsRes := new(accountBalanceRes)
 
-	err := c.request(http.MethodGet, path, nil, nil, accountsRes)
+	resp, err := c.request(http.MethodGet, path, nil, nil, accountsRes)
 	if err != nil {
-		return AccountBalance{}, err
+		return AccountBalance{}, resp, err
 	}
 
-	return accountsRes.AccountBalance, nil
+	return accountsRes.AccountBalance, resp, nil
 }
 
 // Returns a list of the account's positions.
 // Can be filtered by symbol, underlying_symbol.
-func (c *Client) GetAccountPositions(accountNumber string, query AccountPositionQuery) ([]AccountPosition, error) {
+func (c *Client) GetAccountPositions(accountNumber string, query AccountPositionQuery) ([]AccountPosition, *http.Response, error) {
 	path := fmt.Sprintf("/accounts/%s/positions", accountNumber)
 
 	type accountResponse struct {
@@ -80,16 +80,16 @@ func (c *Client) GetAccountPositions(accountNumber string, query AccountPosition
 
 	accountsRes := new(accountResponse)
 
-	err := c.request(http.MethodGet, path, query, nil, accountsRes)
+	resp, err := c.request(http.MethodGet, path, query, nil, accountsRes)
 	if err != nil {
-		return []AccountPosition{}, err
+		return []AccountPosition{}, resp, err
 	}
 
-	return accountsRes.Data.AccountPositions, nil
+	return accountsRes.Data.AccountPositions, resp, nil
 }
 
 // Returns most recent snapshot and current balance for an account.
-func (c *Client) GetAccountBalanceSnapshots(accountNumber string, query AccountBalanceSnapshotsQuery) ([]AccountBalanceSnapshots, error) {
+func (c *Client) GetAccountBalanceSnapshots(accountNumber string, query AccountBalanceSnapshotsQuery) ([]AccountBalanceSnapshots, *http.Response, error) {
 	// Default to EOD
 	if query.TimeOfDay == "" {
 		query.TimeOfDay = EndOfDay
@@ -105,16 +105,16 @@ func (c *Client) GetAccountBalanceSnapshots(accountNumber string, query AccountB
 
 	accountsRes := new(accountResponse)
 
-	err := c.request(http.MethodGet, path, query, nil, accountsRes)
+	resp, err := c.request(http.MethodGet, path, query, nil, accountsRes)
 	if err != nil {
-		return []AccountBalanceSnapshots{}, err
+		return []AccountBalanceSnapshots{}, resp, err
 	}
 
-	return accountsRes.Data.AccountBalanceSnapshots, nil
+	return accountsRes.Data.AccountBalanceSnapshots, resp, nil
 }
 
 // Returns a list of account net liquidating value snapshots.
-func (c *Client) GetAccountNetLiqHistory(accountNumber string, query HistoricLiquidityQuery) ([]NetLiqOHLC, error) {
+func (c *Client) GetAccountNetLiqHistory(accountNumber string, query HistoricLiquidityQuery) ([]NetLiqOHLC, *http.Response, error) {
 	path := fmt.Sprintf("/accounts/%s/net-liq/history", accountNumber)
 
 	type accountResponse struct {
@@ -125,16 +125,16 @@ func (c *Client) GetAccountNetLiqHistory(accountNumber string, query HistoricLiq
 
 	accountsRes := new(accountResponse)
 
-	err := c.request(http.MethodGet, path, query, nil, accountsRes)
+	resp, err := c.request(http.MethodGet, path, query, nil, accountsRes)
 	if err != nil {
-		return []NetLiqOHLC{}, err
+		return []NetLiqOHLC{}, resp, err
 	}
 
-	return accountsRes.Data.HistoricLiquidity, nil
+	return accountsRes.Data.HistoricLiquidity, resp, nil
 }
 
 // Get the position limit.
-func (c *Client) GetAccountPositionLimit(accountNumber string) (PositionLimit, error) {
+func (c *Client) GetAccountPositionLimit(accountNumber string) (PositionLimit, *http.Response, error) {
 	path := fmt.Sprintf("/accounts/%s/position-limit", accountNumber)
 
 	type accountResponse struct {
@@ -143,10 +143,10 @@ func (c *Client) GetAccountPositionLimit(accountNumber string) (PositionLimit, e
 
 	accountsRes := new(accountResponse)
 
-	err := c.request(http.MethodGet, path, nil, nil, accountsRes)
+	resp, err := c.request(http.MethodGet, path, nil, nil, accountsRes)
 	if err != nil {
-		return PositionLimit{}, err
+		return PositionLimit{}, resp, err
 	}
 
-	return accountsRes.PositionLimit, nil
+	return accountsRes.PositionLimit, resp, nil
 }

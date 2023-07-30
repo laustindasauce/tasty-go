@@ -20,8 +20,9 @@ func TestGetMarketMetrics(t *testing.T) {
 		fmt.Fprint(writer, marketMetricsResp)
 	})
 
-	resp, err := client.GetMarketMetrics(symbols)
+	resp, httpResp, err := client.GetMarketMetrics(symbols)
 	require.Nil(t, err)
+	require.NotNil(t, httpResp)
 
 	require.Equal(t, 2, len(resp))
 
@@ -103,7 +104,7 @@ func TestGetMarketMetricsError(t *testing.T) {
 		fmt.Fprint(writer, tastyUnauthorizedError)
 	})
 
-	_, err := client.GetMarketMetrics(symbols)
+	_, _, err := client.GetMarketMetrics(symbols)
 	expectedUnauthorized(t, err)
 }
 
@@ -117,8 +118,9 @@ func TestGetHistoricDividends(t *testing.T) {
 		fmt.Fprint(writer, historicDividendsResp)
 	})
 
-	resp, err := client.GetHistoricDividends(symbol)
+	resp, httpResp, err := client.GetHistoricDividends(symbol)
 	require.Nil(t, err)
+	require.NotNil(t, httpResp)
 
 	require.Equal(t, 39, len(resp))
 	require.Equal(t, "2023-05-12", resp[0].OccurredDate)
@@ -136,7 +138,7 @@ func TestGetHistoricDividendsError(t *testing.T) {
 		fmt.Fprint(writer, tastyUnauthorizedError)
 	})
 
-	_, err := client.GetHistoricDividends(symbol)
+	_, _, err := client.GetHistoricDividends(symbol)
 	expectedUnauthorized(t, err)
 }
 
@@ -151,8 +153,9 @@ func TestGetHistoricEarnings(t *testing.T) {
 		fmt.Fprint(writer, historicEarningsResp)
 	})
 
-	resp, err := client.GetHistoricEarnings(symbol, startDate)
+	resp, httpResp, err := client.GetHistoricEarnings(symbol, startDate)
 	require.Nil(t, err)
+	require.NotNil(t, httpResp)
 
 	require.Equal(t, 4, len(resp))
 	require.Equal(t, "2022-06-30", resp[0].OccurredDate)
@@ -171,7 +174,7 @@ func TestGetHistoricEarningsError(t *testing.T) {
 		fmt.Fprint(writer, tastyUnauthorizedError)
 	})
 
-	_, err := client.GetHistoricEarnings(symbol, startDate)
+	_, _, err := client.GetHistoricEarnings(symbol, startDate)
 	expectedUnauthorized(t, err)
 }
 
