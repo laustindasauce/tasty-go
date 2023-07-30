@@ -14,10 +14,10 @@ import (
 )
 
 const (
-	apiBaseURL      = "https://api.tastyworks.com"
-	apiBaseHost     = "api.tastyworks.com"
-	apiCertBaseURL  = "https://api.cert.tastyworks.com"
-	apiCertBaseHost = "api.cert.tastyworks.com"
+	apiBaseURL      = "https://api.tastytrade.com"
+	apiBaseHost     = "api.tastytrade.com"
+	apiCertBaseURL  = "https://api.cert.tastytrade.com"
+	apiCertBaseHost = "api.cert.tastytrade.com"
 )
 
 var (
@@ -34,7 +34,7 @@ type Client struct {
 }
 
 // NewClient creates a new Tasty Client.
-func NewClient(httpClient *http.Client) (*Client, error) {
+func NewClient(httpClient *http.Client) *Client {
 	if httpClient == nil {
 		httpClient = defaultHTTPClient
 	}
@@ -44,11 +44,11 @@ func NewClient(httpClient *http.Client) (*Client, error) {
 		baseHost:   apiBaseHost,
 	}
 
-	return c, nil
+	return c
 }
 
 // NewCertClient creates a new Tasty Cert Client.
-func NewCertClient(httpClient *http.Client) (*Client, error) {
+func NewCertClient(httpClient *http.Client) *Client {
 	if httpClient == nil {
 		httpClient = defaultHTTPClient
 	}
@@ -58,16 +58,16 @@ func NewCertClient(httpClient *http.Client) (*Client, error) {
 		baseHost:   apiCertBaseHost,
 	}
 
-	return c, nil
+	return c
 }
 
-// Error reasoning given by TastyTrade.
+// Error reasoning given by tastytrade.
 type ErrorResponse struct {
 	Domain string `json:"domain"`
 	Reason string `json:"reason"`
 }
 
-// Error represents an error returned by the TastyWorks API.
+// Error represents an error returned by the tastytrade API.
 type Error struct {
 	// Simple code error string
 	Code string `json:"code"`
@@ -85,7 +85,7 @@ func (e Error) Error() string {
 }
 
 // decodeError decodes an Error from response status code based off
-// the developer docs in TastyWorks -> https://developer.tastytrade.com/#error-codes
+// the developer docs in tastytrade -> https://developer.tastytrade.com/#error-codes
 func decodeError(resp *http.Response) *Error {
 	e := new(Error)
 
@@ -97,7 +97,7 @@ func decodeError(resp *http.Response) *Error {
 
 	err := json.NewDecoder(resp.Body).Decode(errRes)
 	if err != nil {
-		e.Message = fmt.Sprintf("TastyWorks: unexpected HTTP %d: %s (empty error)", resp.StatusCode, err.Error())
+		e.Message = fmt.Sprintf("tastytrade: unexpected HTTP %d: %s (empty error)", resp.StatusCode, err.Error())
 		e.StatusCode = resp.StatusCode
 		return e
 	}

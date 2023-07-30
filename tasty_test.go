@@ -2,7 +2,6 @@ package tasty //nolint:testpackage // testing private field
 
 import (
 	"fmt"
-	"log"
 	"math"
 	"net/http"
 	"net/http/httptest"
@@ -23,11 +22,7 @@ var (
 func setup() {
 	mux = http.NewServeMux()
 	server = httptest.NewServer(mux)
-	var err error
-	client, err = NewClient(http.DefaultClient)
-	if err != nil {
-		log.Fatal(err)
-	}
+	client = NewClient(http.DefaultClient)
 	client.Session = Session{
 		SessionToken: &testToken,
 	}
@@ -41,30 +36,26 @@ func teardown() {
 }
 
 func TestTastyCertSession(t *testing.T) {
-	c, err := NewCertClient(nil)
-	require.NoError(t, err)
+	c := NewCertClient(nil)
 
 	require.NotNil(t, c.httpClient)
 	require.Equal(t, apiCertBaseURL, c.baseURL)
 	require.Equal(t, apiCertBaseHost, c.baseHost)
 
-	cWithHTTP, err := NewCertClient(&http.Client{Timeout: time.Duration(30) * time.Second})
-	require.NoError(t, err)
+	cWithHTTP := NewCertClient(&http.Client{Timeout: time.Duration(30) * time.Second})
 
 	require.NotNil(t, cWithHTTP.httpClient)
 	require.Equal(t, time.Duration(30)*time.Second, cWithHTTP.httpClient.Timeout)
 }
 
 func TestTastySession(t *testing.T) {
-	c, err := NewClient(nil)
-	require.NoError(t, err)
+	c := NewClient(nil)
 
 	require.NotNil(t, c.httpClient)
 	require.Equal(t, apiBaseURL, c.baseURL)
 	require.Equal(t, apiBaseHost, c.baseHost)
 
-	cWithHTTP, err := NewClient(&http.Client{Timeout: time.Duration(30) * time.Second})
-	require.NoError(t, err)
+	cWithHTTP := NewClient(&http.Client{Timeout: time.Duration(30) * time.Second})
 
 	require.NotNil(t, cWithHTTP.httpClient)
 	require.Equal(t, time.Duration(30)*time.Second, cWithHTTP.httpClient.Timeout)
@@ -98,8 +89,7 @@ func TestDecodeError(t *testing.T) {
 }
 
 func TestCustomRequest(t *testing.T) {
-	c, err := NewCertClient(&http.Client{Timeout: time.Duration(30) * time.Second})
-	require.NoError(t, err)
+	c := NewCertClient(&http.Client{Timeout: time.Duration(30) * time.Second})
 	c.Session.SessionToken = &testToken
 
 	// Test invalid payload
@@ -132,8 +122,7 @@ func TestCustomRequest(t *testing.T) {
 }
 
 func TestRequest(t *testing.T) {
-	c, err := NewCertClient(&http.Client{Timeout: time.Duration(30) * time.Second})
-	require.NoError(t, err)
+	c := NewCertClient(&http.Client{Timeout: time.Duration(30) * time.Second})
 
 	httpResp, tastyError := c.request(http.MethodGet, "/no-auth", nil, nil, nil)
 	require.NotNil(t, tastyError)
@@ -185,8 +174,7 @@ func TestRequest(t *testing.T) {
 }
 
 func TestNoAuthRequest(t *testing.T) {
-	c, err := NewCertClient(&http.Client{Timeout: time.Duration(30) * time.Second})
-	require.NoError(t, err)
+	c := NewCertClient(&http.Client{Timeout: time.Duration(30) * time.Second})
 
 	// Test invalid payload
 	invalid := math.Inf(1)
@@ -360,8 +348,7 @@ func TestNoAuthRequestInvalidResult(t *testing.T) {
 }
 
 func TestCustomRequestMissingCredentials(t *testing.T) {
-	c, err := NewClient(&http.Client{Timeout: time.Duration(30) * time.Second})
-	require.NoError(t, err)
+	c := NewClient(&http.Client{Timeout: time.Duration(30) * time.Second})
 
 	httpResp, tastyErr := c.customRequest(http.MethodGet, "/invalid", nil, nil, nil)
 	require.NotNil(t, tastyErr)
@@ -373,8 +360,7 @@ func TestCustomRequestMissingCredentials(t *testing.T) {
 }
 
 func TestRequestMissingCredentials(t *testing.T) {
-	c, err := NewClient(&http.Client{Timeout: time.Duration(30) * time.Second})
-	require.NoError(t, err)
+	c := NewClient(&http.Client{Timeout: time.Duration(30) * time.Second})
 
 	httpResp, tastyErr := c.customRequest(http.MethodGet, "/invalid", nil, nil, nil)
 	require.NotNil(t, tastyErr)
