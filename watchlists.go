@@ -97,7 +97,7 @@ func (c *Client) DeleteWatchlist(name string) (RemovedWatchlist, *http.Response,
 	return *removedWatchlist, resp, nil
 }
 
-// Returns a list of all tastyworks pairs watchlists.
+// Returns a list of all tastytrade pairs watchlists.
 func (c *Client) GetPairsWatchlists() ([]PairsWatchlist, *http.Response, error) {
 	path := "/pairs-watchlists"
 
@@ -117,7 +117,7 @@ func (c *Client) GetPairsWatchlists() ([]PairsWatchlist, *http.Response, error) 
 	return watchlistsRes.Data.Watchlists, resp, nil
 }
 
-// Returns a requested tastyworks pairs watchlist.
+// Returns a requested tastytrade pairs watchlist.
 func (c *Client) GetPairsWatchlist(name string) (PairsWatchlist, *http.Response, error) {
 	path := fmt.Sprintf("/pairs-watchlists/%s", url.PathEscape(name))
 
@@ -136,7 +136,7 @@ func (c *Client) GetPairsWatchlist(name string) (PairsWatchlist, *http.Response,
 	return watchlistsRes.Watchlist, resp, nil
 }
 
-// Returns a list of all tastyworks watchlists.
+// Returns a list of all tastytrade watchlists.
 func (c *Client) GetPublicWatchlists(countsOnly bool) ([]PublicWatchlist, *http.Response, error) {
 	path := "/public-watchlists"
 
@@ -162,7 +162,7 @@ func (c *Client) GetPublicWatchlists(countsOnly bool) ([]PublicWatchlist, *http.
 	return watchlistsRes.Data.Watchlists, resp, nil
 }
 
-// Returns a requested tastyworks watchlist.
+// Returns a requested tastytrade watchlist.
 func (c *Client) GetPublicWatchlist(name string) (Watchlist, *http.Response, error) {
 	path := fmt.Sprintf("/public-watchlists/%s", url.PathEscape(name))
 
