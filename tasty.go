@@ -14,10 +14,10 @@ import (
 )
 
 const (
-	apiBaseURL      = "https://api.tastytrade.com"
-	apiBaseHost     = "api.tastytrade.com"
-	apiCertBaseURL  = "https://api.cert.tastytrade.com"
-	apiCertBaseHost = "api.cert.tastytrade.com"
+	apiBaseURL      = "https://api.tastyworks.com"
+	apiBaseHost     = "api.tastyworks.com"
+	apiCertBaseURL  = "https://api.cert.tastyworks.com"
+	apiCertBaseHost = "api.cert.tastyworks.com"
 )
 
 var (
