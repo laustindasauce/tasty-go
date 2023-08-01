@@ -93,3 +93,8 @@ type MarginType struct {
 	Name     string `json:"name"`
 	IsMargin bool   `json:"is-margin"`
 }
+
+// Response object for the margin requirements public configuration request.
+type MarginRequirementsGlobalConfiguration struct {
+	RiskFreeRate decimal.Decimal `json:"risk-free-rate"`
+}
