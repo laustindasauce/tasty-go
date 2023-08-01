@@ -171,10 +171,3 @@ type EntityOfficer struct {
 	OwnerOfRecord        bool    `json:"owner-of-record"`
 	Address              Address `json:"address"`
 }
-
-type QuoteStreamerTokenAuthResult struct {
-	Token        string `json:"token"`
-	StreamerURL  string `json:"streamer-url"`
-	WebsocketURL string `json:"websocket-url"`
-	Level        string `json:"level"`
-}
