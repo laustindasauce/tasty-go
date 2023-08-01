@@ -211,6 +211,36 @@ func TestGetEffectiveMarginRequirementsError(t *testing.T) {
 	expectedUnauthorized(t, err)
 }
 
+func TestGetMarginRequirementsPublicConfiguration(t *testing.T) {
+	setup()
+	defer teardown()
+
+	mux.HandleFunc("/margin-requirements-public-configuration", func(writer http.ResponseWriter, request *http.Request) {
+		fmt.Fprint(writer, marginPublicConfigResp)
+	})
+
+	resp, httpResp, err := client.GetMarginRequirementsPublicConfiguration()
+	require.Nil(t, err)
+	require.NotNil(t, httpResp)
+
+	require.True(t, resp.RiskFreeRate.Equal(decimal.NewFromFloat(0.055)))
+}
+
+func TestGetMarginRequirementsPublicConfigurationError(t *testing.T) {
+	setup()
+	defer teardown()
+
+	mux.HandleFunc("/margin-requirements-public-configuration", func(writer http.ResponseWriter, request *http.Request) {
+		writer.WriteHeader(500)
+		fmt.Fprint(writer, tastyUnauthorizedError)
+	})
+
+	_, resp, err := client.GetMarginRequirementsPublicConfiguration()
+	require.NotNil(t, err)
+	require.NotNil(t, resp)
+	require.Equal(t, http.StatusInternalServerError, resp.StatusCode)
+}
+
 const marginReqResp = `{
   "data": {
     "account-number": "5YZ55555",
@@ -343,4 +373,11 @@ const effectiveMarginRequirementsResp = `{
         "naked-option-floor": "250.0"
     },
     "context": "/accounts/5YZ55555/margin-requirements/AAPL/effective"
+}`
+
+const marginPublicConfigResp = `{
+    "data": {
+        "risk-free-rate": "0.055"
+    },
+    "context": "/margin-requirements-public-configuration"
 }`
