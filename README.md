@@ -49,7 +49,6 @@ import (
 	"time"
 
 	"github.com/austinbspencer/tasty-go"
-	_ "github.com/joho/godotenv/autoload" // load .env file automatically
 )
 
 var (
@@ -103,7 +102,6 @@ import (
 	"time"
 
 	"github.com/austinbspencer/tasty-go"
-	_ "github.com/joho/godotenv/autoload" // load .env file automatically
 )
 
 var (
@@ -167,7 +165,6 @@ import (
 	"time"
 
 	"github.com/austinbspencer/tasty-go"
-	_ "github.com/joho/godotenv/autoload" // load .env file automatically
 )
 
 var (
@@ -229,7 +226,6 @@ import (
 	"time"
 
 	"github.com/austinbspencer/tasty-go"
-	_ "github.com/joho/godotenv/autoload" // load .env file automatically
 )
 
 var (
@@ -280,7 +276,6 @@ import (
 	"time"
 
 	"github.com/austinbspencer/tasty-go"
-	_ "github.com/joho/godotenv/autoload" // load .env file automatically
 )
 
 var (
@@ -329,7 +324,6 @@ import (
 	"time"
 
 	"github.com/austinbspencer/tasty-go"
-	_ "github.com/joho/godotenv/autoload" // load .env file automatically
 )
 
 var (
@@ -380,7 +374,6 @@ import (
 	"time"
 
 	"github.com/austinbspencer/tasty-go"
-	_ "github.com/joho/godotenv/autoload" // load .env file automatically
 )
 
 var (
@@ -433,7 +426,6 @@ import (
 	"time"
 
 	"github.com/austinbspencer/tasty-go"
-	_ "github.com/joho/godotenv/autoload" // load .env file automatically
 )
 
 var (
@@ -484,7 +476,6 @@ import (
 	"time"
 
 	"github.com/austinbspencer/tasty-go"
-	_ "github.com/joho/godotenv/autoload" // load .env file automatically
 )
 
 var (
@@ -549,7 +540,6 @@ import (
 	"time"
 
 	"github.com/austinbspencer/tasty-go"
-	_ "github.com/joho/godotenv/autoload" // load .env file automatically
 )
 
 var (
@@ -595,7 +585,6 @@ import (
 	"time"
 
 	"github.com/austinbspencer/tasty-go"
-	_ "github.com/joho/godotenv/autoload" // load .env file automatically
 )
 
 var (
@@ -663,7 +652,6 @@ import (
 	"time"
 
 	"github.com/austinbspencer/tasty-go"
-	_ "github.com/joho/godotenv/autoload" // load .env file automatically
 )
 
 var (
@@ -714,7 +702,6 @@ import (
 	"time"
 
 	"github.com/austinbspencer/tasty-go"
-	_ "github.com/joho/godotenv/autoload" // load .env file automatically
 )
 
 var (
@@ -763,7 +750,6 @@ import (
 	"time"
 
 	"github.com/austinbspencer/tasty-go"
-	_ "github.com/joho/godotenv/autoload" // load .env file automatically
 )
 
 var (
@@ -831,7 +817,6 @@ import (
 	"time"
 
 	"github.com/austinbspencer/tasty-go"
-	_ "github.com/joho/godotenv/autoload" // load .env file automatically
 )
 
 var (
@@ -918,7 +903,6 @@ import (
 	"time"
 
 	"github.com/austinbspencer/tasty-go"
-	_ "github.com/joho/godotenv/autoload" // load .env file automatically
 )
 
 var (
@@ -967,7 +951,6 @@ import (
 	"time"
 
 	"github.com/austinbspencer/tasty-go"
-	_ "github.com/joho/godotenv/autoload" // load .env file automatically
 )
 
 var (
@@ -1228,7 +1211,7 @@ Check out tastytrade's [documentation](https://developer.tastytrade.com/streamin
 
 **This requires using the DXFeed Streamer which isn't supported by tastytrade or this unofficial tastytrade API wrapper.**
 
-Check out tastytrade's [documentation](https://developer.tastytrade.com/#streaming-market-data)
+Check out tastytrade's [documentation](https://developer.tastytrade.com/streaming-market-data)
 
 ```go
 package main
@@ -1240,7 +1223,6 @@ import (
 	"time"
 
 	"github.com/austinbspencer/tasty-go"
-	_ "github.com/joho/godotenv/autoload" // load .env file automatically
 )
 
 var (
