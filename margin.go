@@ -40,3 +40,22 @@ func (c *Client) GetEffectiveMarginRequirements(accountNumber, underlyingSymbol 
 
 	return marginRes.EffectiveMarginRequirements, resp, nil
 }
+
+// Publicly accessible, read only margin configuration.
+func (c *Client) GetMarginRequirementsPublicConfiguration() (MarginRequirementsGlobalConfiguration,
+	*http.Response, error) {
+	path := "/margin-requirements-public-configuration"
+
+	type marginResponse struct {
+		MarginReq MarginRequirementsGlobalConfiguration `json:"data"`
+	}
+
+	marginRes := new(marginResponse)
+
+	resp, err := c.noAuthRequest(http.MethodGet, path, nil, nil, nil, marginRes)
+	if err != nil {
+		return MarginRequirementsGlobalConfiguration{}, resp, err
+	}
+
+	return marginRes.MarginReq, resp, nil
+}
