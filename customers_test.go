@@ -401,38 +401,6 @@ func TestGetMyAccountError(t *testing.T) {
 	require.NotNil(t, httpResp)
 }
 
-func TestGetQuoteStreamerTokens(t *testing.T) {
-	setup()
-	defer teardown()
-
-	mux.HandleFunc("/quote-streamer-tokens", func(writer http.ResponseWriter, request *http.Request) {
-		fmt.Fprint(writer, quoteStreamerTokensResp)
-	})
-
-	resp, httpResp, err := client.GetQuoteStreamerTokens()
-	require.Nil(t, err)
-	require.NotNil(t, httpResp)
-
-	require.Equal(t, "example-token-here", resp.Token)
-	require.Equal(t, "tasty-live.dxfeed.com:7301", resp.StreamerURL)
-	require.Equal(t, "https://tasty-live-web.dxfeed.com/live", resp.WebsocketURL)
-	require.Equal(t, "live", resp.Level)
-}
-
-func TestGetQuoteStreamerTokensError(t *testing.T) {
-	setup()
-	defer teardown()
-
-	mux.HandleFunc("/quote-streamer-tokens", func(writer http.ResponseWriter, request *http.Request) {
-		writer.WriteHeader(401)
-		fmt.Fprint(writer, tastyUnauthorizedError)
-	})
-
-	_, httpResp, err := client.GetQuoteStreamerTokens()
-	expectedUnauthorized(t, err)
-	require.NotNil(t, httpResp)
-}
-
 const getCustomerResp = `{
   "data": {
     "id": "me",
@@ -574,16 +542,6 @@ const getCustomerResp = `{
     }
   },
   "context": "/customers/me"
-}`
-
-const quoteStreamerTokensResp = `{
-  "data": {
-    "token": "example-token-here",
-    "streamer-url": "tasty-live.dxfeed.com:7301",
-    "websocket-url": "https://tasty-live-web.dxfeed.com/live",
-    "level": "live"
-  },
-  "context": "/quote-streamer-tokens"
 }`
 
 const getCustomerAccountResp = `{
