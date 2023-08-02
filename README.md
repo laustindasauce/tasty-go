@@ -17,7 +17,7 @@ This library provides `unofficial` Go clients for [tastytrade API](https://tasty
 
 ## Dependencies
 
-There are very few dependencies for this lightweight API wrapper.
+There are very few direct dependencies for this lightweight API wrapper.
 
 - [decimal](https://github.com/shopspring/decimal)
 - [go-querystring](https://github.com/google/go-querystring)
@@ -1258,6 +1258,108 @@ func main() {
 ## Streaming Account Data
 
 Check out tastytrade's [documentation](https://developer.tastytrade.com/streaming-account-data/)
+
+<details>
+<summary>Simple Websocket Account Streamer</summary>
+
+**This is an oversimplified websocket connection example for streaming account data**
+
+```go
+package main
+
+import (
+	"fmt"
+	"log"
+	"net/http"
+	"os"
+	"time"
+
+	"github.com/austinbspencer/tasty-go"
+	"golang.org/x/net/websocket"
+)
+
+var (
+	hClient   = http.Client{Timeout: time.Duration(30) * time.Second}
+	certCreds = tasty.LoginInfo{
+		Login:      os.Getenv("certUsername"),
+		Password:   os.Getenv("certPassword"),
+		RememberMe: true,
+	}
+)
+
+const accountNumber = "5WV48989"
+
+func main() {
+	client := tasty.NewCertClient(&hClient)
+	_, _, err := client.CreateSession(certCreds, nil)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	protocol := ""
+	origin := "http://localhost:8080"
+
+	// Open Websocket connection
+	ws, err := websocket.Dial(client.GetWebsocketURL(), protocol, origin)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	incomingMessages := make(chan string)
+	go readClientMessages(ws, incomingMessages)
+
+	// Send connect message
+	response := new(tasty.WebsocketMessage)
+	response.Action = "connect"
+	response.Value = []string{accountNumber}
+	response.AuthToken = *client.Session.SessionToken
+	err = websocket.JSON.Send(ws, response)
+	if err != nil {
+		fmt.Printf("Send failed: %s\n", err.Error())
+		os.Exit(1)
+	}
+
+	// Subscribe to notifications
+	// Add notification subscription message here
+	// All available -> https://developer.tastytrade.com/streaming-account-data/#available-actions
+
+	// Await responses and send heartbeats
+	i := 0
+	for {
+		select {
+		case <-time.After(time.Duration(time.Second * 15)):
+			// Send heartbeat every 15 seconds to keep connection alive
+			fmt.Println("sending heartbeat")
+			i++
+			response := new(tasty.WebsocketMessage)
+			response.Action = "heartbeat"
+			response.AuthToken = *client.Session.SessionToken
+			err = websocket.JSON.Send(ws, response)
+			if err != nil {
+				fmt.Printf("Send failed: %s\n", err.Error())
+				os.Exit(1)
+			}
+		case message := <-incomingMessages:
+			fmt.Println(`Message Received:`, message)
+		}
+	}
+}
+
+func readClientMessages(ws *websocket.Conn, incomingMessages chan string) {
+	for {
+		var message string
+		err := websocket.Message.Receive(ws, &message)
+		if err != nil {
+			fmt.Printf("Error::: %s\n", err.Error())
+			return
+		}
+		incomingMessages <- message
+	}
+}
+
+```
+
+</details>
 
 ## Testing
 

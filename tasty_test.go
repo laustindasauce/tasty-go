@@ -41,6 +41,8 @@ func TestTastyCertSession(t *testing.T) {
 	require.NotNil(t, c.httpClient)
 	require.Equal(t, apiCertBaseURL, c.baseURL)
 	require.Equal(t, apiCertBaseHost, c.baseHost)
+	require.Equal(t, streamerCertBaseURL, c.websocket)
+	require.Equal(t, streamerCertBaseURL, c.GetWebsocketURL())
 
 	cWithHTTP := NewCertClient(&http.Client{Timeout: time.Duration(30) * time.Second})
 
@@ -54,6 +56,8 @@ func TestTastySession(t *testing.T) {
 	require.NotNil(t, c.httpClient)
 	require.Equal(t, apiBaseURL, c.baseURL)
 	require.Equal(t, apiBaseHost, c.baseHost)
+	require.Equal(t, streamerBaseURL, c.websocket)
+	require.Equal(t, streamerBaseURL, c.GetWebsocketURL())
 
 	cWithHTTP := NewClient(&http.Client{Timeout: time.Duration(30) * time.Second})
 

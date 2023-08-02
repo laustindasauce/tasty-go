@@ -14,10 +14,12 @@ import (
 )
 
 const (
-	apiBaseURL      = "https://api.tastyworks.com"
-	apiBaseHost     = "api.tastyworks.com"
-	apiCertBaseURL  = "https://api.cert.tastyworks.com"
-	apiCertBaseHost = "api.cert.tastyworks.com"
+	apiBaseURL          = "https://api.tastyworks.com"
+	apiBaseHost         = "api.tastyworks.com"
+	apiCertBaseURL      = "https://api.cert.tastyworks.com"
+	apiCertBaseHost     = "api.cert.tastyworks.com"
+	streamerBaseURL     = "wss://streamer.tastyworks.com"
+	streamerCertBaseURL = "wss://streamer.cert.tastyworks.com"
 )
 
 var (
@@ -30,6 +32,7 @@ type Client struct {
 	httpClient *http.Client
 	baseURL    string
 	baseHost   string
+	websocket  string
 	Session    Session
 }
 
@@ -42,6 +45,7 @@ func NewClient(httpClient *http.Client) *Client {
 		httpClient: httpClient,
 		baseURL:    apiBaseURL,
 		baseHost:   apiBaseHost,
+		websocket:  streamerBaseURL,
 	}
 
 	return c
@@ -56,9 +60,15 @@ func NewCertClient(httpClient *http.Client) *Client {
 		httpClient: httpClient,
 		baseURL:    apiCertBaseURL,
 		baseHost:   apiCertBaseHost,
+		websocket:  streamerCertBaseURL,
 	}
 
 	return c
+}
+
+// Getter for the tastytrade account streaming websocket url.
+func (c Client) GetWebsocketURL() string {
+	return c.websocket
 }
 
 // Error reasoning given by tastytrade.
