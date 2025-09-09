@@ -20,8 +20,9 @@
 # Go workspace file
 go.work
 
-# VS Code
+# Code IDE
 .vscode/
+.kiro/
 
 # Testing
 testing/
