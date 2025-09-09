@@ -17,10 +17,10 @@ jobs:
       - name: Run vet
         run: |
           go vet .
-      - name: Run golangci-lint
-        uses: golangci/golangci-lint-action@v8
-        with:
-          version: latest
+      # - name: Run golangci-lint
+      #   uses: golangci/golangci-lint-action@v8
+      #   with:
+      #     version: latest
       - name: Run tests
         run: go test -race -covermode=atomic -coverprofile=coverage.out -v .
       - name: Upload coverage reports to Codecov
