@@ -3,6 +3,7 @@ package tasty //nolint:testpackage // testing private field
 import (
 	"fmt"
 	"net/http"
+	"net/url"
 	"testing"
 	"time"
 
@@ -287,7 +288,7 @@ func TestGetEquityOption(t *testing.T) {
 	}
 	occSymbol := sym.Build()
 
-	mux.HandleFunc(fmt.Sprintf("/instruments/equity-options/%s", occSymbol), func(writer http.ResponseWriter, request *http.Request) {
+	mux.HandleFunc(fmt.Sprintf("/instruments/equity-options/%s", url.PathEscape(occSymbol)), func(writer http.ResponseWriter, request *http.Request) {
 		fmt.Fprint(writer, equityOptionResp)
 	})
 
@@ -331,7 +332,7 @@ func TestGetEquityOptionError(t *testing.T) {
 	}
 	occSymbol := sym.Build()
 
-	mux.HandleFunc(fmt.Sprintf("/instruments/equity-options/%s", occSymbol), func(writer http.ResponseWriter, request *http.Request) {
+	mux.HandleFunc(fmt.Sprintf("/instruments/equity-options/%s", url.PathEscape(occSymbol)), func(writer http.ResponseWriter, request *http.Request) {
 		writer.WriteHeader(401)
 		fmt.Fprint(writer, tastyUnauthorizedError)
 	})

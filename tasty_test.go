@@ -431,3 +431,355 @@ func expectedInvalidSession(t *testing.T, err error) {
 		"\nError in request 401;\nCode: invalid_session\nMessage: Session user not present. Unique customer support identifier: test-id",
 		err.Error())
 }
+
+// OAuth2 Client Integration Tests
+
+func TestNewOAuth2Client(t *testing.T) {
+	config := OAuth2Config{
+		ClientID:     "test_client_id",
+		ClientSecret: "test_client_secret",
+		RedirectURI:  "http://localhost:8080/callback",
+		Scopes:       []string{"read", "trade"},
+	}
+
+	client, err := NewOAuth2Client(config, nil)
+	require.NoError(t, err)
+	require.NotNil(t, client)
+	require.Equal(t, AuthModeOAuth2, client.authMode)
+	require.Equal(t, apiBaseURL, client.baseURL)
+	require.Equal(t, apiBaseHost, client.baseHost)
+	require.Equal(t, streamerBaseURL, client.websocket)
+	require.NotNil(t, client.oauth2Client)
+	require.True(t, client.IsOAuth2Mode())
+	require.False(t, client.IsSessionMode())
+
+	// Test with custom HTTP client
+	customClient := &http.Client{Timeout: time.Duration(60) * time.Second}
+	client2, err := NewOAuth2Client(config, customClient)
+	require.NoError(t, err)
+	require.Equal(t, customClient, client2.httpClient)
+}
+
+func TestNewOAuth2Client_WithEndpoints(t *testing.T) {
+	config := OAuth2Config{
+		ClientID:     "test_client_id",
+		ClientSecret: "test_client_secret",
+		RedirectURI:  "http://localhost:8080/callback",
+		Scopes:       []string{"read", "trade"},
+		BaseURL:      apiBaseURL,
+		AuthURL:      oauth2ProductionAuthURL,
+		TokenURL:     oauth2ProductionTokenURL,
+	}
+
+	client, err := NewOAuth2Client(config, nil)
+	require.NoError(t, err)
+	require.NotNil(t, client)
+	require.Equal(t, AuthModeOAuth2, client.authMode)
+}
+
+func TestNewOAuth2Client_InvalidEndpoints(t *testing.T) {
+	tests := []struct {
+		name    string
+		config  OAuth2Config
+		wantErr string
+	}{
+		{
+			name: "sandbox auth URL with production constructor",
+			config: OAuth2Config{
+				ClientID:     "test_client_id",
+				ClientSecret: "test_client_secret",
+				RedirectURI:  "http://localhost:8080/callback",
+				AuthURL:      oauth2SandboxAuthURL,
+			},
+			wantErr: "NewOAuth2Client requires production authorization URL",
+		},
+		{
+			name: "sandbox token URL with production constructor",
+			config: OAuth2Config{
+				ClientID:     "test_client_id",
+				ClientSecret: "test_client_secret",
+				RedirectURI:  "http://localhost:8080/callback",
+				TokenURL:     oauth2SandboxTokenURL,
+			},
+			wantErr: "NewOAuth2Client requires production token URL",
+		},
+		{
+			name: "cert base URL with production constructor",
+			config: OAuth2Config{
+				ClientID:     "test_client_id",
+				ClientSecret: "test_client_secret",
+				RedirectURI:  "http://localhost:8080/callback",
+				BaseURL:      apiCertBaseURL,
+			},
+			wantErr: "use NewCertOAuth2Client for sandbox environment",
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			client, err := NewOAuth2Client(tt.config, nil)
+			require.Error(t, err)
+			require.Nil(t, client)
+			require.Contains(t, err.Error(), tt.wantErr)
+		})
+	}
+}
+
+func TestNewCertOAuth2Client(t *testing.T) {
+	config := OAuth2Config{
+		ClientID:     "test_client_id",
+		ClientSecret: "test_client_secret",
+		RedirectURI:  "http://localhost:8080/callback",
+		Scopes:       []string{"read", "trade"},
+	}
+
+	client, err := NewCertOAuth2Client(config, nil)
+	require.NoError(t, err)
+	require.NotNil(t, client)
+	require.Equal(t, AuthModeOAuth2, client.authMode)
+	require.Equal(t, apiCertBaseURL, client.baseURL)
+	require.Equal(t, apiCertBaseHost, client.baseHost)
+	require.Equal(t, streamerCertBaseURL, client.websocket)
+	require.NotNil(t, client.oauth2Client)
+	require.True(t, client.IsOAuth2Mode())
+	require.False(t, client.IsSessionMode())
+
+	// Test with custom HTTP client
+	customClient := &http.Client{Timeout: time.Duration(60) * time.Second}
+	client2, err := NewCertOAuth2Client(config, customClient)
+	require.NoError(t, err)
+	require.Equal(t, customClient, client2.httpClient)
+}
+
+func TestNewCertOAuth2Client_WithEndpoints(t *testing.T) {
+	config := OAuth2Config{
+		ClientID:     "test_client_id",
+		ClientSecret: "test_client_secret",
+		RedirectURI:  "http://localhost:8080/callback",
+		Scopes:       []string{"read", "trade"},
+		BaseURL:      apiCertBaseURL,
+		AuthURL:      oauth2SandboxAuthURL,
+		TokenURL:     oauth2SandboxTokenURL,
+	}
+
+	client, err := NewCertOAuth2Client(config, nil)
+	require.NoError(t, err)
+	require.NotNil(t, client)
+	require.Equal(t, AuthModeOAuth2, client.authMode)
+}
+
+func TestNewCertOAuth2Client_InvalidEndpoints(t *testing.T) {
+	tests := []struct {
+		name    string
+		config  OAuth2Config
+		wantErr string
+	}{
+		{
+			name: "production auth URL with cert constructor",
+			config: OAuth2Config{
+				ClientID:     "test_client_id",
+				ClientSecret: "test_client_secret",
+				RedirectURI:  "http://localhost:8080/callback",
+				AuthURL:      oauth2ProductionAuthURL,
+			},
+			wantErr: "NewCertOAuth2Client requires sandbox authorization URL",
+		},
+		{
+			name: "production token URL with cert constructor",
+			config: OAuth2Config{
+				ClientID:     "test_client_id",
+				ClientSecret: "test_client_secret",
+				RedirectURI:  "http://localhost:8080/callback",
+				TokenURL:     oauth2ProductionTokenURL,
+			},
+			wantErr: "NewCertOAuth2Client requires sandbox token URL",
+		},
+		{
+			name: "production base URL with cert constructor",
+			config: OAuth2Config{
+				ClientID:     "test_client_id",
+				ClientSecret: "test_client_secret",
+				RedirectURI:  "http://localhost:8080/callback",
+				BaseURL:      apiBaseURL,
+			},
+			wantErr: "use NewOAuth2Client for production environment",
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			client, err := NewCertOAuth2Client(tt.config, nil)
+			require.Error(t, err)
+			require.Nil(t, client)
+			require.Contains(t, err.Error(), tt.wantErr)
+		})
+	}
+}
+
+func TestClient_AuthMode(t *testing.T) {
+	// Test session mode
+	sessionClient := NewClient(nil)
+	require.Equal(t, AuthModeSession, sessionClient.GetAuthMode())
+	require.True(t, sessionClient.IsSessionMode())
+	require.False(t, sessionClient.IsOAuth2Mode())
+
+	// Test OAuth2 mode
+	config := OAuth2Config{
+		ClientID:     "test_client_id",
+		ClientSecret: "test_client_secret",
+		RedirectURI:  "http://localhost:8080/callback",
+		Scopes:       []string{"read", "trade"},
+	}
+	oauth2Client, err := NewOAuth2Client(config, nil)
+	require.NoError(t, err)
+	require.Equal(t, AuthModeOAuth2, oauth2Client.GetAuthMode())
+	require.True(t, oauth2Client.IsOAuth2Mode())
+	require.False(t, oauth2Client.IsSessionMode())
+}
+
+func TestClient_OAuth2Methods_SessionMode(t *testing.T) {
+	client := NewClient(nil)
+
+	// Test OAuth2 methods fail in session mode
+	_, err := client.GetAuthorizationURL()
+	require.Error(t, err)
+	require.Contains(t, err.Error(), "authorization URL is only available in OAuth2 mode")
+
+	_, err = client.ExchangeCodeForTokens("test_code")
+	require.Error(t, err)
+	require.Contains(t, err.Error(), "token exchange is only available in OAuth2 mode")
+
+	_, err = client.RefreshTokens()
+	require.Error(t, err)
+	require.Contains(t, err.Error(), "token refresh is only available in OAuth2 mode")
+
+	_, err = client.StartRedirectServer(8080)
+	require.Error(t, err)
+	require.Contains(t, err.Error(), "redirect server is only available in OAuth2 mode")
+
+	err = client.ValidateState("test_state")
+	require.Error(t, err)
+	require.Contains(t, err.Error(), "state validation is only available in OAuth2 mode")
+
+	require.Nil(t, client.GetOAuth2Client())
+}
+
+func TestClient_OAuth2Methods_OAuth2Mode(t *testing.T) {
+	config := OAuth2Config{
+		ClientID:     "test_client_id",
+		ClientSecret: "test_client_secret",
+		RedirectURI:  "http://localhost:8080/callback",
+		Scopes:       []string{"read", "trade"},
+		State:        "test_state",
+	}
+	client, err := NewOAuth2Client(config, nil)
+	require.NoError(t, err)
+
+	// Test OAuth2 methods work in OAuth2 mode
+	authURL, err := client.GetAuthorizationURL()
+	require.NoError(t, err)
+	require.Contains(t, authURL, "client_id=test_client_id")
+	require.Contains(t, authURL, "state=test_state")
+
+	err = client.ValidateState("test_state")
+	require.NoError(t, err)
+
+	err = client.ValidateState("wrong_state")
+	require.Error(t, err)
+
+	require.NotNil(t, client.GetOAuth2Client())
+}
+
+func TestClient_IsAuthenticated(t *testing.T) {
+	// Test session mode
+	sessionClient := NewClient(nil)
+	require.False(t, sessionClient.IsAuthenticated())
+
+	sessionClient.Session.SessionToken = &testToken
+	require.True(t, sessionClient.IsAuthenticated())
+
+	// Test OAuth2 mode with isolated storage
+	config := OAuth2Config{
+		ClientID:     "test_client_id",
+		ClientSecret: "test_client_secret",
+		RedirectURI:  "http://localhost:8080/callback",
+		Scopes:       []string{"read", "trade"},
+		BaseURL:      apiBaseURL,
+		AuthURL:      oauth2ProductionAuthURL,
+		TokenURL:     oauth2ProductionTokenURL,
+	}
+	
+	// Create OAuth2Client with memory storage for isolated testing
+	tokenManager := NewMemoryTokenManager()
+	oauth2ClientInternal := &OAuth2Client{
+		config:       config,
+		tokenManager: tokenManager,
+		httpClient:   defaultHTTPClient,
+		pkce:         nil,
+	}
+	tokenManager.SetRefreshCallback(oauth2ClientInternal.refreshTokensInternal)
+	
+	// Create Client with the isolated OAuth2Client
+	oauth2Client := &Client{
+		httpClient:   defaultHTTPClient,
+		baseURL:      config.BaseURL,
+		oauth2Client: oauth2ClientInternal,
+		authMode:     AuthModeOAuth2,
+	}
+	
+	require.False(t, oauth2Client.IsAuthenticated())
+
+	// Set tokens to make it authenticated
+	oauth2Client.oauth2Client.tokenManager.SetTokens("access_token", "refresh_token", 3600)
+	require.True(t, oauth2Client.IsAuthenticated())
+}
+
+func TestClient_ClearAuthentication(t *testing.T) {
+	// Test session mode
+	sessionClient := NewClient(nil)
+	sessionClient.Session.SessionToken = &testToken
+	require.True(t, sessionClient.IsAuthenticated())
+
+	sessionClient.ClearAuthentication()
+	require.False(t, sessionClient.IsAuthenticated())
+	require.Equal(t, Session{}, sessionClient.Session)
+
+	// Test OAuth2 mode
+	config := OAuth2Config{
+		ClientID:     "test_client_id",
+		ClientSecret: "test_client_secret",
+		RedirectURI:  "http://localhost:8080/callback",
+		Scopes:       []string{"read", "trade"},
+	}
+	oauth2Client, err := NewOAuth2Client(config, nil)
+	require.NoError(t, err)
+
+	oauth2Client.oauth2Client.tokenManager.SetTokens("access_token", "refresh_token", 3600)
+	require.True(t, oauth2Client.IsAuthenticated())
+
+	oauth2Client.ClearAuthentication()
+	require.False(t, oauth2Client.IsAuthenticated())
+}
+
+
+
+func TestAuthMode_String(t *testing.T) {
+	require.Equal(t, "session", AuthModeSession.String())
+	require.Equal(t, "oauth2", AuthModeOAuth2.String())
+	require.Equal(t, "unknown", AuthMode(999).String())
+}
+
+func TestClient_BackwardCompatibility(t *testing.T) {
+	// Test that existing session-based constructors still work
+	sessionClient := NewClient(nil)
+	require.NotNil(t, sessionClient)
+	require.Equal(t, AuthModeSession, sessionClient.authMode)
+
+	certClient := NewCertClient(nil)
+	require.NotNil(t, certClient)
+	require.Equal(t, AuthModeSession, certClient.authMode)
+
+	// Test that session-based methods still work
+	sessionClient.Session.SessionToken = &testToken
+	require.True(t, sessionClient.IsAuthenticated())
+}

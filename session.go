@@ -5,7 +5,10 @@ import (
 )
 
 // Create a new user session.
+// Deprecated: Session-based authentication is deprecated and will be removed in a future version.
+// Use OAuth2 authentication with NewOAuth2Client or NewCertOAuth2Client instead.
 func (c *Client) CreateSession(login LoginInfo, twoFactorCode *string) (Session, *http.Response, error) {
+	LogSessionDeprecation("CreateSession", "OAuth2 authorization flow with GetAuthorizationURL() and ExchangeCodeForTokens()")
 	path := "/sessions"
 
 	type sessionResponse struct {
@@ -31,7 +34,10 @@ func (c *Client) CreateSession(login LoginInfo, twoFactorCode *string) (Session,
 }
 
 // Validate the user session.
+// Deprecated: Session-based authentication is deprecated and will be removed in a future version.
+// Use OAuth2 authentication with NewOAuth2Client or NewCertOAuth2Client instead.
 func (c *Client) ValidateSession() (User, *http.Response, error) {
+	LogSessionDeprecation("ValidateSession", "OAuth2 tokens are validated automatically during API requests")
 	path := "/sessions/validate"
 
 	type validSessionResponse struct {
@@ -51,7 +57,10 @@ func (c *Client) ValidateSession() (User, *http.Response, error) {
 }
 
 // Destroy the user session and invalidate the token.
+// Deprecated: Session-based authentication is deprecated and will be removed in a future version.
+// Use OAuth2 authentication with NewOAuth2Client or NewCertOAuth2Client instead.
 func (c *Client) DestroySession() (*http.Response, error) {
+	LogSessionDeprecation("DestroySession", "ClearAuthentication() to clear OAuth2 tokens")
 	path := "/sessions"
 
 	return c.request(http.MethodDelete, path, nil, nil, nil)

@@ -3,6 +3,7 @@ package tasty //nolint:testpackage // testing private field
 import (
 	"fmt"
 	"net/http"
+	"net/url"
 	"testing"
 	"time"
 
@@ -80,7 +81,7 @@ func TestGetMyWatchlist(t *testing.T) {
 	setup()
 	defer teardown()
 
-	mux.HandleFunc(fmt.Sprintf("/watchlists/%s", watchlist.Name), func(writer http.ResponseWriter, request *http.Request) {
+	mux.HandleFunc(fmt.Sprintf("/watchlists/%s", url.PathEscape(watchlist.Name)), func(writer http.ResponseWriter, request *http.Request) {
 		fmt.Fprint(writer, getWatchlistResp)
 	})
 
@@ -100,7 +101,7 @@ func TestGetMyWatchlistError(t *testing.T) {
 	setup()
 	defer teardown()
 
-	mux.HandleFunc(fmt.Sprintf("/watchlists/%s", watchlist.Name), func(writer http.ResponseWriter, request *http.Request) {
+	mux.HandleFunc(fmt.Sprintf("/watchlists/%s", url.PathEscape(watchlist.Name)), func(writer http.ResponseWriter, request *http.Request) {
 		writer.WriteHeader(401)
 		fmt.Fprint(writer, tastyUnauthorizedError)
 	})
@@ -148,7 +149,7 @@ func TestEditWatchlist(t *testing.T) {
 	setup()
 	defer teardown()
 
-	mux.HandleFunc(fmt.Sprintf("/watchlists/%s", watchlist.Name), func(writer http.ResponseWriter, request *http.Request) {
+	mux.HandleFunc(fmt.Sprintf("/watchlists/%s", url.PathEscape(watchlist.Name)), func(writer http.ResponseWriter, request *http.Request) {
 		fmt.Fprint(writer, editedWatchlistResp)
 	})
 
@@ -168,7 +169,7 @@ func TestEditWatchlistError(t *testing.T) {
 	setup()
 	defer teardown()
 
-	mux.HandleFunc(fmt.Sprintf("/watchlists/%s", watchlist.Name), func(writer http.ResponseWriter, request *http.Request) {
+	mux.HandleFunc(fmt.Sprintf("/watchlists/%s", url.PathEscape(watchlist.Name)), func(writer http.ResponseWriter, request *http.Request) {
 		writer.WriteHeader(401)
 		fmt.Fprint(writer, tastyUnauthorizedError)
 	})
@@ -182,7 +183,7 @@ func TestDeleteWatchlist(t *testing.T) {
 	setup()
 	defer teardown()
 
-	mux.HandleFunc(fmt.Sprintf("/watchlists/%s", newWatchlist.Name), func(writer http.ResponseWriter, request *http.Request) {
+	mux.HandleFunc(fmt.Sprintf("/watchlists/%s", url.PathEscape(newWatchlist.Name)), func(writer http.ResponseWriter, request *http.Request) {
 		fmt.Fprint(writer, deleteWatchlistResp)
 	})
 
@@ -209,7 +210,7 @@ func TestDeleteWatchlistError(t *testing.T) {
 	setup()
 	defer teardown()
 
-	mux.HandleFunc(fmt.Sprintf("/watchlists/%s", newWatchlist.Name), func(writer http.ResponseWriter, request *http.Request) {
+	mux.HandleFunc(fmt.Sprintf("/watchlists/%s", url.PathEscape(newWatchlist.Name)), func(writer http.ResponseWriter, request *http.Request) {
 		writer.WriteHeader(401)
 		fmt.Fprint(writer, tastyUnauthorizedError)
 	})
@@ -390,7 +391,7 @@ func TestGetPublicWatchlist(t *testing.T) {
 
 	name := "High Options Volume"
 
-	mux.HandleFunc(fmt.Sprintf("/public-watchlists/%s", name), func(writer http.ResponseWriter, request *http.Request) {
+	mux.HandleFunc(fmt.Sprintf("/public-watchlists/%s", url.PathEscape(name)), func(writer http.ResponseWriter, request *http.Request) {
 		fmt.Fprint(writer, getPublicWatchlistResp)
 	})
 
@@ -414,7 +415,7 @@ func TestGetPublicWatchlistError(t *testing.T) {
 
 	name := "High Options Volume"
 
-	mux.HandleFunc(fmt.Sprintf("/public-watchlists/%s", name), func(writer http.ResponseWriter, request *http.Request) {
+	mux.HandleFunc(fmt.Sprintf("/public-watchlists/%s", url.PathEscape(name)), func(writer http.ResponseWriter, request *http.Request) {
 		writer.WriteHeader(401)
 		fmt.Fprint(writer, tastyUnauthorizedError)
 	})

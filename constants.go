@@ -1,5 +1,16 @@
 package tasty
 
+// OAuth2 endpoint constants for production and sandbox environments
+const (
+	// Production OAuth2 endpoints
+	oauth2ProductionAuthURL  = "https://my.tastytrade.com/auth.html"
+	oauth2ProductionTokenURL = "https://api.tastyworks.com/oauth/token"
+	
+	// Sandbox OAuth2 endpoints  
+	oauth2SandboxAuthURL  = "https://cert-my.staging-tasty.works/auth.html"
+	oauth2SandboxTokenURL = "https://api.cert.tastyworks.com/oauth/token"
+)
+
 type InstrumentType string
 type TimeOfDay string
 type TimeInForce string
