@@ -204,6 +204,11 @@ func (c *OAuth2Client) ExchangeCodeForTokens(code string) (*TokenResponse, error
 		return nil, err
 	}
 	
+	// Set scope from config if not provided in response
+	if tokenResponse.Scope == "" && len(c.config.Scopes) > 0 {
+		tokenResponse.Scope = strings.Join(c.config.Scopes, " ")
+	}
+	
 	// Store tokens in token manager
 	c.tokenManager.SetTokensFromResponse(&tokenResponse)
 	
@@ -312,6 +317,24 @@ func (c *OAuth2Client) performTokenRefresh(refreshToken string) (*TokenResponse,
 	// Validate response
 	if err := ValidateTokenResponse(&tokenResponse); err != nil {
 		return nil, err
+	}
+	
+	// Get existing token data to preserve refresh token and scope if not provided in response
+	existingRefreshToken := c.tokenManager.GetRefreshToken()
+	existingScope := c.tokenManager.GetScope()
+	
+	// Set scope from config or preserve existing scope if not provided in response (common for refresh responses)
+	if tokenResponse.Scope == "" {
+		if len(c.config.Scopes) > 0 {
+			tokenResponse.Scope = strings.Join(c.config.Scopes, " ")
+		} else if existingScope != "" {
+			tokenResponse.Scope = existingScope
+		}
+	}
+	
+	// Preserve existing refresh token if not provided in response (common for TastyTrade)
+	if tokenResponse.RefreshToken == "" && existingRefreshToken != "" {
+		tokenResponse.RefreshToken = existingRefreshToken
 	}
 	
 	// Store new tokens in token manager

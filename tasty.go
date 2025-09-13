@@ -55,10 +55,10 @@ type Client struct {
 	baseURL    string
 	baseHost   string
 	websocket  string
-	
+
 	// Legacy session support (deprecated)
 	Session Session
-	
+
 	// OAuth2 support
 	oauth2Client *OAuth2Client
 	authMode     AuthMode
@@ -68,7 +68,7 @@ type Client struct {
 // For new applications, use NewOAuth2Client instead.
 func NewClient(httpClient *http.Client) *Client {
 	LogSessionDeprecation("NewClient", "NewOAuth2Client() with OAuth2Config")
-	
+
 	if httpClient == nil {
 		httpClient = defaultHTTPClient
 	}
@@ -87,7 +87,7 @@ func NewClient(httpClient *http.Client) *Client {
 // For new applications, use NewCertOAuth2Client instead.
 func NewCertClient(httpClient *http.Client) *Client {
 	LogSessionDeprecation("NewCertClient", "NewCertOAuth2Client() with OAuth2Config")
-	
+
 	if httpClient == nil {
 		httpClient = defaultHTTPClient
 	}
@@ -107,7 +107,7 @@ func NewOAuth2Client(config OAuth2Config, httpClient *http.Client) (*Client, err
 	if httpClient == nil {
 		httpClient = defaultHTTPClient
 	}
-	
+
 	// Ensure production environment configuration
 	if config.BaseURL == "" && config.AuthURL == "" && config.TokenURL == "" {
 		// Set production endpoints if none are specified
@@ -123,7 +123,7 @@ func NewOAuth2Client(config OAuth2Config, httpClient *http.Client) (*Client, err
 			return nil, fmt.Errorf("use NewCertOAuth2Client for sandbox environment")
 		}
 	}
-	
+
 	// Validate that we're using production endpoints
 	if config.AuthURL != "" && config.AuthURL != oauth2ProductionAuthURL {
 		return nil, fmt.Errorf("NewOAuth2Client requires production authorization URL, got: %s", config.AuthURL)
@@ -131,13 +131,13 @@ func NewOAuth2Client(config OAuth2Config, httpClient *http.Client) (*Client, err
 	if config.TokenURL != "" && config.TokenURL != oauth2ProductionTokenURL {
 		return nil, fmt.Errorf("NewOAuth2Client requires production token URL, got: %s", config.TokenURL)
 	}
-	
+
 	// Create OAuth2 client
 	oauth2Client, err := newOAuth2ClientInternal(config, httpClient)
 	if err != nil {
 		return nil, fmt.Errorf("failed to create OAuth2 client: %w", err)
 	}
-	
+
 	c := &Client{
 		httpClient:   httpClient,
 		baseURL:      apiBaseURL,
@@ -157,10 +157,10 @@ func NewOAuth2ClientWithTokens(config OAuth2Config, accessToken, refreshToken st
 	if err != nil {
 		return nil, err
 	}
-	
+
 	// Set the provided tokens
 	client.oauth2Client.SetTokens(accessToken, refreshToken, expiresIn)
-	
+
 	return client, nil
 }
 
@@ -172,10 +172,10 @@ func NewOAuth2ClientWithTokenResponse(config OAuth2Config, tokenResponse *TokenR
 	if err != nil {
 		return nil, err
 	}
-	
+
 	// Set tokens from the response
 	client.oauth2Client.SetTokensFromResponse(tokenResponse)
-	
+
 	return client, nil
 }
 
@@ -184,7 +184,7 @@ func NewCertOAuth2Client(config OAuth2Config, httpClient *http.Client) (*Client,
 	if httpClient == nil {
 		httpClient = defaultHTTPClient
 	}
-	
+
 	// Ensure sandbox environment configuration
 	if config.BaseURL == "" && config.AuthURL == "" && config.TokenURL == "" {
 		// Set sandbox endpoints if none are specified
@@ -200,7 +200,7 @@ func NewCertOAuth2Client(config OAuth2Config, httpClient *http.Client) (*Client,
 			return nil, fmt.Errorf("use NewOAuth2Client for production environment")
 		}
 	}
-	
+
 	// Validate that we're using sandbox endpoints
 	if config.AuthURL != "" && config.AuthURL != oauth2SandboxAuthURL {
 		return nil, fmt.Errorf("NewCertOAuth2Client requires sandbox authorization URL, got: %s", config.AuthURL)
@@ -208,13 +208,13 @@ func NewCertOAuth2Client(config OAuth2Config, httpClient *http.Client) (*Client,
 	if config.TokenURL != "" && config.TokenURL != oauth2SandboxTokenURL {
 		return nil, fmt.Errorf("NewCertOAuth2Client requires sandbox token URL, got: %s", config.TokenURL)
 	}
-	
+
 	// Create OAuth2 client
 	oauth2Client, err := newOAuth2ClientInternal(config, httpClient)
 	if err != nil {
 		return nil, fmt.Errorf("failed to create OAuth2 client: %w", err)
 	}
-	
+
 	c := &Client{
 		httpClient:   httpClient,
 		baseURL:      apiCertBaseURL,
@@ -234,10 +234,10 @@ func NewCertOAuth2ClientWithTokens(config OAuth2Config, accessToken, refreshToke
 	if err != nil {
 		return nil, err
 	}
-	
+
 	// Set the provided tokens
 	client.oauth2Client.SetTokens(accessToken, refreshToken, expiresIn)
-	
+
 	return client, nil
 }
 
@@ -249,10 +249,10 @@ func NewCertOAuth2ClientWithTokenResponse(config OAuth2Config, tokenResponse *To
 	if err != nil {
 		return nil, err
 	}
-	
+
 	// Set tokens from the response
 	client.oauth2Client.SetTokensFromResponse(tokenResponse)
-	
+
 	return client, nil
 }
 
@@ -436,7 +436,7 @@ func (c *Client) IsTokenExpired() bool {
 // Deprecated: This method is provided for migration purposes only and will be removed in a future version
 func (c *Client) TryOAuth2FallbackToSession(oauth2Config *OAuth2Config, sessionLogin *LoginInfo, twoFactorCode *string) error {
 	LogSessionDeprecation("TryOAuth2FallbackToSession", "full OAuth2 authentication flow")
-	
+
 	// If OAuth2 config is provided, try OAuth2 first
 	if oauth2Config != nil {
 		// Validate OAuth2 config
@@ -444,13 +444,13 @@ func (c *Client) TryOAuth2FallbackToSession(oauth2Config *OAuth2Config, sessionL
 			// Try to create OAuth2 client
 			var oauth2Client *OAuth2Client
 			var err error
-			
+
 			if oauth2Config.IsProduction() {
 				oauth2Client, err = newOAuth2ClientInternal(*oauth2Config, c.httpClient)
 			} else {
 				oauth2Client, err = newOAuth2ClientInternal(*oauth2Config, c.httpClient)
 			}
-			
+
 			if err == nil {
 				// Successfully created OAuth2 client, switch to OAuth2 mode
 				c.oauth2Client = oauth2Client
@@ -459,13 +459,13 @@ func (c *Client) TryOAuth2FallbackToSession(oauth2Config *OAuth2Config, sessionL
 			}
 		}
 	}
-	
+
 	// OAuth2 failed or not configured, fall back to session
 	if sessionLogin != nil {
 		_, _, err := c.CreateSession(*sessionLogin, twoFactorCode)
 		return err
 	}
-	
+
 	return fmt.Errorf("both OAuth2 and session authentication failed or not configured")
 }
 
@@ -476,43 +476,43 @@ func (c *Client) MigrateToOAuth2(config OAuth2Config) error {
 	if err := ValidateOAuth2Migration(config); err != nil {
 		return fmt.Errorf("OAuth2 migration validation failed: %w", err)
 	}
-	
+
 	// Create OAuth2 client
 	oauth2Client, err := newOAuth2ClientInternal(config, c.httpClient)
 	if err != nil {
 		return fmt.Errorf("failed to create OAuth2 client during migration: %w", err)
 	}
-	
+
 	// Clear existing session data
 	c.Session = Session{}
-	
+
 	// Switch to OAuth2
 	c.oauth2Client = oauth2Client
 	c.authMode = AuthModeOAuth2
-	
+
 	return nil
 }
 
 // GetMigrationStatus returns information about the current authentication mode and migration status
 func (c *Client) GetMigrationStatus() map[string]interface{} {
 	status := make(map[string]interface{})
-	
+
 	status["auth_mode"] = c.authMode.String()
 	status["is_oauth2"] = c.IsOAuth2Mode()
 	status["is_session"] = c.IsSessionMode()
 	status["is_authenticated"] = c.IsAuthenticated()
 	status["needs_migration"] = c.IsSessionMode()
-	
+
 	if c.IsOAuth2Mode() && c.oauth2Client != nil {
 		status["oauth2_environment"] = c.oauth2Client.config.GetEnvironment()
 		status["has_valid_token"] = c.oauth2Client.tokenManager.HasValidToken()
 		status["has_refresh_token"] = c.oauth2Client.tokenManager.HasRefreshToken()
 	}
-	
+
 	if c.IsSessionMode() {
 		status["has_session_token"] = c.Session.SessionToken != nil
 	}
-	
+
 	return status
 }
 
@@ -683,6 +683,8 @@ func (c *Client) customOAuthRequest(method, path string, params, payload, result
 
 	defer resp.Body.Close()
 
+	fmt.Printf("Retrieve status code: %d\n", resp.StatusCode)
+
 	// Handle 401 Unauthorized - attempt token refresh and retry once
 	if resp.StatusCode == http.StatusUnauthorized {
 		// Try to refresh the token
@@ -840,27 +842,37 @@ func (c *Client) oauthRequest(method, path string, params, payload, result any) 
 		return nil, &Error{Code: "invalid_oauth2", Message: "OAuth2 client not initialized"}
 	}
 
-	// Get access token (automatically refreshes if needed)
 	accessToken, err := c.oauth2Client.GetTokenManager().GetAccessToken()
 	if err != nil {
 		return nil, &Error{Code: "oauth2_token_error", Message: fmt.Sprintf("Failed to get access token: %v", err)}
 	}
 
-	body, err := json.Marshal(payload)
-	if err != nil {
-		return nil, &Error{Message: fmt.Sprintf("Client Side Error: %v", err)}
+	// Initialize an empty buffer for the request body
+	var bodyReader io.Reader
+
+	// Condition to set the body and Content-Type header only for methods that need a body
+	if payload != nil && (method == http.MethodPost || method == http.MethodPut || method == http.MethodPatch) {
+		body, err := json.Marshal(payload)
+		if err != nil {
+			return nil, &Error{Message: fmt.Sprintf("Client Side Error: %v", err)}
+		}
+		bodyReader = bytes.NewBuffer(body)
 	}
 
 	fullURL := c.baseURL + path
 
-	r, err := http.NewRequest(method, fullURL, bytes.NewBuffer(body))
+	r, err := http.NewRequest(method, fullURL, bodyReader)
 	if err != nil {
 		return nil, &Error{Message: fmt.Sprintf("Client Side Error: %v", err)}
 	}
 
 	r.Header = http.Header{}
 	r.Header.Add("Authorization", "Bearer "+accessToken)
-	r.Header.Add("Content-Type", "application/json")
+
+	// Condition to add Content-Type header
+	if bodyReader != nil {
+		r.Header.Add("Content-Type", "application/json")
+	}
 
 	if params != nil {
 		queryString, queryErr := query.Values(params)
@@ -870,6 +882,20 @@ func (c *Client) oauthRequest(method, path string, params, payload, result any) 
 		r.URL.RawQuery = queryString.Encode()
 	}
 
+	// ----------------------------------------
+	// Start of new logging code for the request
+	// ----------------------------------------
+	// requestDump, err := httputil.DumpRequestOut(r, true)
+	// if err != nil {
+	// 	return nil, &Error{Message: fmt.Sprintf("Client Side Error: failed to dump request: %v", err)}
+	// }
+	// fmt.Println("--- Request Dump ---")
+	// fmt.Printf("%s", requestDump)
+	// fmt.Println("--------------------")
+	// ----------------------------------------
+	// End of new logging code
+	// ----------------------------------------
+
 	resp, err := c.httpClient.Do(r)
 	if err != nil {
 		return nil, &Error{Message: fmt.Sprintf("Client Side Error: %v", err)}
@@ -877,17 +903,32 @@ func (c *Client) oauthRequest(method, path string, params, payload, result any) 
 
 	defer resp.Body.Close()
 
-	// Handle 401 Unauthorized - attempt token refresh and retry once
+	fmt.Printf("Retrieve status code: %d\n", resp.StatusCode)
+
+	// ----------------------------------------
+	// Start of new logging code for the response
+	// ----------------------------------------
+	// bodyBytes, err := io.ReadAll(resp.Body)
+	// if err != nil {
+	// 	return resp, &Error{Message: fmt.Sprintf("Client Side Error: failed to read response body: %v", err)}
+	// }
+
+	// // Re-create the response body so it can be decoded later
+	// resp.Body = io.NopCloser(bytes.NewBuffer(bodyBytes))
+
+	// fmt.Println("--- Response Body Dump ---")
+	// fmt.Printf("%s\n", string(bodyBytes))
+	// fmt.Println("--------------------------")
+	// ----------------------------------------
+	// End of new logging code
+	// ----------------------------------------
+
 	if resp.StatusCode == http.StatusUnauthorized {
-		// Try to refresh the token
 		if _, refreshErr := c.oauth2Client.RefreshTokens(); refreshErr == nil {
-			// Get the new access token
 			if newAccessToken, tokenErr := c.oauth2Client.GetTokenManager().GetAccessToken(); tokenErr == nil {
-				// Retry the request with the new token
 				return c.retryOAuthRequest(method, path, params, payload, result, newAccessToken)
 			}
 		}
-		// If refresh failed, continue with original error handling
 	}
 
 	if resp.StatusCode == http.StatusNoContent {
@@ -909,21 +950,32 @@ func (c *Client) oauthRequest(method, path string, params, payload, result any) 
 
 // retryOAuthRequest retries an OAuth2 request with a new access token
 func (c *Client) retryOAuthRequest(method, path string, params, payload, result any, accessToken string) (*http.Response, *Error) {
-	body, err := json.Marshal(payload)
-	if err != nil {
-		return nil, &Error{Message: fmt.Sprintf("Client Side Error: %v", err)}
+	// Initialize an empty reader for the request body.
+	var bodyReader io.Reader
+
+	// Only create a body for methods that require a payload.
+	if payload != nil && (method == http.MethodPost || method == http.MethodPut || method == http.MethodPatch) {
+		body, err := json.Marshal(payload)
+		if err != nil {
+			return nil, &Error{Message: fmt.Sprintf("Client Side Error: %v", err)}
+		}
+		bodyReader = bytes.NewBuffer(body)
 	}
 
 	fullURL := c.baseURL + path
 
-	r, err := http.NewRequest(method, fullURL, bytes.NewBuffer(body))
+	r, err := http.NewRequest(method, fullURL, bodyReader)
 	if err != nil {
 		return nil, &Error{Message: fmt.Sprintf("Client Side Error: %v", err)}
 	}
 
 	r.Header = http.Header{}
 	r.Header.Add("Authorization", "Bearer "+accessToken)
-	r.Header.Add("Content-Type", "application/json")
+
+	// Add Content-Type header only when a body is present.
+	if bodyReader != nil {
+		r.Header.Add("Content-Type", "application/json")
+	}
 
 	if params != nil {
 		queryString, queryErr := query.Values(params)

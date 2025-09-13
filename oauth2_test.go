@@ -9,6 +9,7 @@ import (
 	"net/http"
 	"net/http/httptest"
 	"net/url"
+	"strings"
 	"sync"
 	"testing"
 	"time"
@@ -1153,4 +1154,75 @@ func TestValidateOAuth2Options(t *testing.T) {
 		err := ValidateOAuth2Options(options)
 		assert.NoError(t, err)
 	})
+}
+
+func TestOAuth2Client_ScopeHandling(t *testing.T) {
+	mockServer := NewMockOAuth2Server()
+	defer mockServer.Close()
+	
+	// Set up mock server to return token response without scope
+	mockServer.tokenResponse = &TokenResponse{
+		AccessToken:  "test_access_token",
+		RefreshToken: "test_refresh_token",
+		TokenType:    "Bearer",
+		ExpiresIn:    3600,
+		// Scope is intentionally omitted to simulate TastyTrade behavior
+	}
+	
+	client, err := createTestOAuth2ClientWithMemoryStorage(mockServer)
+	require.NoError(t, err)
+	
+	// Exchange code for tokens (use a longer code to pass validation)
+	tokenResponse, err := client.ExchangeCodeForTokens("test_code_1234567890")
+	require.NoError(t, err)
+	
+	// Verify scope is set from config
+	expectedScope := strings.Join(client.config.Scopes, " ")
+	assert.Equal(t, expectedScope, tokenResponse.Scope)
+	assert.Equal(t, expectedScope, client.tokenManager.GetScope())
+}
+
+func TestOAuth2Client_RefreshTokenPreservation(t *testing.T) {
+	mockServer := NewMockOAuth2Server()
+	defer mockServer.Close()
+	
+	client, err := createTestOAuth2ClientWithMemoryStorage(mockServer)
+	require.NoError(t, err)
+	
+	// Set initial tokens
+	client.SetTokens("initial-token", "persistent-refresh-token", 3600)
+	originalScope := strings.Join(client.config.Scopes, " ")
+	
+	// Manually set scope to simulate initial token exchange
+	client.tokenManager.storage.Store(&TokenData{
+		AccessToken:  "initial-token",
+		RefreshToken: "persistent-refresh-token",
+		TokenType:    "Bearer",
+		ExpiresAt:    time.Now().Add(time.Hour),
+		Scope:        originalScope,
+	})
+	
+	// Set up mock server to return refresh response without refresh token or scope
+	mockServer.tokenResponse = &TokenResponse{
+		AccessToken: "refreshed-token",
+		TokenType:   "Bearer",
+		ExpiresIn:   3600,
+		// RefreshToken and Scope are intentionally omitted
+	}
+	
+	// Perform token refresh
+	refreshResponse, err := client.RefreshTokens()
+	require.NoError(t, err)
+	
+	// Verify refresh token is preserved
+	assert.Equal(t, "persistent-refresh-token", client.tokenManager.GetRefreshToken())
+	
+	// Verify scope is preserved
+	assert.Equal(t, originalScope, client.tokenManager.GetScope())
+	
+	// Verify new access token is set
+	assert.Equal(t, "refreshed-token", refreshResponse.AccessToken)
+	
+	// Verify scope is set in response
+	assert.Equal(t, originalScope, refreshResponse.Scope)
 }

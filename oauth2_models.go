@@ -376,17 +376,32 @@ func (tm *TokenManager) SetTokensFromResponse(response *TokenResponse) {
 	tm.mutex.Lock()
 	defer tm.mutex.Unlock()
 	
+	// Load existing data to preserve refresh token and scope if not provided in response
+	existingData, _ := tm.storage.Load()
+	
 	tokenType := response.TokenType
 	if tokenType == "" {
 		tokenType = "Bearer" // Default token type
 	}
 	
+	// Use refresh token from response, but preserve existing one if not provided
+	refreshToken := response.RefreshToken
+	if refreshToken == "" && existingData != nil {
+		refreshToken = existingData.RefreshToken
+	}
+	
+	// Use scope from response, but preserve existing one if not provided
+	scope := response.Scope
+	if scope == "" && existingData != nil {
+		scope = existingData.Scope
+	}
+	
 	data := &TokenData{
 		AccessToken:  response.AccessToken,
-		RefreshToken: response.RefreshToken,
+		RefreshToken: refreshToken,
 		TokenType:    tokenType,
 		ExpiresAt:    time.Now().Add(time.Duration(response.ExpiresIn) * time.Second),
-		Scope:        response.Scope,
+		Scope:        scope,
 	}
 	
 	tm.storage.Store(data)

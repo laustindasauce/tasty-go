@@ -136,13 +136,13 @@ func (c *Client) GetPairsWatchlist(name string) (PairsWatchlist, *http.Response,
 	return watchlistsRes.Watchlist, resp, nil
 }
 
-// Returns a list of all tastytrade watchlists.
-func (c *Client) GetPublicWatchlists(countsOnly bool) ([]PublicWatchlist, *http.Response, error) {
+// Returns a list of all tastytrade public watchlists.
+func (c *Client) GetPublicWatchlists(countsOnly bool) ([]Watchlist, *http.Response, error) {
 	path := "/public-watchlists"
 
 	type watchlistResponse struct {
 		Data struct {
-			Watchlists []PublicWatchlist `json:"items"`
+			Watchlists []Watchlist `json:"items"`
 		} `json:"data"`
 	}
 
@@ -156,13 +156,13 @@ func (c *Client) GetPublicWatchlists(countsOnly bool) ([]PublicWatchlist, *http.
 
 	resp, err := c.request(http.MethodGet, path, query, nil, watchlistsRes)
 	if err != nil {
-		return []PublicWatchlist{}, resp, err
+		return []Watchlist{}, resp, err
 	}
 
 	return watchlistsRes.Data.Watchlists, resp, nil
 }
 
-// Returns a requested tastytrade watchlist.
+// Returns a requested tastytrade public watchlist.
 func (c *Client) GetPublicWatchlist(name string) (Watchlist, *http.Response, error) {
 	path := fmt.Sprintf("/public-watchlists/%s", url.PathEscape(name))
 

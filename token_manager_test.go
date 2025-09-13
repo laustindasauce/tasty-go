@@ -948,3 +948,105 @@ func TestDefaultTokenPath(t *testing.T) {
 		t.Errorf("Expected path to end with 'tokens.json', got '%s'", path)
 	}
 }
+
+func TestTokenManager_SetTokensFromResponse_PreservesRefreshTokenAndScope(t *testing.T) {
+	tm := NewMemoryTokenManager()
+	
+	// Set initial tokens with scope
+	initialResponse := &TokenResponse{
+		AccessToken:  "initial-access-token",
+		RefreshToken: "persistent-refresh-token",
+		TokenType:    "Bearer",
+		ExpiresIn:    3600,
+		Scope:        "read write trade",
+	}
+	
+	tm.SetTokensFromResponse(initialResponse)
+	
+	// Verify initial tokens are set
+	token, err := tm.GetAccessToken()
+	if err != nil {
+		t.Fatalf("Failed to get initial access token: %v", err)
+	}
+	if token != "initial-access-token" {
+		t.Errorf("Expected initial access token 'initial-access-token', got '%s'", token)
+	}
+	if tm.GetRefreshToken() != "persistent-refresh-token" {
+		t.Errorf("Expected refresh token 'persistent-refresh-token', got '%s'", tm.GetRefreshToken())
+	}
+	if tm.GetScope() != "read write trade" {
+		t.Errorf("Expected scope 'read write trade', got '%s'", tm.GetScope())
+	}
+	
+	// Simulate refresh response without refresh token or scope (common for TastyTrade)
+	refreshResponse := &TokenResponse{
+		AccessToken: "new-access-token",
+		TokenType:   "Bearer",
+		ExpiresIn:   3600,
+		// RefreshToken and Scope are empty (not provided in refresh response)
+	}
+	
+	tm.SetTokensFromResponse(refreshResponse)
+	
+	// Verify new access token is set
+	token, err = tm.GetAccessToken()
+	if err != nil {
+		t.Fatalf("Failed to get refreshed access token: %v", err)
+	}
+	if token != "new-access-token" {
+		t.Errorf("Expected refreshed access token 'new-access-token', got '%s'", token)
+	}
+	
+	// Verify refresh token is preserved
+	if tm.GetRefreshToken() != "persistent-refresh-token" {
+		t.Errorf("Expected refresh token to be preserved 'persistent-refresh-token', got '%s'", tm.GetRefreshToken())
+	}
+	
+	// Verify scope is preserved
+	if tm.GetScope() != "read write trade" {
+		t.Errorf("Expected scope to be preserved 'read write trade', got '%s'", tm.GetScope())
+	}
+}
+
+func TestTokenManager_SetTokensFromResponse_UpdatesRefreshTokenWhenProvided(t *testing.T) {
+	tm := NewMemoryTokenManager()
+	
+	// Set initial tokens
+	initialResponse := &TokenResponse{
+		AccessToken:  "initial-access-token",
+		RefreshToken: "old-refresh-token",
+		TokenType:    "Bearer",
+		ExpiresIn:    3600,
+		Scope:        "read write",
+	}
+	
+	tm.SetTokensFromResponse(initialResponse)
+	
+	// Simulate refresh response with new refresh token (some OAuth2 providers do this)
+	refreshResponse := &TokenResponse{
+		AccessToken:  "new-access-token",
+		RefreshToken: "new-refresh-token",
+		TokenType:    "Bearer",
+		ExpiresIn:    3600,
+		Scope:        "read write trade", // Updated scope
+	}
+	
+	tm.SetTokensFromResponse(refreshResponse)
+	
+	// Verify all tokens are updated
+	token, err := tm.GetAccessToken()
+	if err != nil {
+		t.Fatalf("Failed to get access token: %v", err)
+	}
+	if token != "new-access-token" {
+		t.Errorf("Expected access token 'new-access-token', got '%s'", token)
+	}
+	
+	if tm.GetRefreshToken() != "new-refresh-token" {
+		t.Errorf("Expected refresh token 'new-refresh-token', got '%s'", tm.GetRefreshToken())
+	}
+	
+	if tm.GetScope() != "read write trade" {
+		t.Errorf("Expected scope 'read write trade', got '%s'", tm.GetScope())
+	}
+}
