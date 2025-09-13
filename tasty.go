@@ -648,26 +648,28 @@ func (c *Client) customOAuthRequest(method, path string, params, payload, result
 		return nil, &Error{Code: "oauth2_token_error", Message: fmt.Sprintf("Failed to get access token: %v", err)}
 	}
 
-	r := new(http.Request)
+	fullURL := c.baseURL + path
 
-	r.Method = method
-
-	r.URL = &url.URL{
-		Scheme: strings.Split(c.baseURL, ":")[0],
-		Host:   c.baseHost,
-		Opaque: fmt.Sprintf("//%s%s", c.baseHost, path),
+	var bodyReader io.Reader
+	if payload != nil && (method == http.MethodPost || method == http.MethodPut || method == http.MethodPatch) {
+		body, err := json.Marshal(payload)
+		if err != nil {
+			return nil, &Error{Message: fmt.Sprintf("Client Side Error: %v", err)}
+		}
+		bodyReader = bytes.NewBuffer(body)
 	}
 
-	body, err := json.Marshal(payload)
+	r, err := http.NewRequest(method, fullURL, bodyReader)
 	if err != nil {
 		return nil, &Error{Message: fmt.Sprintf("Client Side Error: %v", err)}
 	}
 
-	r.Body = io.NopCloser(bytes.NewBuffer(body))
-
 	r.Header = http.Header{}
 	r.Header.Add("Authorization", "Bearer "+accessToken)
-	r.Header.Add("Content-Type", "application/json")
+	// Add Content-Type only if a body is present
+	if bodyReader != nil {
+		r.Header.Add("Content-Type", "application/json")
+	}
 
 	if params != nil {
 		queryString, queryErr := query.Values(params)
@@ -688,15 +690,11 @@ func (c *Client) customOAuthRequest(method, path string, params, payload, result
 
 	// Handle 401 Unauthorized - attempt token refresh and retry once
 	if resp.StatusCode == http.StatusUnauthorized {
-		// Try to refresh the token
 		if _, refreshErr := c.oauth2Client.RefreshTokens(); refreshErr == nil {
-			// Get the new access token
 			if newAccessToken, tokenErr := c.oauth2Client.GetTokenManager().GetAccessToken(); tokenErr == nil {
-				// Retry the request with the new token
 				return c.retryCustomOAuthRequest(method, path, params, payload, result, newAccessToken)
 			}
 		}
-		// If refresh failed, continue with original error handling
 	}
 
 	if resp.StatusCode == http.StatusNoContent {
@@ -718,26 +716,28 @@ func (c *Client) customOAuthRequest(method, path string, params, payload, result
 
 // retryCustomOAuthRequest retries a custom OAuth2 request with a new access token
 func (c *Client) retryCustomOAuthRequest(method, path string, params, payload, result any, accessToken string) (*http.Response, *Error) {
-	r := new(http.Request)
+	fullURL := c.baseURL + path
 
-	r.Method = method
-
-	r.URL = &url.URL{
-		Scheme: strings.Split(c.baseURL, ":")[0],
-		Host:   c.baseHost,
-		Opaque: fmt.Sprintf("//%s%s", c.baseHost, path),
+	var bodyReader io.Reader
+	if payload != nil && (method == http.MethodPost || method == http.MethodPut || method == http.MethodPatch) {
+		body, err := json.Marshal(payload)
+		if err != nil {
+			return nil, &Error{Message: fmt.Sprintf("Client Side Error: %v", err)}
+		}
+		bodyReader = bytes.NewBuffer(body)
 	}
 
-	body, err := json.Marshal(payload)
+	r, err := http.NewRequest(method, fullURL, bodyReader)
 	if err != nil {
 		return nil, &Error{Message: fmt.Sprintf("Client Side Error: %v", err)}
 	}
 
-	r.Body = io.NopCloser(bytes.NewBuffer(body))
-
 	r.Header = http.Header{}
 	r.Header.Add("Authorization", "Bearer "+accessToken)
-	r.Header.Add("Content-Type", "application/json")
+	// Add Content-Type only if a body is present
+	if bodyReader != nil {
+		r.Header.Add("Content-Type", "application/json")
+	}
 
 	if params != nil {
 		queryString, queryErr := query.Values(params)
@@ -909,17 +909,17 @@ func (c *Client) oauthRequest(method, path string, params, payload, result any) 
 	// ----------------------------------------
 	// Start of new logging code for the response
 	// ----------------------------------------
-	// bodyBytes, err := io.ReadAll(resp.Body)
-	// if err != nil {
-	// 	return resp, &Error{Message: fmt.Sprintf("Client Side Error: failed to read response body: %v", err)}
-	// }
+	bodyBytes, err := io.ReadAll(resp.Body)
+	if err != nil {
+		return resp, &Error{Message: fmt.Sprintf("Client Side Error: failed to read response body: %v", err)}
+	}
 
-	// // Re-create the response body so it can be decoded later
-	// resp.Body = io.NopCloser(bytes.NewBuffer(bodyBytes))
+	// Re-create the response body so it can be decoded later
+	resp.Body = io.NopCloser(bytes.NewBuffer(bodyBytes))
 
-	// fmt.Println("--- Response Body Dump ---")
-	// fmt.Printf("%s\n", string(bodyBytes))
-	// fmt.Println("--------------------------")
+	fmt.Println("--- Response Body Dump ---")
+	fmt.Printf("%s\n", string(bodyBytes))
+	fmt.Println("--------------------------")
 	// ----------------------------------------
 	// End of new logging code
 	// ----------------------------------------

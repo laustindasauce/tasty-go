@@ -384,3 +384,46 @@ const historicEarningsResp = `{
     ]
   }
 }`
+
+const marketDataByTypeResp = `{
+  "data": {
+    "items": [
+      {
+        "symbol": "AAPL",
+        "instrument-type": "Equity",
+        "updated-at": "2025-09-13T10:49:42.551Z",
+        "bid": "233.97",
+        "bid-size": "1.0",
+        "ask": "234.0",
+        "ask-size": "8.0",
+        "mid": "233.985",
+        "mark": "233.99",
+        "last": "233.99",
+        "last-ext": "221.8511",
+        "last-mkt": "234.07",
+        "beta": "1.078586035",
+        "dividend-amount": "0.26",
+        "dividend-frequency": "4.0",
+        "open": "229.22",
+        "day-high-price": "234.51",
+        "day-low-price": "229.02",
+        "close": "234.07",
+        "close-price-type": "Final",
+        "prev-close": "230.03",
+        "prev-close-price-type": "Final",
+        "summary-date": "2025-09-12",
+        "prev-close-date": "2025-09-11",
+        "low-limit-price": "210.46",
+        "high-limit-price": "257.23",
+        "is-trading-halted": false,
+        "trading-halted-reason": "",
+        "halt-start-time": -1,
+        "halt-end-time": -1,
+        "year-low-price": "169.2101",
+        "year-high-price": "260.1",
+        "volume": "55824216.0"
+      }
+    ]
+  },
+  "pagination": null
+}`

@@ -82,3 +82,30 @@ func (c *Client) GetHistoricEarnings(symbol string, startDate time.Time) ([]Earn
 
 	return marketMetricsRes.Data.HistoricEarnings, resp, nil
 }
+
+// Returns an array of volatility data for given symbols.
+func (c *Client) GetMarketDataByType(symbols []string) ([]MarketMetricVolatility, *http.Response, error) {
+	path := "/market-metrics"
+
+	type marketMetricResponse struct {
+		Data struct {
+			MarketMetrics []MarketMetricVolatility `json:"items"`
+		} `json:"data"`
+	}
+
+	marketMetricsRes := new(marketMetricResponse)
+
+	type marketMetrics struct {
+		// Symbols is the list of symbols
+		Symbols []string `url:"symbols,comma"`
+	}
+
+	query := marketMetrics{Symbols: symbols}
+
+	resp, err := c.request(http.MethodGet, path, query, nil, marketMetricsRes)
+	if err != nil {
+		return []MarketMetricVolatility{}, resp, err
+	}
+
+	return marketMetricsRes.Data.MarketMetrics, resp, nil
+}
