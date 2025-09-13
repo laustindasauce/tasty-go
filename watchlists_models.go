@@ -39,9 +39,12 @@ type WatchlistEntry struct {
 }
 
 type PairsWatchlist struct {
+	ID             string          `json:"id"`
 	Name           string          `json:"name"`
 	PairsEquations []PairsEquation `json:"pairs-equations"`
 	OrderIndex     int             `json:"order-index,omitempty"`
+	CreatedAt      time.Time       `json:"created-at"`
+	UpdatedAt      time.Time       `json:"updated-at"`
 }
 
 type PairsEquation struct {

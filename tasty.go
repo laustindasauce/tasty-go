@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"io"
 	"net/http"
+	"net/http/httputil"
 	"net/url"
 	"strings"
 	"time"
@@ -885,13 +886,13 @@ func (c *Client) oauthRequest(method, path string, params, payload, result any) 
 	// ----------------------------------------
 	// Start of new logging code for the request
 	// ----------------------------------------
-	// requestDump, err := httputil.DumpRequestOut(r, true)
-	// if err != nil {
-	// 	return nil, &Error{Message: fmt.Sprintf("Client Side Error: failed to dump request: %v", err)}
-	// }
-	// fmt.Println("--- Request Dump ---")
-	// fmt.Printf("%s", requestDump)
-	// fmt.Println("--------------------")
+	requestDump, err := httputil.DumpRequestOut(r, true)
+	if err != nil {
+		return nil, &Error{Message: fmt.Sprintf("Client Side Error: failed to dump request: %v", err)}
+	}
+	fmt.Println("--- Request Dump ---")
+	fmt.Printf("%s", requestDump)
+	fmt.Println("--------------------")
 	// ----------------------------------------
 	// End of new logging code
 	// ----------------------------------------

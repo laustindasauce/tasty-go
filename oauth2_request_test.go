@@ -27,7 +27,7 @@ type testParams struct {
 func setupOAuth2Test(t *testing.T) (*Client, *httptest.Server, *http.ServeMux) {
 	mux := http.NewServeMux()
 	server := httptest.NewServer(mux)
-	
+
 	// Create OAuth2 client using internal function to bypass endpoint validation
 	config := OAuth2Config{
 		ClientID:     "test_client_id",
@@ -38,10 +38,10 @@ func setupOAuth2Test(t *testing.T) (*Client, *httptest.Server, *http.ServeMux) {
 		TokenURL:     server.URL + "/oauth/token",
 		BaseURL:      server.URL,
 	}
-	
+
 	oauth2Client, err := newOAuth2ClientInternal(config, http.DefaultClient)
 	require.NoError(t, err)
-	
+
 	// Create client with OAuth2 mode
 	client := &Client{
 		httpClient:   http.DefaultClient,
@@ -50,10 +50,10 @@ func setupOAuth2Test(t *testing.T) (*Client, *httptest.Server, *http.ServeMux) {
 		oauth2Client: oauth2Client,
 		authMode:     AuthModeOAuth2,
 	}
-	
+
 	// Set up valid tokens in the token manager
 	client.oauth2Client.tokenManager.SetTokens("valid-access-token", "valid-refresh-token", 3600)
-	
+
 	return client, server, mux
 }
 
@@ -61,16 +61,16 @@ func setupOAuth2Test(t *testing.T) (*Client, *httptest.Server, *http.ServeMux) {
 func TestOAuth2Request_Success(t *testing.T) {
 	client, server, mux := setupOAuth2Test(t)
 	defer server.Close()
-	
+
 	// Set up test endpoint
 	mux.HandleFunc("/test", func(w http.ResponseWriter, r *http.Request) {
 		// Verify Bearer token is present
 		auth := r.Header.Get("Authorization")
 		require.Equal(t, "Bearer valid-access-token", auth)
-		
+
 		// Verify content type
-		require.Equal(t, "application/json", r.Header.Get("Content-Type"))
-		
+		require.Empty(t, r.Header.Get("Content-Type"))
+
 		// Return success response
 		response := testResponse{
 			Message: "success",
@@ -79,10 +79,10 @@ func TestOAuth2Request_Success(t *testing.T) {
 		w.Header().Set("Content-Type", "application/json")
 		json.NewEncoder(w).Encode(response)
 	})
-	
+
 	var result testResponse
 	resp, err := client.request("GET", "/test", nil, nil, &result)
-	
+
 	require.Nil(t, err)
 	require.NotNil(t, resp)
 	require.Equal(t, "success", result.Message)
@@ -93,25 +93,25 @@ func TestOAuth2Request_Success(t *testing.T) {
 func TestOAuth2Request_WithParams(t *testing.T) {
 	client, server, mux := setupOAuth2Test(t)
 	defer server.Close()
-	
+
 	mux.HandleFunc("/test-params", func(w http.ResponseWriter, r *http.Request) {
 		// Verify Bearer token
 		auth := r.Header.Get("Authorization")
 		require.Equal(t, "Bearer valid-access-token", auth)
-		
+
 		// Verify query parameters
 		require.Equal(t, "active", r.URL.Query().Get("filter"))
 		require.Equal(t, "10", r.URL.Query().Get("limit"))
-		
+
 		response := testResponse{Message: "success with params"}
 		w.Header().Set("Content-Type", "application/json")
 		json.NewEncoder(w).Encode(response)
 	})
-	
+
 	params := testParams{Filter: "active", Limit: 10}
 	var result testResponse
 	resp, err := client.request("GET", "/test-params", params, nil, &result)
-	
+
 	require.Nil(t, err)
 	require.NotNil(t, resp)
 	require.Equal(t, "success with params", result.Message)
@@ -121,30 +121,30 @@ func TestOAuth2Request_WithParams(t *testing.T) {
 func TestOAuth2Request_WithPayload(t *testing.T) {
 	client, server, mux := setupOAuth2Test(t)
 	defer server.Close()
-	
+
 	mux.HandleFunc("/test-payload", func(w http.ResponseWriter, r *http.Request) {
 		// Verify Bearer token
 		auth := r.Header.Get("Authorization")
 		require.Equal(t, "Bearer valid-access-token", auth)
-		
+
 		// Verify method
 		require.Equal(t, "POST", r.Method)
-		
+
 		// Parse and verify payload
 		var payload testResponse
 		err := json.NewDecoder(r.Body).Decode(&payload)
 		require.NoError(t, err)
 		require.Equal(t, "test payload", payload.Message)
-		
+
 		response := testResponse{Message: "payload received"}
 		w.Header().Set("Content-Type", "application/json")
 		json.NewEncoder(w).Encode(response)
 	})
-	
+
 	payload := testResponse{Message: "test payload"}
 	var result testResponse
 	resp, err := client.request("POST", "/test-payload", nil, payload, &result)
-	
+
 	require.Nil(t, err)
 	require.NotNil(t, resp)
 	require.Equal(t, "payload received", result.Message)
@@ -154,17 +154,17 @@ func TestOAuth2Request_WithPayload(t *testing.T) {
 func TestOAuth2Request_NoContent(t *testing.T) {
 	client, server, mux := setupOAuth2Test(t)
 	defer server.Close()
-	
+
 	mux.HandleFunc("/no-content", func(w http.ResponseWriter, r *http.Request) {
 		// Verify Bearer token
 		auth := r.Header.Get("Authorization")
 		require.Equal(t, "Bearer valid-access-token", auth)
-		
+
 		w.WriteHeader(http.StatusNoContent)
 	})
-	
+
 	resp, err := client.request("DELETE", "/no-content", nil, nil, nil)
-	
+
 	require.Nil(t, err)
 	require.NotNil(t, resp)
 	require.Equal(t, http.StatusNoContent, resp.StatusCode)
@@ -174,14 +174,14 @@ func TestOAuth2Request_NoContent(t *testing.T) {
 func TestOAuth2Request_TokenRefresh(t *testing.T) {
 	client, server, mux := setupOAuth2Test(t)
 	defer server.Close()
-	
+
 	requestCount := 0
-	
+
 	// Set up token endpoint for refresh
 	mux.HandleFunc("/oauth/token", func(w http.ResponseWriter, r *http.Request) {
 		require.Equal(t, "POST", r.Method)
 		require.Equal(t, "application/x-www-form-urlencoded", r.Header.Get("Content-Type"))
-		
+
 		// Return new tokens
 		response := TokenResponse{
 			AccessToken:  "new-access-token",
@@ -192,12 +192,12 @@ func TestOAuth2Request_TokenRefresh(t *testing.T) {
 		w.Header().Set("Content-Type", "application/json")
 		json.NewEncoder(w).Encode(response)
 	})
-	
+
 	// Set up test endpoint that returns 401 on first request, success on second
 	mux.HandleFunc("/test-refresh", func(w http.ResponseWriter, r *http.Request) {
 		requestCount++
 		auth := r.Header.Get("Authorization")
-		
+
 		if requestCount == 1 {
 			// First request with expired token - return 401
 			require.Equal(t, "Bearer valid-access-token", auth)
@@ -207,22 +207,22 @@ func TestOAuth2Request_TokenRefresh(t *testing.T) {
 			})
 			return
 		}
-		
+
 		// Second request with refreshed token - return success
 		require.Equal(t, "Bearer new-access-token", auth)
 		response := testResponse{Message: "success after refresh"}
 		w.Header().Set("Content-Type", "application/json")
 		json.NewEncoder(w).Encode(response)
 	})
-	
+
 	var result testResponse
 	resp, err := client.request("GET", "/test-refresh", nil, nil, &result)
-	
+
 	require.Nil(t, err)
 	require.NotNil(t, resp)
 	require.Equal(t, "success after refresh", result.Message)
 	require.Equal(t, 2, requestCount) // Should have made 2 requests
-	
+
 	// Verify token was updated
 	token, tokenErr := client.oauth2Client.tokenManager.GetAccessToken()
 	require.NoError(t, tokenErr)
@@ -233,7 +233,7 @@ func TestOAuth2Request_TokenRefresh(t *testing.T) {
 func TestOAuth2Request_TokenRefreshFails(t *testing.T) {
 	client, server, mux := setupOAuth2Test(t)
 	defer server.Close()
-	
+
 	// Set up token endpoint to return error
 	mux.HandleFunc("/oauth/token", func(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusBadRequest)
@@ -242,7 +242,7 @@ func TestOAuth2Request_TokenRefreshFails(t *testing.T) {
 			"error_description": "Refresh token expired",
 		})
 	})
-	
+
 	// Set up test endpoint that returns 401
 	mux.HandleFunc("/test-refresh-fail", func(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusUnauthorized)
@@ -250,10 +250,10 @@ func TestOAuth2Request_TokenRefreshFails(t *testing.T) {
 			"error": "invalid_token",
 		})
 	})
-	
+
 	var result testResponse
 	resp, err := client.request("GET", "/test-refresh-fail", nil, nil, &result)
-	
+
 	require.NotNil(t, err)
 	require.NotNil(t, resp)
 	require.Equal(t, http.StatusUnauthorized, resp.StatusCode)
@@ -263,20 +263,20 @@ func TestOAuth2Request_TokenRefreshFails(t *testing.T) {
 func TestCustomOAuth2Request_Success(t *testing.T) {
 	client, server, mux := setupOAuth2Test(t)
 	defer server.Close()
-	
+
 	mux.HandleFunc("/custom/test", func(w http.ResponseWriter, r *http.Request) {
 		// Verify Bearer token
 		auth := r.Header.Get("Authorization")
 		require.Equal(t, "Bearer valid-access-token", auth)
-		
+
 		response := testResponse{Message: "custom success"}
 		w.Header().Set("Content-Type", "application/json")
 		json.NewEncoder(w).Encode(response)
 	})
-	
+
 	var result testResponse
 	resp, err := client.customRequest("GET", "/custom/test", nil, nil, &result)
-	
+
 	require.Nil(t, err)
 	require.NotNil(t, resp)
 	require.Equal(t, "custom success", result.Message)
@@ -286,9 +286,9 @@ func TestCustomOAuth2Request_Success(t *testing.T) {
 func TestCustomOAuth2Request_TokenRefresh(t *testing.T) {
 	client, server, mux := setupOAuth2Test(t)
 	defer server.Close()
-	
+
 	requestCount := 0
-	
+
 	// Set up token endpoint for refresh
 	mux.HandleFunc("/oauth/token", func(w http.ResponseWriter, r *http.Request) {
 		response := TokenResponse{
@@ -300,27 +300,27 @@ func TestCustomOAuth2Request_TokenRefresh(t *testing.T) {
 		w.Header().Set("Content-Type", "application/json")
 		json.NewEncoder(w).Encode(response)
 	})
-	
+
 	// Set up custom endpoint that returns 401 on first request
 	mux.HandleFunc("/custom/refresh", func(w http.ResponseWriter, r *http.Request) {
 		requestCount++
 		auth := r.Header.Get("Authorization")
-		
+
 		if requestCount == 1 {
 			require.Equal(t, "Bearer valid-access-token", auth)
 			w.WriteHeader(http.StatusUnauthorized)
 			return
 		}
-		
+
 		require.Equal(t, "Bearer refreshed-access-token", auth)
 		response := testResponse{Message: "custom refresh success"}
 		w.Header().Set("Content-Type", "application/json")
 		json.NewEncoder(w).Encode(response)
 	})
-	
+
 	var result testResponse
 	resp, err := client.customRequest("GET", "/custom/refresh", nil, nil, &result)
-	
+
 	require.Nil(t, err)
 	require.NotNil(t, resp)
 	require.Equal(t, "custom refresh success", result.Message)
@@ -331,16 +331,16 @@ func TestCustomOAuth2Request_TokenRefresh(t *testing.T) {
 func TestOAuth2Request_ErrorResponses(t *testing.T) {
 	client, server, mux := setupOAuth2Test(t)
 	defer server.Close()
-	
+
 	errorCodes := []int{400, 403, 404, 415, 422, 500}
-	
+
 	for _, code := range errorCodes {
 		path := fmt.Sprintf("/error-%d", code)
 		mux.HandleFunc(path, func(w http.ResponseWriter, r *http.Request) {
 			// Verify Bearer token
 			auth := r.Header.Get("Authorization")
 			require.Equal(t, "Bearer valid-access-token", auth)
-			
+
 			w.WriteHeader(code)
 			json.NewEncoder(w).Encode(map[string]interface{}{
 				"error": map[string]interface{}{
@@ -349,10 +349,10 @@ func TestOAuth2Request_ErrorResponses(t *testing.T) {
 				},
 			})
 		})
-		
+
 		var result testResponse
 		resp, err := client.request("GET", path, nil, nil, &result)
-		
+
 		require.NotNil(t, err, "Expected error for status code %d", code)
 		require.NotNil(t, resp, "Expected response for status code %d", code)
 		require.Equal(t, code, resp.StatusCode, "Expected status code %d", code)
@@ -363,11 +363,11 @@ func TestOAuth2Request_ErrorResponses(t *testing.T) {
 func TestOAuth2Request_InvalidPayload(t *testing.T) {
 	client, server, _ := setupOAuth2Test(t)
 	defer server.Close()
-	
+
 	// Test with invalid payload that can't be marshaled
 	invalid := math.Inf(1)
 	resp, err := client.request("POST", "/test", nil, invalid, nil)
-	
+
 	require.NotNil(t, err)
 	require.Nil(t, resp)
 	require.Contains(t, err.Message, "Client Side Error")
@@ -377,11 +377,11 @@ func TestOAuth2Request_InvalidPayload(t *testing.T) {
 func TestOAuth2Request_InvalidParams(t *testing.T) {
 	client, server, _ := setupOAuth2Test(t)
 	defer server.Close()
-	
+
 	// Test with invalid params that can't be encoded
 	invalid := math.Inf(1)
 	resp, err := client.request("GET", "/test", invalid, nil, nil)
-	
+
 	require.NotNil(t, err)
 	require.Nil(t, resp)
 	require.Contains(t, err.Message, "Client Side Error")
@@ -391,17 +391,17 @@ func TestOAuth2Request_InvalidParams(t *testing.T) {
 func TestOAuth2Request_InvalidResult(t *testing.T) {
 	client, server, mux := setupOAuth2Test(t)
 	defer server.Close()
-	
+
 	mux.HandleFunc("/invalid-result", func(w http.ResponseWriter, r *http.Request) {
 		response := testResponse{Message: "test"}
 		w.Header().Set("Content-Type", "application/json")
 		json.NewEncoder(w).Encode(response)
 	})
-	
+
 	// Test with invalid result type that can't be decoded
 	invalid := math.Inf(1)
 	resp, err := client.request("GET", "/invalid-result", nil, nil, &invalid)
-	
+
 	require.NotNil(t, err)
 	require.NotNil(t, resp)
 	require.Contains(t, err.Message, "Client Side Error")
@@ -416,9 +416,9 @@ func TestOAuth2Request_NoOAuth2Client(t *testing.T) {
 		authMode:   AuthModeOAuth2,
 		// oauth2Client is nil
 	}
-	
+
 	resp, err := client.request("GET", "/test", nil, nil, nil)
-	
+
 	require.NotNil(t, err)
 	require.Nil(t, resp)
 	require.Equal(t, "invalid_oauth2", err.Code)
@@ -429,12 +429,12 @@ func TestOAuth2Request_NoOAuth2Client(t *testing.T) {
 func TestOAuth2Request_TokenError(t *testing.T) {
 	client, server, _ := setupOAuth2Test(t)
 	defer server.Close()
-	
+
 	// Clear tokens to simulate token error
 	client.oauth2Client.tokenManager.Clear()
-	
+
 	resp, err := client.request("GET", "/test", nil, nil, nil)
-	
+
 	require.NotNil(t, err)
 	require.Nil(t, resp)
 	require.Equal(t, "oauth2_token_error", err.Code)
@@ -445,9 +445,9 @@ func TestOAuth2Request_TokenError(t *testing.T) {
 func TestOAuth2Request_NetworkError(t *testing.T) {
 	client, server, _ := setupOAuth2Test(t)
 	server.Close() // Close server to simulate network error
-	
+
 	resp, err := client.request("GET", "/test", nil, nil, nil)
-	
+
 	require.NotNil(t, err)
 	require.Nil(t, resp)
 	require.Contains(t, err.Message, "Client Side Error")
@@ -457,12 +457,12 @@ func TestOAuth2Request_NetworkError(t *testing.T) {
 func TestOAuth2Request_InvalidURL(t *testing.T) {
 	client, server, _ := setupOAuth2Test(t)
 	defer server.Close()
-	
+
 	// Set invalid base URL
 	client.baseURL = "invalid-url"
-	
+
 	resp, err := client.request("GET", "/test", nil, nil, nil)
-	
+
 	require.NotNil(t, err)
 	require.Nil(t, resp)
 	require.Contains(t, err.Message, "Client Side Error")
