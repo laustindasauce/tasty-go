@@ -88,7 +88,7 @@ type OAuth2Options struct {
 }
 
 // PKCEChallenge represents a PKCE challenge/verifier pair for OAuth2 security
-// 
+//
 // IMPORTANT: TastyTrade's OAuth2 implementation does not currently support PKCE.
 // Using PKCE parameters in authorization requests will result in "405 Method Not Allowed" errors.
 // This implementation is provided for future compatibility and for use with other OAuth2 providers
@@ -163,7 +163,7 @@ func NewMemoryTokenStorage() *MemoryTokenStorage {
 func (m *MemoryTokenStorage) Store(data *TokenData) error {
 	m.mutex.Lock()
 	defer m.mutex.Unlock()
-	
+
 	// Create a copy to avoid external modifications
 	m.data = &TokenData{
 		AccessToken:  data.AccessToken,
@@ -179,11 +179,11 @@ func (m *MemoryTokenStorage) Store(data *TokenData) error {
 func (m *MemoryTokenStorage) Load() (*TokenData, error) {
 	m.mutex.RLock()
 	defer m.mutex.RUnlock()
-	
+
 	if m.data == nil {
 		return nil, nil
 	}
-	
+
 	// Return a copy to avoid external modifications
 	return &TokenData{
 		AccessToken:  m.data.AccessToken,
@@ -198,7 +198,7 @@ func (m *MemoryTokenStorage) Load() (*TokenData, error) {
 func (m *MemoryTokenStorage) Clear() error {
 	m.mutex.Lock()
 	defer m.mutex.Unlock()
-	
+
 	if m.data != nil {
 		// Securely overwrite sensitive data
 		if m.data.AccessToken != "" {
@@ -235,19 +235,19 @@ func NewFileTokenStorage(filePath string) *FileTokenStorage {
 func (f *FileTokenStorage) Store(data *TokenData) error {
 	f.mutex.Lock()
 	defer f.mutex.Unlock()
-	
+
 	// Marshal token data to JSON
 	jsonData, err := json.Marshal(data)
 	if err != nil {
 		return fmt.Errorf("failed to marshal token data: %w", err)
 	}
-	
+
 	// Write to file with restricted permissions (0600 - owner read/write only)
 	err = os.WriteFile(f.filePath, jsonData, 0600)
 	if err != nil {
 		return fmt.Errorf("failed to write token file: %w", err)
 	}
-	
+
 	return nil
 }
 
@@ -255,25 +255,25 @@ func (f *FileTokenStorage) Store(data *TokenData) error {
 func (f *FileTokenStorage) Load() (*TokenData, error) {
 	f.mutex.RLock()
 	defer f.mutex.RUnlock()
-	
+
 	// Check if file exists
 	if _, err := os.Stat(f.filePath); os.IsNotExist(err) {
 		return nil, nil // No token file exists
 	}
-	
+
 	// Read file contents
 	jsonData, err := os.ReadFile(f.filePath)
 	if err != nil {
 		return nil, fmt.Errorf("failed to read token file: %w", err)
 	}
-	
+
 	// Unmarshal JSON data
 	var data TokenData
 	err = json.Unmarshal(jsonData, &data)
 	if err != nil {
 		return nil, fmt.Errorf("failed to unmarshal token data: %w", err)
 	}
-	
+
 	return &data, nil
 }
 
@@ -281,18 +281,18 @@ func (f *FileTokenStorage) Load() (*TokenData, error) {
 func (f *FileTokenStorage) Clear() error {
 	f.mutex.Lock()
 	defer f.mutex.Unlock()
-	
+
 	// Check if file exists
 	if _, err := os.Stat(f.filePath); os.IsNotExist(err) {
 		return nil // File doesn't exist, nothing to clear
 	}
-	
+
 	// Remove the file
 	err := os.Remove(f.filePath)
 	if err != nil {
 		return fmt.Errorf("failed to remove token file: %w", err)
 	}
-	
+
 	return nil
 }
 
@@ -300,10 +300,10 @@ func (f *FileTokenStorage) Clear() error {
 type TokenManager struct {
 	// Thread-safe access to token operations
 	mutex sync.RWMutex
-	
+
 	// Storage backend for token persistence
 	storage TokenStorage
-	
+
 	// Configuration for token refresh
 	refreshCallback func() (*TokenResponse, error)
 }
@@ -343,11 +343,11 @@ func getDefaultTokenPath() string {
 		// Fallback to current directory if home directory is not available
 		return ".tasty-go-tokens.json"
 	}
-	
+
 	// Create .tasty-go directory in user's home directory
 	configDir := filepath.Join(homeDir, ".tasty-go")
 	os.MkdirAll(configDir, 0700) // Create directory with secure permissions
-	
+
 	return filepath.Join(configDir, "tokens.json")
 }
 
@@ -356,14 +356,14 @@ func getDefaultTokenPath() string {
 func (tm *TokenManager) SetTokens(accessToken, refreshToken string, expiresIn int) {
 	tm.mutex.Lock()
 	defer tm.mutex.Unlock()
-	
+
 	data := &TokenData{
 		AccessToken:  accessToken,
 		RefreshToken: refreshToken,
 		TokenType:    "Bearer", // Default token type
 		ExpiresAt:    time.Now().Add(time.Duration(expiresIn) * time.Second),
 	}
-	
+
 	tm.storage.Store(data)
 }
 
@@ -372,30 +372,30 @@ func (tm *TokenManager) SetTokensFromResponse(response *TokenResponse) {
 	if response == nil {
 		return
 	}
-	
+
 	tm.mutex.Lock()
 	defer tm.mutex.Unlock()
-	
+
 	// Load existing data to preserve refresh token and scope if not provided in response
 	existingData, _ := tm.storage.Load()
-	
+
 	tokenType := response.TokenType
 	if tokenType == "" {
 		tokenType = "Bearer" // Default token type
 	}
-	
+
 	// Use refresh token from response, but preserve existing one if not provided
 	refreshToken := response.RefreshToken
 	if refreshToken == "" && existingData != nil {
 		refreshToken = existingData.RefreshToken
 	}
-	
+
 	// Use scope from response, but preserve existing one if not provided
 	scope := response.Scope
 	if scope == "" && existingData != nil {
 		scope = existingData.Scope
 	}
-	
+
 	data := &TokenData{
 		AccessToken:  response.AccessToken,
 		RefreshToken: refreshToken,
@@ -403,7 +403,7 @@ func (tm *TokenManager) SetTokensFromResponse(response *TokenResponse) {
 		ExpiresAt:    time.Now().Add(time.Duration(response.ExpiresIn) * time.Second),
 		Scope:        scope,
 	}
-	
+
 	tm.storage.Store(data)
 }
 
@@ -411,21 +411,21 @@ func (tm *TokenManager) SetTokensFromResponse(response *TokenResponse) {
 // Returns an error if no valid token is available and refresh fails
 func (tm *TokenManager) GetAccessToken() (string, error) {
 	tm.mutex.RLock()
-	
+
 	// Load current token data
 	data, err := tm.storage.Load()
 	if err != nil {
 		tm.mutex.RUnlock()
 		return "", fmt.Errorf("failed to load token data: %w", err)
 	}
-	
+
 	// Check if current token is still valid (with 30 second buffer)
 	if data != nil && data.AccessToken != "" && time.Now().Add(30*time.Second).Before(data.ExpiresAt) {
 		token := data.AccessToken
 		tm.mutex.RUnlock()
 		return token, nil
 	}
-	
+
 	// Token is expired or about to expire, need to refresh
 	var refreshToken string
 	if data != nil {
@@ -433,13 +433,13 @@ func (tm *TokenManager) GetAccessToken() (string, error) {
 	}
 	callback := tm.refreshCallback
 	tm.mutex.RUnlock()
-	
+
 	// Attempt automatic refresh if callback is available
 	if callback != nil && refreshToken != "" {
 		if err := tm.refreshTokens(); err != nil {
 			return "", fmt.Errorf("failed to refresh access token: %w", err)
 		}
-		
+
 		// Return the new token after successful refresh
 		tm.mutex.RLock()
 		data, err := tm.storage.Load()
@@ -451,7 +451,7 @@ func (tm *TokenManager) GetAccessToken() (string, error) {
 			return data.AccessToken, nil
 		}
 	}
-	
+
 	return "", fmt.Errorf("access token expired and no refresh mechanism available")
 }
 
@@ -459,7 +459,7 @@ func (tm *TokenManager) GetAccessToken() (string, error) {
 func (tm *TokenManager) GetRefreshToken() string {
 	tm.mutex.RLock()
 	defer tm.mutex.RUnlock()
-	
+
 	data, err := tm.storage.Load()
 	if err != nil || data == nil {
 		return ""
@@ -471,7 +471,7 @@ func (tm *TokenManager) GetRefreshToken() string {
 func (tm *TokenManager) GetTokenType() string {
 	tm.mutex.RLock()
 	defer tm.mutex.RUnlock()
-	
+
 	data, err := tm.storage.Load()
 	if err != nil || data == nil {
 		return "Bearer" // Default token type
@@ -486,7 +486,7 @@ func (tm *TokenManager) GetTokenType() string {
 func (tm *TokenManager) GetScope() string {
 	tm.mutex.RLock()
 	defer tm.mutex.RUnlock()
-	
+
 	data, err := tm.storage.Load()
 	if err != nil || data == nil {
 		return ""
@@ -498,12 +498,12 @@ func (tm *TokenManager) GetScope() string {
 func (tm *TokenManager) IsExpired() bool {
 	tm.mutex.RLock()
 	defer tm.mutex.RUnlock()
-	
+
 	data, err := tm.storage.Load()
 	if err != nil || data == nil || data.AccessToken == "" {
 		return true
 	}
-	
+
 	// Consider token expired if it expires within 30 seconds
 	return time.Now().Add(30 * time.Second).After(data.ExpiresAt)
 }
@@ -517,7 +517,7 @@ func (tm *TokenManager) HasValidToken() bool {
 func (tm *TokenManager) HasRefreshToken() bool {
 	tm.mutex.RLock()
 	defer tm.mutex.RUnlock()
-	
+
 	data, err := tm.storage.Load()
 	if err != nil || data == nil {
 		return false
@@ -529,7 +529,7 @@ func (tm *TokenManager) HasRefreshToken() bool {
 func (tm *TokenManager) GetExpiresAt() time.Time {
 	tm.mutex.RLock()
 	defer tm.mutex.RUnlock()
-	
+
 	data, err := tm.storage.Load()
 	if err != nil || data == nil {
 		return time.Time{}
@@ -541,13 +541,13 @@ func (tm *TokenManager) GetExpiresAt() time.Time {
 func (tm *TokenManager) GetTimeUntilExpiry() time.Duration {
 	tm.mutex.RLock()
 	defer tm.mutex.RUnlock()
-	
+
 	data, err := tm.storage.Load()
 	if err != nil || data == nil || data.AccessToken == "" {
 		return 0
 	}
-	
-	remaining := data.ExpiresAt.Sub(time.Now())
+
+	remaining := time.Until(data.ExpiresAt)
 	if remaining < 0 {
 		return 0
 	}
@@ -566,20 +566,20 @@ func (tm *TokenManager) refreshTokens() error {
 	tm.mutex.RLock()
 	callback := tm.refreshCallback
 	tm.mutex.RUnlock()
-	
+
 	if callback == nil {
 		return fmt.Errorf("no refresh callback configured")
 	}
-	
+
 	response, err := callback()
 	if err != nil {
 		return fmt.Errorf("refresh callback failed: %w", err)
 	}
-	
+
 	if response == nil {
 		return fmt.Errorf("refresh callback returned nil response")
 	}
-	
+
 	// Update tokens with new response
 	tm.SetTokensFromResponse(response)
 	return nil
@@ -589,7 +589,7 @@ func (tm *TokenManager) refreshTokens() error {
 func (tm *TokenManager) Clear() {
 	tm.mutex.Lock()
 	defer tm.mutex.Unlock()
-	
+
 	// Clear tokens from storage backend
 	tm.storage.Clear()
 	tm.refreshCallback = nil
@@ -601,20 +601,20 @@ func (tm *TokenManager) Clear() {
 func (tm *TokenManager) Clone() *TokenManager {
 	tm.mutex.RLock()
 	defer tm.mutex.RUnlock()
-	
+
 	// Load current data
 	data, err := tm.storage.Load()
 	if err != nil || data == nil {
 		// Return empty clone if no data or error
 		return NewMemoryTokenManager()
 	}
-	
+
 	// Create clone with memory storage and copy data
 	clone := NewMemoryTokenManager()
-	
+
 	// Store the data in the clone
 	clone.storage.Store(data)
-	
+
 	return clone
 }
 
@@ -623,7 +623,7 @@ func NewProductionOAuth2Config(clientID, clientSecret, redirectURI string, scope
 	if len(scopes) == 0 {
 		scopes = []string{defaultScope}
 	}
-	
+
 	return OAuth2Config{
 		ClientID:     clientID,
 		ClientSecret: clientSecret,
@@ -640,7 +640,7 @@ func NewSandboxOAuth2Config(clientID, clientSecret, redirectURI string, scopes [
 	if len(scopes) == 0 {
 		scopes = []string{defaultScope}
 	}
-	
+
 	return OAuth2Config{
 		ClientID:     clientID,
 		ClientSecret: clientSecret,
@@ -678,40 +678,40 @@ func (c OAuth2Config) Validate() error {
 	if c.ClientID == "" {
 		return fmt.Errorf("OAuth2 client ID is required")
 	}
-	
+
 	if c.RedirectURI == "" {
 		return fmt.Errorf("OAuth2 redirect URI is required")
 	}
-	
+
 	// Validate redirect URI format
 	if err := validateRedirectURI(c.RedirectURI); err != nil {
 		return fmt.Errorf("invalid redirect URI: %w", err)
 	}
-	
+
 	// Validate endpoint URLs if provided
 	if c.AuthURL != "" {
 		if err := validateEndpointURL(c.AuthURL, "authorization"); err != nil {
 			return fmt.Errorf("invalid authorization URL: %w", err)
 		}
 	}
-	
+
 	if c.TokenURL != "" {
 		if err := validateEndpointURL(c.TokenURL, "token"); err != nil {
 			return fmt.Errorf("invalid token URL: %w", err)
 		}
 	}
-	
+
 	if c.BaseURL != "" {
 		if err := validateEndpointURL(c.BaseURL, "base"); err != nil {
 			return fmt.Errorf("invalid base URL: %w", err)
 		}
 	}
-	
+
 	// Validate environment consistency
 	if err := c.validateEnvironmentConsistency(); err != nil {
 		return fmt.Errorf("environment configuration inconsistency: %w", err)
 	}
-	
+
 	return nil
 }
 
@@ -721,11 +721,11 @@ func (c OAuth2Config) validateEnvironmentConsistency() error {
 	if c.BaseURL == "" && c.AuthURL == "" && c.TokenURL == "" {
 		return nil
 	}
-	
+
 	// Check if configuration mixes production and sandbox URLs
 	hasProduction := false
 	hasSandbox := false
-	
+
 	if c.BaseURL != "" {
 		if c.BaseURL == apiBaseURL {
 			hasProduction = true
@@ -733,7 +733,7 @@ func (c OAuth2Config) validateEnvironmentConsistency() error {
 			hasSandbox = true
 		}
 	}
-	
+
 	if c.AuthURL != "" {
 		if c.AuthURL == oauth2ProductionAuthURL {
 			hasProduction = true
@@ -741,7 +741,7 @@ func (c OAuth2Config) validateEnvironmentConsistency() error {
 			hasSandbox = true
 		}
 	}
-	
+
 	if c.TokenURL != "" {
 		if c.TokenURL == oauth2ProductionTokenURL {
 			hasProduction = true
@@ -749,12 +749,12 @@ func (c OAuth2Config) validateEnvironmentConsistency() error {
 			hasSandbox = true
 		}
 	}
-	
+
 	// Error if mixing environments
 	if hasProduction && hasSandbox {
 		return fmt.Errorf("configuration mixes production and sandbox endpoints")
 	}
-	
+
 	return nil
 }
 
@@ -780,13 +780,13 @@ func validateRedirectURI(redirectURI string) error {
 	if redirectURI == "" {
 		return fmt.Errorf("redirect URI cannot be empty")
 	}
-	
+
 	// Parse the URI
 	parsedURL, err := url.Parse(redirectURI)
 	if err != nil {
 		return fmt.Errorf("invalid URI format: %w", err)
 	}
-	
+
 	// Check scheme
 	switch parsedURL.Scheme {
 	case "http":
@@ -804,12 +804,12 @@ func validateRedirectURI(redirectURI string) error {
 			return fmt.Errorf("custom URI schemes must be at least 3 characters long")
 		}
 	}
-	
+
 	// Validate that URI is not just a scheme
 	if parsedURL.Host == "" && parsedURL.Path == "" {
 		return fmt.Errorf("redirect URI must include a host or path")
 	}
-	
+
 	return nil
 }
 
@@ -818,23 +818,23 @@ func validateEndpointURL(endpointURL, endpointType string) error {
 	if endpointURL == "" {
 		return fmt.Errorf("%s URL cannot be empty", endpointType)
 	}
-	
+
 	// Parse the URL
 	parsedURL, err := url.Parse(endpointURL)
 	if err != nil {
 		return fmt.Errorf("invalid %s URL format: %w", endpointType, err)
 	}
-	
+
 	// Must have a scheme
 	if parsedURL.Scheme == "" {
 		return fmt.Errorf("%s URL must include a scheme", endpointType)
 	}
-	
+
 	// Must have a host
 	if parsedURL.Host == "" {
 		return fmt.Errorf("%s URL must include a host", endpointType)
 	}
-	
+
 	// Check if this is a TastyTrade production domain
 	tastyTradeHosts := []string{
 		"api.tastyworks.com",
@@ -842,7 +842,7 @@ func validateEndpointURL(endpointURL, endpointType string) error {
 		"my.tastytrade.com",
 		"cert-my.staging-tasty.works",
 	}
-	
+
 	isTastyTradeDomain := false
 	for _, host := range tastyTradeHosts {
 		if parsedURL.Host == host {
@@ -850,12 +850,12 @@ func validateEndpointURL(endpointURL, endpointType string) error {
 			break
 		}
 	}
-	
+
 	// TastyTrade domains must always use HTTPS
 	if isTastyTradeDomain && parsedURL.Scheme != "https" {
 		return fmt.Errorf("%s URL must use HTTPS", endpointType)
 	}
-	
+
 	// For production use, require HTTPS and valid TastyTrade endpoints
 	// Allow HTTP and test domains for development/testing
 	if parsedURL.Scheme == "https" {
@@ -871,14 +871,14 @@ func validateEndpointURL(endpointURL, endpointType string) error {
 	} else {
 		return fmt.Errorf("%s URL must use HTTP or HTTPS scheme", endpointType)
 	}
-	
+
 	return nil
 }
 
 // isLocalhost checks if the host is localhost or 127.0.0.1
 func isLocalhost(host string) bool {
-	return host == "localhost" || host == "127.0.0.1" || 
-		   strings.HasPrefix(host, "localhost:") || strings.HasPrefix(host, "127.0.0.1:")
+	return host == "localhost" || host == "127.0.0.1" ||
+		strings.HasPrefix(host, "localhost:") || strings.HasPrefix(host, "127.0.0.1:")
 }
 
 // isTestDomain checks if the host is a test domain (for testing purposes)
@@ -889,19 +889,19 @@ func isTestDomain(host string) bool {
 		"example.com",
 		"httpbin.org",
 	}
-	
+
 	for _, testDomain := range testDomains {
 		if host == testDomain || strings.HasSuffix(host, "."+testDomain) {
 			return true
 		}
 	}
-	
+
 	// Allow any .test TLD for testing
 	return strings.HasSuffix(host, ".test")
 }
 
 // SupportsPKCE returns whether the OAuth2 configuration supports PKCE
-// 
+//
 // DEPRECATED: Always returns false because PKCE is completely disabled.
 // TastyTrade does not support PKCE and this library is specifically for TastyTrade.
 func (c OAuth2Config) SupportsPKCE() bool {
