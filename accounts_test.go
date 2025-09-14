@@ -129,7 +129,7 @@ func TestGetAccountBalances(t *testing.T) {
 
 	accountNumber := "5YZ55555"
 
-	mux.HandleFunc(fmt.Sprintf("/accounts/%s/balances", accountNumber), func(writer http.ResponseWriter, request *http.Request) {
+	mux.HandleFunc(fmt.Sprintf("/accounts/%s/balances/USD", accountNumber), func(writer http.ResponseWriter, request *http.Request) {
 		fmt.Fprint(writer, accountBalancesResp)
 	})
 
@@ -181,7 +181,7 @@ func TestGetAccountBalancesError(t *testing.T) {
 
 	accountNumber := "5YZ55555"
 
-	mux.HandleFunc(fmt.Sprintf("/accounts/%s/balances", accountNumber), func(writer http.ResponseWriter, request *http.Request) {
+	mux.HandleFunc(fmt.Sprintf("/accounts/%s/balances/USD", accountNumber), func(writer http.ResponseWriter, request *http.Request) {
 		writer.WriteHeader(401)
 		fmt.Fprint(writer, tastyUnauthorizedError)
 	})

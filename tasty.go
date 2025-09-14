@@ -685,8 +685,6 @@ func (c *Client) customOAuthRequest(method, path string, params, payload, result
 
 	defer resp.Body.Close()
 
-	fmt.Printf("Retrieve status code: %d\n", resp.StatusCode)
-
 	// Handle 401 Unauthorized - attempt token refresh and retry once
 	if resp.StatusCode == http.StatusUnauthorized {
 		if _, refreshErr := c.oauth2Client.RefreshTokens(); refreshErr == nil {
@@ -902,8 +900,6 @@ func (c *Client) oauthRequest(method, path string, params, payload, result any) 
 	}
 
 	defer resp.Body.Close()
-
-	fmt.Printf("Retrieve status code: %d\n", resp.StatusCode)
 
 	// ----------------------------------------
 	// Start of new logging code for the response
