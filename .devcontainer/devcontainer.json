@@ -1,0 +1,10 @@
+{
+  "name": "Go 1.24",
+  "image": "mcr.microsoft.com/devcontainers/go:1.24-bookworm",
+  "customizations": {
+    "vscode": {
+      "extensions": ["golang.go"]
+    }
+  },
+  "postCreateCommand": "go version"
+}

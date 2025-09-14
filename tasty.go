@@ -6,7 +6,6 @@ import (
 	"fmt"
 	"io"
 	"net/http"
-	"net/http/httputil"
 	"net/url"
 	"strings"
 	"time"
@@ -886,13 +885,13 @@ func (c *Client) oauthRequest(method, path string, params, payload, result any) 
 	// ----------------------------------------
 	// Start of new logging code for the request
 	// ----------------------------------------
-	requestDump, err := httputil.DumpRequestOut(r, true)
-	if err != nil {
-		return nil, &Error{Message: fmt.Sprintf("Client Side Error: failed to dump request: %v", err)}
-	}
-	fmt.Println("--- Request Dump ---")
-	fmt.Printf("%s", requestDump)
-	fmt.Println("--------------------")
+	// requestDump, err := httputil.DumpRequestOut(r, true)
+	// if err != nil {
+	// 	return nil, &Error{Message: fmt.Sprintf("Client Side Error: failed to dump request: %v", err)}
+	// }
+	// fmt.Println("--- Request Dump ---")
+	// fmt.Printf("%s", requestDump)
+	// fmt.Println("--------------------")
 	// ----------------------------------------
 	// End of new logging code
 	// ----------------------------------------
@@ -909,17 +908,17 @@ func (c *Client) oauthRequest(method, path string, params, payload, result any) 
 	// ----------------------------------------
 	// Start of new logging code for the response
 	// ----------------------------------------
-	bodyBytes, err := io.ReadAll(resp.Body)
-	if err != nil {
-		return resp, &Error{Message: fmt.Sprintf("Client Side Error: failed to read response body: %v", err)}
-	}
+	// bodyBytes, err := io.ReadAll(resp.Body)
+	// if err != nil {
+	// 	return resp, &Error{Message: fmt.Sprintf("Client Side Error: failed to read response body: %v", err)}
+	// }
 
-	// Re-create the response body so it can be decoded later
-	resp.Body = io.NopCloser(bytes.NewBuffer(bodyBytes))
+	// // Re-create the response body so it can be decoded later
+	// resp.Body = io.NopCloser(bytes.NewBuffer(bodyBytes))
 
-	fmt.Println("--- Response Body Dump ---")
-	fmt.Printf("%s\n", string(bodyBytes))
-	fmt.Println("--------------------------")
+	// fmt.Println("--- Response Body Dump ---")
+	// fmt.Printf("%s\n", string(bodyBytes))
+	// fmt.Println("--------------------------")
 	// ----------------------------------------
 	// End of new logging code
 	// ----------------------------------------

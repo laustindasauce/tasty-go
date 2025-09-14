@@ -81,65 +81,7 @@ func TestGetActiveEquitiesError(t *testing.T) {
 	expectedUnauthorized(t, err)
 	require.NotNil(t, httpResp)
 }
-func TestGetEquities(t *testing.T) {
-	setup()
-	defer teardown()
 
-	mux.HandleFunc("/instruments/equities", func(writer http.ResponseWriter, request *http.Request) {
-		fmt.Fprint(writer, equitiesResp)
-	})
-
-	resp, httpResp, err := client.GetEquities(EquitiesQuery{Symbols: []string{"AAPL", "TSLA"}})
-	require.Nil(t, err)
-	require.NotNil(t, httpResp)
-
-	require.Equal(t, 2, len(resp))
-
-	equity := resp[0]
-
-	require.Equal(t, 726, equity.ID)
-	require.Equal(t, "AAPL", equity.Symbol)
-	require.Equal(t, EquityIT, equity.InstrumentType)
-	require.Equal(t, "037833100", equity.Cusip)
-	require.Equal(t, "APPLE INC", equity.ShortDescription)
-	require.False(t, equity.IsIndex)
-	require.Equal(t, "XNAS", equity.ListedMarket)
-	require.Equal(t, "APPLE INC", equity.Description)
-	require.Equal(t, "Easy To Borrow", equity.Lendability)
-	require.True(t, decimal.Zero.Equal(equity.BorrowRate))
-	require.Equal(t, "Equity", equity.MarketTimeInstrumentCollection)
-	require.False(t, equity.IsClosingOnly)
-	require.False(t, equity.IsOptionsClosingOnly)
-	require.True(t, equity.Active)
-	require.True(t, equity.IsFractionalQuantityEligible)
-	require.False(t, equity.IsIlliquid)
-	require.False(t, equity.IsEtf)
-	require.Equal(t, "AAPL", equity.StreamerSymbol)
-
-	tickSize := equity.TickSizes[0]
-
-	require.True(t, tickSize.Value.Equal(decimal.NewFromFloat(0.0001)))
-	require.True(t, tickSize.Threshold.Equal(decimal.NewFromInt(1)))
-
-	optionTickSize := equity.OptionTickSizes[0]
-
-	require.Equal(t, decimal.NewFromFloat(0.01), optionTickSize.Value)
-	require.True(t, optionTickSize.Threshold.Equal(decimal.NewFromInt(3)))
-}
-
-func TestGetEquitiesError(t *testing.T) {
-	setup()
-	defer teardown()
-
-	mux.HandleFunc("/instruments/equities", func(writer http.ResponseWriter, request *http.Request) {
-		writer.WriteHeader(401)
-		fmt.Fprint(writer, tastyUnauthorizedError)
-	})
-
-	_, httpResp, err := client.GetEquities(EquitiesQuery{Symbols: []string{"AAPL", "TSLA"}})
-	expectedUnauthorized(t, err)
-	require.NotNil(t, httpResp)
-}
 func TestGetEquity(t *testing.T) {
 	setup()
 	defer teardown()
@@ -196,79 +138,6 @@ func TestGetEquityError(t *testing.T) {
 	})
 
 	_, httpResp, err := client.GetEquity(symbol)
-	expectedUnauthorized(t, err)
-	require.NotNil(t, httpResp)
-}
-
-func TestGetEquityOptions(t *testing.T) {
-	setup()
-	defer teardown()
-
-	mux.HandleFunc("/instruments/equity-options", func(writer http.ResponseWriter, request *http.Request) {
-		fmt.Fprint(writer, equityOptionsResp)
-	})
-
-	symbol := "AAPL"
-	optionType := Call
-
-	sym := EquityOptionsSymbology{
-		Symbol:     symbol,
-		Strike:     185,
-		OptionType: optionType,
-		Expiration: time.Date(2023, 6, 16, 0, 0, 0, 0, time.UTC),
-	}
-	occSymbol := sym.Build()
-
-	resp, httpResp, err := client.GetEquityOptions(EquityOptionsQuery{Symbols: []string{occSymbol}})
-	require.Nil(t, err)
-	require.NotNil(t, httpResp)
-
-	require.Equal(t, 1, len(resp))
-
-	equity := resp[0]
-
-	require.Equal(t, occSymbol, equity.Symbol)
-	require.Equal(t, EquityOptionIT, equity.InstrumentType)
-	require.True(t, equity.Active)
-	require.True(t, equity.StrikePrice.Equal(decimal.NewFromInt(185)))
-	require.Equal(t, symbol, equity.RootSymbol)
-	require.Equal(t, symbol, equity.UnderlyingSymbol)
-	require.Equal(t, "2023-06-16", equity.ExpirationDate)
-	require.Equal(t, "American", equity.ExerciseStyle)
-	require.Equal(t, 100, equity.SharesPerContract)
-	require.Equal(t, optionType, equity.OptionType)
-	require.Equal(t, "Standard", equity.OptionChainType)
-	require.Equal(t, "Regular", equity.ExpirationType)
-	require.Equal(t, "PM", equity.SettlementType)
-	require.Equal(t, "2023-06-16T20:00:00Z", equity.StopsTradingAt.Format(time.RFC3339))
-	require.Equal(t, "Equity Option", equity.MarketTimeInstrumentCollection)
-	require.Equal(t, 6, equity.DaysToExpiration)
-	require.Equal(t, "2023-06-16T20:00:00Z", equity.ExpiresAt.Format(time.RFC3339))
-	require.False(t, equity.IsClosingOnly)
-	require.Equal(t, ".AAPL230616C185", equity.StreamerSymbol)
-}
-
-func TestGetEquityOptionsError(t *testing.T) {
-	setup()
-	defer teardown()
-
-	mux.HandleFunc("/instruments/equity-options", func(writer http.ResponseWriter, request *http.Request) {
-		writer.WriteHeader(401)
-		fmt.Fprint(writer, tastyUnauthorizedError)
-	})
-
-	symbol := "AAPL"
-	optionType := Call
-
-	sym := EquityOptionsSymbology{
-		Symbol:     symbol,
-		Strike:     185,
-		OptionType: optionType,
-		Expiration: time.Date(2023, 6, 16, 0, 0, 0, 0, time.UTC),
-	}
-	occSymbol := sym.Build()
-
-	_, httpResp, err := client.GetEquityOptions(EquityOptionsQuery{Symbols: []string{occSymbol}})
 	expectedUnauthorized(t, err)
 	require.NotNil(t, httpResp)
 }

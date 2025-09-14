@@ -95,9 +95,24 @@ type MarketMetricVolatility struct {
 	EarningsPerShare                       decimal.Decimal                     `json:"earnings-per-share"`
 }
 
-type Instrument struct {
+type MarketDataQuery struct {
+	// Ticker(s) of indices
+	Index []string `url:"index[]"`
+	// The symbol(s) of the equities
+	Equity []string `url:"equity[]"`
+	// The symbol(s) of the equity option(s) using OCC Symbology, i.e. [FB 180629C00200000]
+	EquityOption []string `url:"equity-option[]"`
+	// Symbol(s) for future, i.e. [ES]
+	Future []string `url:"future[]"`
+	// Symbol(s) for future option(s) using proper symbology, i.e. [./ESZ5 EW4V5 251024C5850]
+	FutureOption []string `url:"future-option[]"`
+	// The symbol(s) of the cryptocurrency, i.e. [BTC]
+	Cryptocurrency []string `url:"cryptocurrency[]"`
+}
+
+type MarketData struct {
 	Symbol             string           `json:"symbol"`
-	InstrumentType     string           `json:"instrument-type"`
+	InstrumentType     InstrumentType   `json:"instrument-type"`
 	UpdatedAt          time.Time        `json:"updated-at"`
 	Bid                *decimal.Decimal `json:"bid,omitempty"`
 	BidSize            *decimal.Decimal `json:"bid-size,omitempty"`

@@ -381,10 +381,10 @@ func TestNoAuthRequestWithParams(t *testing.T) {
 
 	mux.HandleFunc("/with-params", func(writer http.ResponseWriter, request *http.Request) {
 		writer.WriteHeader(http.StatusNoContent)
-		require.Equal(t, "true", request.URL.Query().Get("is-etf"))
+		require.Equal(t, "AAPL", request.URL.Query().Get("symbol"))
 	})
 
-	httpResp, err := client.noAuthRequest(http.MethodGet, "/with-params", nil, EquitiesQuery{IsETF: true}, nil, nil)
+	httpResp, err := client.noAuthRequest(http.MethodGet, "/with-params", nil, AccountPositionQuery{Symbol: "AAPL"}, nil, nil)
 	require.Nil(t, err)
 	require.NotNil(t, httpResp)
 }
@@ -708,7 +708,7 @@ func TestClient_IsAuthenticated(t *testing.T) {
 		AuthURL:      oauth2ProductionAuthURL,
 		TokenURL:     oauth2ProductionTokenURL,
 	}
-	
+
 	// Create OAuth2Client with memory storage for isolated testing
 	tokenManager := NewMemoryTokenManager()
 	oauth2ClientInternal := &OAuth2Client{
@@ -718,7 +718,7 @@ func TestClient_IsAuthenticated(t *testing.T) {
 		pkce:         nil,
 	}
 	tokenManager.SetRefreshCallback(oauth2ClientInternal.refreshTokensInternal)
-	
+
 	// Create Client with the isolated OAuth2Client
 	oauth2Client := &Client{
 		httpClient:   defaultHTTPClient,
@@ -726,7 +726,7 @@ func TestClient_IsAuthenticated(t *testing.T) {
 		oauth2Client: oauth2ClientInternal,
 		authMode:     AuthModeOAuth2,
 	}
-	
+
 	require.False(t, oauth2Client.IsAuthenticated())
 
 	// Set tokens to make it authenticated
@@ -760,8 +760,6 @@ func TestClient_ClearAuthentication(t *testing.T) {
 	oauth2Client.ClearAuthentication()
 	require.False(t, oauth2Client.IsAuthenticated())
 }
-
-
 
 func TestAuthMode_String(t *testing.T) {
 	require.Equal(t, "session", AuthModeSession.String())

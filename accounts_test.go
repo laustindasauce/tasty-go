@@ -133,7 +133,7 @@ func TestGetAccountBalances(t *testing.T) {
 		fmt.Fprint(writer, accountBalancesResp)
 	})
 
-	resp, httpResp, err := client.GetAccountBalances(accountNumber)
+	resp, httpResp, err := client.GetAccountBalances(accountNumber, "USD")
 	require.Nil(t, err)
 	require.NotNil(t, httpResp)
 
@@ -186,7 +186,7 @@ func TestGetAccountBalancesError(t *testing.T) {
 		fmt.Fprint(writer, tastyUnauthorizedError)
 	})
 
-	_, httpResp, err := client.GetAccountBalances(accountNumber)
+	_, httpResp, err := client.GetAccountBalances(accountNumber, "USD")
 	expectedUnauthorized(t, err)
 	require.NotNil(t, httpResp)
 }

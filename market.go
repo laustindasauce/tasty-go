@@ -83,29 +83,23 @@ func (c *Client) GetHistoricEarnings(symbol string, startDate time.Time) ([]Earn
 	return marketMetricsRes.Data.HistoricEarnings, resp, nil
 }
 
-// Returns an array of volatility data for given symbols.
-func (c *Client) GetMarketDataByType(symbols []string) ([]MarketMetricVolatility, *http.Response, error) {
-	path := "/market-metrics"
+// Get market data for many symbols of type. Combined limit across all types is 100.
+func (c *Client) GetMarketDataByType(query MarketDataQuery) ([]MarketData, Pagination, *http.Response, error) {
+	path := "/market-data/by-type"
 
-	type marketMetricResponse struct {
+	type marketDataResponse struct {
 		Data struct {
-			MarketMetrics []MarketMetricVolatility `json:"items"`
+			AllData []MarketData `json:"items"`
 		} `json:"data"`
+		Pagination Pagination `json:"pagination"`
 	}
 
-	marketMetricsRes := new(marketMetricResponse)
+	marketDataRes := new(marketDataResponse)
 
-	type marketMetrics struct {
-		// Symbols is the list of symbols
-		Symbols []string `url:"symbols,comma"`
-	}
-
-	query := marketMetrics{Symbols: symbols}
-
-	resp, err := c.request(http.MethodGet, path, query, nil, marketMetricsRes)
+	resp, err := c.request(http.MethodGet, path, query, nil, marketDataRes)
 	if err != nil {
-		return []MarketMetricVolatility{}, resp, err
+		return []MarketData{}, Pagination{}, resp, err
 	}
 
-	return marketMetricsRes.Data.MarketMetrics, resp, nil
+	return marketDataRes.Data.AllData, marketDataRes.Pagination, resp, nil
 }
