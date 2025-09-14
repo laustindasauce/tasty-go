@@ -51,8 +51,8 @@ func (c *Client) GetAccountTradingStatus(accountNumber string) (AccountTradingSt
 }
 
 // Returns the current balance values for an account.
-func (c *Client) GetAccountBalances(accountNumber string) (AccountBalance, *http.Response, error) {
-	path := fmt.Sprintf("/accounts/%s/balances", accountNumber)
+func (c *Client) GetAccountBalances(accountNumber, currency string) (AccountBalance, *http.Response, error) {
+	path := fmt.Sprintf("/accounts/%s/balances/%s", accountNumber, currency)
 
 	type accountBalanceRes struct {
 		AccountBalance AccountBalance `json:"data"`

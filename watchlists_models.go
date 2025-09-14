@@ -17,7 +17,7 @@ type RemovedWatchlist struct {
 }
 
 type Watchlist struct {
-	ID                  *int             `json:"id"`
+	ID                  *string          `json:"id"`
 	Name                string           `json:"name"`
 	WatchlistEntries    []WatchlistEntry `json:"watchlist-entries"`
 	GroupName           string           `json:"group-name"`
@@ -38,25 +38,13 @@ type WatchlistEntry struct {
 	InstrumentType InstrumentType `json:"instrument-type"`
 }
 
-type PublicWatchlist struct {
-	ID                  *int                   `json:"id"`
-	Name                string                 `json:"name"`
-	WatchlistEntries    []PublicWatchlistEntry `json:"watchlist-entries"`
-	GroupName           string                 `json:"group-name"`
-	OrderIndex          int                    `json:"order-index"`
-	WatchlistEntryCount *int                   `json:"watchlist-entry-count"`
-}
-
-// Something weird here in the api where instrument_type instead of instrument-type.
-type PublicWatchlistEntry struct {
-	Symbol         string         `json:"symbol"`
-	InstrumentType InstrumentType `json:"instrument_type"`
-}
-
 type PairsWatchlist struct {
+	ID             string          `json:"id"`
 	Name           string          `json:"name"`
 	PairsEquations []PairsEquation `json:"pairs-equations"`
 	OrderIndex     int             `json:"order-index,omitempty"`
+	CreatedAt      time.Time       `json:"created-at"`
+	UpdatedAt      time.Time       `json:"updated-at"`
 }
 
 type PairsEquation struct {

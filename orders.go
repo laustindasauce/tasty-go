@@ -65,26 +65,6 @@ func (c *Client) SubmitOrder(accountNumber string, order NewOrder) (OrderRespons
 	return ordersRes.OrderResponse, ordersRes.OrderError, resp, nil
 }
 
-// Returns a list of live orders for the resource.
-func (c *Client) GetAccountLiveOrders(accountNumber string) ([]Order, *http.Response, error) {
-	path := fmt.Sprintf("/accounts/%s/orders/live", accountNumber)
-
-	type ordersResponse struct {
-		Data struct {
-			Orders []Order `json:"items"`
-		} `json:"data"`
-	}
-
-	ordersRes := new(ordersResponse)
-
-	resp, err := c.request(http.MethodGet, path, nil, nil, ordersRes)
-	if err != nil {
-		return []Order{}, resp, err
-	}
-
-	return ordersRes.Data.Orders, resp, nil
-}
-
 // Returns a paginated list of the account's orders (as identified by the provided
 // authentication token) based on sort param. If no sort is passed in, it defaults
 // to descending order.

@@ -336,28 +336,6 @@ type ActiveEquitiesQuery struct {
 	Lendability Lendability `url:"lendability"`
 }
 
-type EquitiesQuery struct {
-	// The symbols of the equity(s), i.e AAPL
-	Symbols []string `url:"symbol[]"`
-	// Available values : Easy To Borrow, Locate Required, Preborrow
-	Lendability Lendability `url:"lendability"`
-	// Flag indicating if equity is an index instrument
-	IsIndex bool `url:"is-index"`
-	// Flag indicating if equity is an etf instrument
-	IsETF bool `url:"is-etf"`
-}
-
-type EquityOptionsQuery struct {
-	// The symbol(s) of the equity option(s) using OCC Symbology, i.e. [FB 180629C00200000]
-	Symbols []string `url:"symbol[]"`
-	// Whether an option is available for trading with the broker.
-	// Terminology is somewhat misleading as this is generally used
-	// to filter non-standard / flex options out.
-	Active bool `url:"active"`
-	// Include expired options
-	WithExpired bool `url:"with-expired"`
-}
-
 type FuturesQuery struct {
 	// The symbol(s) of the future(s), i.e. symbol[]=ESZ9. Leading forward slash is not required.
 	Symbols []string `url:"symbol[],omitempty"`

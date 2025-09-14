@@ -131,7 +131,7 @@ type AccountPosition struct {
 	Symbol                        string          `json:"symbol"`
 	InstrumentType                InstrumentType  `json:"instrument-type"`
 	UnderlyingSymbol              string          `json:"underlying-symbol"`
-	Quantity                      int             `json:"quantity"`
+	Quantity                      decimal.Decimal `json:"quantity"`
 	QuantityDirection             Direction       `json:"quantity-direction"`
 	ClosePrice                    decimal.Decimal `json:"close-price"`
 	AverageOpenPrice              decimal.Decimal `json:"average-open-price"`
@@ -143,7 +143,7 @@ type AccountPosition struct {
 	CostEffect                    PriceEffect     `json:"cost-effect"`
 	IsSuppressed                  bool            `json:"is-suppressed"`
 	IsFrozen                      bool            `json:"is-frozen"`
-	RestrictedQuantity            int             `json:"restricted-quantity"`
+	RestrictedQuantity            decimal.Decimal `json:"restricted-quantity"`
 	ExpiresAt                     time.Time       `json:"expires-at"`
 	FixingPrice                   decimal.Decimal `json:"fixing-price"`
 	DeliverableType               string          `json:"deliverable-type"`

@@ -178,6 +178,87 @@ func TestGetHistoricEarningsError(t *testing.T) {
 	expectedUnauthorized(t, err)
 }
 
+func TestGetMarketDataByType(t *testing.T) {
+	setup()
+	defer teardown()
+
+	mux.HandleFunc("/market-data/by-type", func(writer http.ResponseWriter, request *http.Request) {
+		fmt.Fprint(writer, marketDataByTypeResp)
+	})
+
+	query := MarketDataQuery{
+		Equity:         []string{"AAPL"},
+		Cryptocurrency: []string{"BTC"},
+		EquityOption:   []string{"AAPL  250919C00005000"},
+		Future:         []string{"ES"},
+		FutureOption:   []string{"./ESZ5 EW4V5 251024C5850"},
+		Index:          []string{"SPY"},
+	}
+
+	resp, pagination, httpResp, err := client.GetMarketDataByType(query)
+	require.Nil(t, err)
+	require.NotNil(t, httpResp)
+
+	require.Equal(t, 6, len(resp))
+
+	equity := resp[0]
+
+	require.Equal(t, "BTC", equity.Symbol)
+	require.Equal(t, EquityIT, equity.InstrumentType)
+	require.Equal(t, "2025-09-13T21:33:06.641Z", equity.UpdatedAt.Format(time.RFC3339Nano))
+	require.True(t, equity.Bid.Equal(decimal.NewFromFloat(51.4)))
+	require.True(t, equity.BidSize.Equal(decimal.NewFromFloat(1.0)))
+	require.True(t, equity.Ask.Equal(decimal.NewFromFloat(51.66)))
+	require.True(t, equity.AskSize.Equal(decimal.NewFromFloat(4.0)))
+	require.True(t, equity.Mid.Equal(decimal.NewFromFloat(51.53)))
+	require.True(t, equity.Mark.Equal(decimal.NewFromFloat(51.66)))
+	require.True(t, equity.Last.Equal(decimal.NewFromFloat(51.78)))
+	require.True(t, equity.LastMkt.Equal(decimal.NewFromFloat(51.78)))
+	require.True(t, equity.Beta.Equal(decimal.NewFromFloat(1.719217504)))
+	require.True(t, equity.Open.Equal(decimal.NewFromFloat(50.94)))
+	require.True(t, equity.DayHighPrice.Equal(decimal.NewFromFloat(51.795)))
+	require.True(t, equity.DayLowPrice.Equal(decimal.NewFromFloat(50.87)))
+	require.True(t, equity.Close.Equal(decimal.NewFromFloat(51.78)))
+	require.Equal(t, "Final", equity.ClosePriceType)
+	require.True(t, equity.PrevClose.Equal(decimal.NewFromFloat(50.74)))
+	require.Equal(t, "Final", equity.PrevClosePriceType)
+	require.Equal(t, "2025-09-12", equity.SummaryDate)
+	require.Equal(t, "2025-09-11", equity.PrevCloseDate)
+	require.True(t, equity.LowLimitPrice.Equal(decimal.NewFromFloat(46.3)))
+	require.True(t, equity.HighLimitPrice.Equal(decimal.NewFromFloat(56.59)))
+	require.False(t, equity.IsTradingHalted)
+	require.Equal(t, -1, equity.HaltStartTime)
+	require.Equal(t, -1, equity.HaltEndTime)
+	require.True(t, equity.YearLowPrice.Equal(decimal.NewFromFloat(25.5)))
+	require.True(t, equity.YearHighPrice.Equal(decimal.NewFromFloat(54.48)))
+	require.True(t, equity.Volume.Equal(decimal.NewFromFloat(995431.0)))
+
+	// Pagination
+	require.Equal(t, 4, pagination.PerPage)
+	require.Equal(t, 0, pagination.PageOffset)
+	require.Equal(t, 0, pagination.ItemOffset)
+	require.Equal(t, 12143, pagination.TotalItems)
+	require.Equal(t, 3036, pagination.TotalPages)
+	require.Equal(t, 4, pagination.CurrentItemCount)
+	require.Nil(t, pagination.PreviousLink)
+	require.Nil(t, pagination.NextLink)
+	require.Nil(t, pagination.PagingLinkTemplate)
+}
+
+func TestGetMarketDataByTypeError(t *testing.T) {
+	setup()
+	defer teardown()
+
+	mux.HandleFunc("/market-data/by-type", func(writer http.ResponseWriter, request *http.Request) {
+		writer.WriteHeader(401)
+		fmt.Fprint(writer, tastyUnauthorizedError)
+	})
+
+	_, _, httpResp, err := client.GetMarketDataByType(MarketDataQuery{})
+	expectedUnauthorized(t, err)
+	require.NotNil(t, httpResp)
+}
+
 const marketMetricsResp = `{
   "data": {
     "items": [
@@ -382,5 +463,221 @@ const historicEarningsResp = `{
       { "occurred-date": "2022-12-31", "eps": "1.89" },
       { "occurred-date": "2023-03-31", "eps": "1.53" }
     ]
+  }
+}`
+
+const marketDataByTypeResp = `{
+  "data": {
+    "items": [
+      {
+        "symbol": "BTC",
+        "instrument-type": "Equity",
+        "updated-at": "2025-09-13T21:33:06.641Z",
+        "bid": "51.4",
+        "bid-size": "1.0",
+        "ask": "51.66",
+        "ask-size": "4.0",
+        "mid": "51.53",
+        "mark": "51.66",
+        "last": "51.78",
+        "last-mkt": "51.78",
+        "beta": "1.719217504",
+        "open": "50.94",
+        "day-high-price": "51.795",
+        "day-low-price": "50.87",
+        "close": "51.78",
+        "close-price-type": "Final",
+        "prev-close": "50.74",
+        "prev-close-price-type": "Final",
+        "summary-date": "2025-09-12",
+        "prev-close-date": "2025-09-11",
+        "low-limit-price": "46.3",
+        "high-limit-price": "56.59",
+        "is-trading-halted": false,
+        "halt-start-time": -1,
+        "halt-end-time": -1,
+        "year-low-price": "25.5",
+        "year-high-price": "54.48",
+        "volume": "995431.0"
+      },
+      {
+        "symbol": "AAPL",
+        "instrument-type": "Equity",
+        "updated-at": "2025-09-13T21:35:04.949Z",
+        "bid": "233.97",
+        "bid-size": "1.0",
+        "ask": "234.0",
+        "ask-size": "8.0",
+        "mid": "233.985",
+        "mark": "233.99",
+        "last": "233.99",
+        "last-ext": "221.8511",
+        "last-mkt": "234.07",
+        "beta": "1.078586035",
+        "dividend-amount": "0.26",
+        "dividend-frequency": "4.0",
+        "open": "229.22",
+        "day-high-price": "234.51",
+        "day-low-price": "229.02",
+        "close": "234.07",
+        "close-price-type": "Final",
+        "prev-close": "230.03",
+        "prev-close-price-type": "Final",
+        "summary-date": "2025-09-12",
+        "prev-close-date": "2025-09-11",
+        "low-limit-price": "210.46",
+        "high-limit-price": "257.23",
+        "is-trading-halted": false,
+        "trading-halted-reason": "",
+        "halt-start-time": -1,
+        "halt-end-time": -1,
+        "year-low-price": "169.2101",
+        "year-high-price": "260.1",
+        "volume": "55824216.0"
+      },
+      {
+        "symbol": "AAPL  250919C00005000",
+        "instrument-type": "Equity Option",
+        "updated-at": "2025-09-13T21:38:31.404Z",
+        "bid": "228.7",
+        "bid-size": "178.0",
+        "ask": "229.5",
+        "ask-size": "171.0",
+        "mid": "229.1",
+        "mark": "229.1",
+        "last": "228.97",
+        "last-mkt": "228.97",
+        "open": "224.35",
+        "day-high-price": "229.18",
+        "day-low-price": "224.17",
+        "close": "228.97",
+        "close-price-type": "Regular",
+        "prev-close": "225.4",
+        "prev-close-price-type": "Regular",
+        "summary-date": "2025-09-12",
+        "prev-close-date": "2025-09-11",
+        "is-trading-halted": false,
+        "halt-start-time": -1,
+        "halt-end-time": -1,
+        "volume": "76.0",
+        "volatility": "1.073205822",
+        "delta": "1.0",
+        "gamma": "0.0",
+        "theta": "0.0",
+        "rho": "0.000944827",
+        "vega": "0.0",
+        "theo-price": "228.943960053",
+        "dx-mark": "228.943960053",
+        "tick-size": "0.01",
+        "open-interest": 510
+      },
+      {
+        "symbol": "./ESZ5 EW4V5 251024C5850",
+        "instrument-type": "Future Option",
+        "updated-at": "2025-09-13T21:35:43.744Z",
+        "bid": "747.0",
+        "bid-size": "0.0",
+        "ask": "754.25",
+        "ask-size": "0.0",
+        "mid": "750.625",
+        "mark": "801.768086004",
+        "close": "802.5",
+        "close-price-type": "Preliminary",
+        "prev-close": "804.75",
+        "prev-close-price-type": "Final",
+        "summary-date": "2025-09-12",
+        "prev-close-date": "2025-09-11",
+        "is-trading-halted": false,
+        "halt-start-time": -1,
+        "halt-end-time": -1,
+        "volatility": "0.235349124",
+        "delta": "0.943486996",
+        "gamma": "0.000196302",
+        "theta": "-0.540852829",
+        "rho": "6.293186268",
+        "vega": "2.347970638",
+        "theo-price": "801.768086004",
+        "dx-mark": "801.768086004",
+        "tick-size": "0.01",
+        "open-interest": 0
+      },
+      {
+        "symbol": "SPY",
+        "instrument-type": "Equity",
+        "updated-at": "2025-09-13T21:35:08.910Z",
+        "bid": "657.23",
+        "bid-size": "1.0",
+        "ask": "657.25",
+        "ask-size": "55.0",
+        "mid": "657.24",
+        "mark": "657.25",
+        "last": "657.41",
+        "last-mkt": "657.41",
+        "beta": "1.007939355",
+        "dividend-amount": "1.761117",
+        "dividend-frequency": "4.0",
+        "open": "657.6",
+        "day-high-price": "659.11",
+        "day-low-price": "656.9",
+        "close": "657.41",
+        "close-price-type": "Final",
+        "prev-close": "657.63",
+        "prev-close-price-type": "Final",
+        "summary-date": "2025-09-12",
+        "prev-close-date": "2025-09-11",
+        "low-limit-price": "591.86",
+        "high-limit-price": "723.38",
+        "is-trading-halted": false,
+        "halt-start-time": -1,
+        "halt-end-time": -1,
+        "year-low-price": "481.8",
+        "year-high-price": "659.11",
+        "volume": "72780135.0"
+      },
+      {
+        "symbol": "ES",
+        "instrument-type": "Equity",
+        "updated-at": "2025-09-13T21:33:44.722Z",
+        "bid": "64.99",
+        "bid-size": "1.0",
+        "ask": "66.24",
+        "ask-size": "5.0",
+        "mid": "65.615",
+        "mark": "65.7",
+        "last": "65.7",
+        "last-mkt": "65.7",
+        "beta": "0.681157943",
+        "dividend-amount": "0.7525",
+        "dividend-frequency": "4.0",
+        "open": "64.79",
+        "day-high-price": "65.835",
+        "day-low-price": "64.6",
+        "close": "65.7",
+        "close-price-type": "Final",
+        "prev-close": "65.05",
+        "prev-close-price-type": "Final",
+        "summary-date": "2025-09-12",
+        "prev-close-date": "2025-09-11",
+        "low-limit-price": "58.89",
+        "high-limit-price": "71.98",
+        "is-trading-halted": false,
+        "halt-start-time": -1,
+        "halt-end-time": -1,
+        "year-low-price": "52.28",
+        "year-high-price": "68.73",
+        "volume": "2169037.0"
+      }
+    ]
+  },
+  "pagination": {
+    "per-page": 4,
+    "page-offset": 0,
+    "item-offset": 0,
+    "total-items": 12143,
+    "total-pages": 3036,
+    "current-item-count": 4,
+    "previous-link": null,
+    "next-link": null,
+    "paging-link-template": null
   }
 }`

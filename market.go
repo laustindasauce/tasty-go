@@ -82,3 +82,24 @@ func (c *Client) GetHistoricEarnings(symbol string, startDate time.Time) ([]Earn
 
 	return marketMetricsRes.Data.HistoricEarnings, resp, nil
 }
+
+// Get market data for many symbols of type. Combined limit across all types is 100.
+func (c *Client) GetMarketDataByType(query MarketDataQuery) ([]MarketData, Pagination, *http.Response, error) {
+	path := "/market-data/by-type"
+
+	type marketDataResponse struct {
+		Data struct {
+			AllData []MarketData `json:"items"`
+		} `json:"data"`
+		Pagination Pagination `json:"pagination"`
+	}
+
+	marketDataRes := new(marketDataResponse)
+
+	resp, err := c.request(http.MethodGet, path, query, nil, marketDataRes)
+	if err != nil {
+		return []MarketData{}, Pagination{}, resp, err
+	}
+
+	return marketDataRes.Data.AllData, marketDataRes.Pagination, resp, nil
+}

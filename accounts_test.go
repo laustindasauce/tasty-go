@@ -129,11 +129,11 @@ func TestGetAccountBalances(t *testing.T) {
 
 	accountNumber := "5YZ55555"
 
-	mux.HandleFunc(fmt.Sprintf("/accounts/%s/balances", accountNumber), func(writer http.ResponseWriter, request *http.Request) {
+	mux.HandleFunc(fmt.Sprintf("/accounts/%s/balances/USD", accountNumber), func(writer http.ResponseWriter, request *http.Request) {
 		fmt.Fprint(writer, accountBalancesResp)
 	})
 
-	resp, httpResp, err := client.GetAccountBalances(accountNumber)
+	resp, httpResp, err := client.GetAccountBalances(accountNumber, "USD")
 	require.Nil(t, err)
 	require.NotNil(t, httpResp)
 
@@ -181,12 +181,12 @@ func TestGetAccountBalancesError(t *testing.T) {
 
 	accountNumber := "5YZ55555"
 
-	mux.HandleFunc(fmt.Sprintf("/accounts/%s/balances", accountNumber), func(writer http.ResponseWriter, request *http.Request) {
+	mux.HandleFunc(fmt.Sprintf("/accounts/%s/balances/USD", accountNumber), func(writer http.ResponseWriter, request *http.Request) {
 		writer.WriteHeader(401)
 		fmt.Fprint(writer, tastyUnauthorizedError)
 	})
 
-	_, httpResp, err := client.GetAccountBalances(accountNumber)
+	_, httpResp, err := client.GetAccountBalances(accountNumber, "USD")
 	expectedUnauthorized(t, err)
 	require.NotNil(t, httpResp)
 }
@@ -212,7 +212,7 @@ func TestGetAccountPositions(t *testing.T) {
 	require.Equal(t, "RIVN  230609P00014000", rivn.Symbol)
 	require.Equal(t, EquityOptionIT, rivn.InstrumentType)
 	require.Equal(t, "RIVN", rivn.UnderlyingSymbol)
-	require.Equal(t, 40, rivn.Quantity)
+	require.True(t, rivn.Quantity.Equal(decimal.NewFromInt(40)))
 	require.Equal(t, Short, rivn.QuantityDirection)
 	require.Equal(t, decimal.NewFromFloat(0.41), rivn.ClosePrice)
 	require.Equal(t, decimal.NewFromFloat(0.79), rivn.AverageOpenPrice)
@@ -222,7 +222,7 @@ func TestGetAccountPositions(t *testing.T) {
 	require.Equal(t, Debit, rivn.CostEffect)
 	require.False(t, rivn.IsSuppressed)
 	require.False(t, rivn.IsFrozen)
-	require.Equal(t, 0, rivn.RestrictedQuantity)
+	require.True(t, decimal.Zero.Equal(rivn.RestrictedQuantity))
 	require.Equal(t, "2023-06-09T20:00:00Z", rivn.ExpiresAt.Format(time.RFC3339))
 	require.True(t, decimal.Zero.Equal(rivn.RealizedDayGain))
 	require.Equal(t, None, rivn.RealizedDayGainEffect)

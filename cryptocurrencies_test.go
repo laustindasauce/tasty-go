@@ -63,7 +63,7 @@ func TestGetCryptocurrency(t *testing.T) {
 	setup()
 	defer teardown()
 
-	mux.HandleFunc("/instruments/cryptocurrencies/BTC/USD", func(writer http.ResponseWriter, request *http.Request) {
+	mux.HandleFunc("/instruments/cryptocurrencies/BTC%2FUSD", func(writer http.ResponseWriter, request *http.Request) {
 		fmt.Fprint(writer, cryptoResp)
 	})
 
@@ -95,7 +95,7 @@ func TestGetCryptocurrencyError(t *testing.T) {
 	setup()
 	defer teardown()
 
-	mux.HandleFunc("/instruments/cryptocurrencies/BTC/USD", func(writer http.ResponseWriter, request *http.Request) {
+	mux.HandleFunc("/instruments/cryptocurrencies/BTC%2FUSD", func(writer http.ResponseWriter, request *http.Request) {
 		writer.WriteHeader(401)
 		fmt.Fprint(writer, tastyUnauthorizedError)
 	})
