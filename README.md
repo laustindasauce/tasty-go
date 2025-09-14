@@ -1,9 +1,9 @@
 # tasty-go
 
 [![Go Reference](https://pkg.go.dev/badge/github.com/laustindasauce/tasty-go.svg)](https://pkg.go.dev/github.com/laustindasauce/tasty-go)
-![GitHub go.mod Go version](https://img.shields.io/github/go-mod/go-version/austinbspencer/tasty-go)
+![GitHub go.mod Go version](https://img.shields.io/github/go-mod/go-version/laustindasauce/tasty-go)
 [![Go Report Card](https://goreportcard.com/badge/github.com/laustindasauce/tasty-go)](https://goreportcard.com/report/github.com/laustindasauce/tasty-go)
-[![codecov](https://codecov.io/gh/austinbspencer/tasty-go/branch/main/graph/badge.svg?token=ZVVJF2RFQO)](https://codecov.io/gh/austinbspencer/tasty-go)
+[![codecov](https://codecov.io/github/laustindasauce/tasty-go/graph/badge.svg?token=86QF45I5RY)](https://codecov.io/github/laustindasauce/tasty-go)
 
 This library provides `unofficial` Go clients for [tastytrade API](https://tastytrade.com).
 
