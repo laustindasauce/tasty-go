@@ -75,13 +75,13 @@ func (m *AdvancedMockOAuth2Server) simulateLoad() bool {
 	return true
 }
 
-// TestOAuth2Client_FullIntegrationFlow tests complete OAuth2 flow
-func TestOAuth2Client_FullIntegrationFlow(t *testing.T) {
+// TestClient_FullIntegrationFlow tests complete OAuth2 flow
+func TestClient_FullIntegrationFlow(t *testing.T) {
 	mockServer := NewMockOAuth2Server()
 	defer mockServer.Close()
 	
 	config := createTestOAuth2Config(mockServer)
-	client, err := newOAuth2ClientInternal(config, nil)
+	client, err := NewClient(config, nil)
 	require.NoError(t, err)
 	
 	// Step 1: Generate authorization URL
@@ -138,17 +138,17 @@ func TestOAuth2Client_FullIntegrationFlow(t *testing.T) {
 	assert.False(t, client.IsAuthenticated())
 }
 
-// TestOAuth2Client_ConcurrentOperations tests concurrent OAuth2 operations
-func TestOAuth2Client_ConcurrentOperations(t *testing.T) {
+// TestClient_ConcurrentOperations tests concurrent OAuth2 operations
+func TestClient_ConcurrentOperations(t *testing.T) {
 	mockServer := NewAdvancedMockOAuth2Server()
 	defer mockServer.Close()
 	
 	config := createTestOAuth2Config(mockServer.MockOAuth2Server)
-	client, err := newOAuth2ClientInternal(config, nil)
+	client, err := NewClient(config, nil)
 	require.NoError(t, err)
 	
 	// Set initial tokens
-	client.tokenManager.SetTokens("access_token", "refresh_token", 3600)
+	client.SetTokens("access_token", "refresh_token", 3600)
 	
 	const numGoroutines = 20
 	const numOperations = 50
@@ -216,8 +216,8 @@ func TestOAuth2Client_ConcurrentOperations(t *testing.T) {
 	assert.Equal(t, 0, errorCount, "Expected no errors in concurrent operations")
 }
 
-// TestOAuth2Client_LoadTesting tests OAuth2 client under high load
-func TestOAuth2Client_LoadTesting(t *testing.T) {
+// TestClient_LoadTesting tests OAuth2 client under high load
+func TestClient_LoadTesting(t *testing.T) {
 	if testing.Short() {
 		t.Skip("Skipping load test in short mode")
 	}
@@ -253,13 +253,13 @@ func TestOAuth2Client_LoadTesting(t *testing.T) {
 		go func(clientID int) {
 			defer wg.Done()
 			
-			client, err := newOAuth2ClientInternal(config, nil)
+			client, err := NewClient(config, nil)
 			if err != nil {
 				results <- TestResult{ClientID: clientID, Failures: operationsPerClient}
 				return
 			}
 			
-			client.tokenManager.SetTokens("access_token", "refresh_token", 3600)
+			client.SetTokens("access_token", "refresh_token", 3600)
 			
 			successes := 0
 			failures := 0
@@ -329,8 +329,8 @@ func TestOAuth2Client_LoadTesting(t *testing.T) {
 	assert.Less(t, totalDuration, 30*time.Second, "Total test duration should be under 30 seconds")
 }
 
-// TestOAuth2Client_ErrorRecovery tests error recovery scenarios
-func TestOAuth2Client_ErrorRecovery(t *testing.T) {
+// TestClient_ErrorRecovery tests error recovery scenarios
+func TestClient_ErrorRecovery(t *testing.T) {
 	// Create a server that fails initially, then recovers
 	failureCount := int64(0)
 	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
@@ -370,14 +370,14 @@ func TestOAuth2Client_ErrorRecovery(t *testing.T) {
 		AuthURL:      server.URL + "/oauth/authorize",
 	}
 	
-	client, err := newOAuth2ClientInternal(config, nil)
+	client, err := NewClient(config, nil)
 	require.NoError(t, err)
 	
 	// Set initial tokens
-	client.tokenManager.SetTokens("old_token", "refresh_token", 3600)
+	client.SetTokens("old_token", "refresh_token", 3600)
 	
 	// Attempt refresh - should eventually succeed after retries
-	response, err := client.refreshTokensWithRetry("refresh_token", 5)
+	response, err := client.RefreshTokens()
 	require.NoError(t, err)
 	require.NotNil(t, response)
 	
@@ -385,8 +385,8 @@ func TestOAuth2Client_ErrorRecovery(t *testing.T) {
 	assert.Greater(t, atomic.LoadInt64(&failureCount), int64(3))
 }
 
-// TestOAuth2Client_MemoryLeakPrevention tests memory leak prevention
-func TestOAuth2Client_MemoryLeakPrevention(t *testing.T) {
+// TestClient_MemoryLeakPrevention tests memory leak prevention
+func TestClient_MemoryLeakPrevention(t *testing.T) {
 	mockServer := NewMockOAuth2Server()
 	defer mockServer.Close()
 	
@@ -394,11 +394,11 @@ func TestOAuth2Client_MemoryLeakPrevention(t *testing.T) {
 	
 	// Create and destroy many clients rapidly
 	for i := 0; i < 1000; i++ {
-		client, err := newOAuth2ClientInternal(config, nil)
+		client, err := NewClient(config, nil)
 		require.NoError(t, err)
 		
 		// Use the client briefly
-		client.tokenManager.SetTokens(fmt.Sprintf("token_%d", i), 
+		client.SetTokens(fmt.Sprintf("token_%d", i), 
 			fmt.Sprintf("refresh_%d", i), 3600)
 		
 		_, err = client.GetAuthorizationURL()
@@ -474,8 +474,8 @@ func TestRedirectServer_HighConcurrency(t *testing.T) {
 	assert.Equal(t, 0, errorCount, "Expected no errors in concurrent redirect server operations")
 }
 
-// TestOAuth2Client_TimeoutHandling tests timeout handling
-func TestOAuth2Client_TimeoutHandling(t *testing.T) {
+// TestClient_TimeoutHandling tests timeout handling
+func TestClient_TimeoutHandling(t *testing.T) {
 	// Create a server that responds very slowly
 	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		time.Sleep(2 * time.Second) // Longer than client timeout
@@ -502,7 +502,7 @@ func TestOAuth2Client_TimeoutHandling(t *testing.T) {
 		AuthURL:      server.URL + "/auth",
 	}
 	
-	client, err := newOAuth2ClientInternal(config, httpClient)
+	client, err := NewClient(config, httpClient)
 	require.NoError(t, err)
 	
 	// Attempt operations that should timeout or fail due to network issues
@@ -511,20 +511,20 @@ func TestOAuth2Client_TimeoutHandling(t *testing.T) {
 	// The error might be timeout or network error depending on timing
 	assert.True(t, strings.Contains(err.Error(), "timeout") || strings.Contains(err.Error(), "network") || strings.Contains(err.Error(), "context deadline exceeded"))
 	
-	client.tokenManager.SetTokens("token", "refresh", 3600)
+	client.SetTokens("token", "refresh", 3600)
 	_, err = client.RefreshTokens()
 	assert.Error(t, err)
 	// The error might be timeout or network error depending on timing
 	assert.True(t, strings.Contains(err.Error(), "timeout") || strings.Contains(err.Error(), "network") || strings.Contains(err.Error(), "context deadline exceeded"))
 }
 
-// TestOAuth2Client_StateManagement tests state parameter management
-func TestOAuth2Client_StateManagement(t *testing.T) {
+// TestClient_StateManagement tests state parameter management
+func TestClient_StateManagement(t *testing.T) {
 	mockServer := NewMockOAuth2Server()
 	defer mockServer.Close()
 	
 	config := createTestOAuth2Config(mockServer)
-	client, err := newOAuth2ClientInternal(config, nil)
+	client, err := NewClient(config, nil)
 	require.NoError(t, err)
 	
 	// Test state consistency across multiple authorization URLs
@@ -547,13 +547,13 @@ func TestOAuth2Client_StateManagement(t *testing.T) {
 	assert.Error(t, client.ValidateState(""))
 }
 
-// TestOAuth2Client_ConfigurationImmutability tests configuration immutability
-func TestOAuth2Client_ConfigurationImmutability(t *testing.T) {
+// TestClient_ConfigurationImmutability tests configuration immutability
+func TestClient_ConfigurationImmutability(t *testing.T) {
 	mockServer := NewMockOAuth2Server()
 	defer mockServer.Close()
 	
 	originalConfig := createTestOAuth2Config(mockServer)
-	client, err := newOAuth2ClientInternal(originalConfig, nil)
+	client, err := NewClient(originalConfig, nil)
 	require.NoError(t, err)
 	
 	// Get configuration copy
@@ -570,13 +570,13 @@ func TestOAuth2Client_ConfigurationImmutability(t *testing.T) {
 	assert.NotEqual(t, "modified_client_id", currentConfig.ClientID)
 }
 
-// TestOAuth2Client_ThreadSafety tests thread safety of OAuth2 client
-func TestOAuth2Client_ThreadSafety(t *testing.T) {
+// TestClient_ThreadSafety tests thread safety of OAuth2 client
+func TestClient_ThreadSafety(t *testing.T) {
 	mockServer := NewMockOAuth2Server()
 	defer mockServer.Close()
 	
 	config := createTestOAuth2Config(mockServer)
-	client, err := newOAuth2ClientInternal(config, nil)
+	client, err := NewClient(config, nil)
 	require.NoError(t, err)
 	
 	const numGoroutines = 50
@@ -612,7 +612,7 @@ func TestOAuth2Client_ThreadSafety(t *testing.T) {
 			defer wg.Done()
 			for j := 0; j < numOperations; j++ {
 				// Set tokens with unique values
-				client.tokenManager.SetTokens(
+				client.SetTokens(
 					fmt.Sprintf("access_%d_%d", id, j),
 					fmt.Sprintf("refresh_%d_%d", id, j),
 					3600,
