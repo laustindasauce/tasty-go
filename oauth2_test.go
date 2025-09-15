@@ -409,6 +409,7 @@ func TestClient_RefreshTokens_NoRefreshToken(t *testing.T) {
 	require.NoError(t, err)
 
 	// Don't set any tokens
+	client.tokenManager.Clear()
 	tokenResponse, err := client.RefreshTokens()
 	assert.Error(t, err)
 	assert.Nil(t, tokenResponse)

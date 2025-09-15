@@ -414,6 +414,7 @@ func TestOAuth2Request_NoTokens(t *testing.T) {
 	client, err := NewClient(config, http.DefaultClient)
 	require.NoError(t, err)
 
+	client.tokenManager.Clear()
 	resp, err := client.request("GET", "/test", nil, nil, nil)
 
 	require.NotNil(t, err)

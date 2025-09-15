@@ -67,14 +67,6 @@ func NewClient(config OAuth2Config, httpClient *http.Client) (*Client, error) {
 		}
 	}
 
-	// Validate that we're using production endpoints
-	if config.AuthURL != "" && config.AuthURL != oauth2ProductionAuthURL {
-		return nil, fmt.Errorf("NewClient requires production authorization URL, got: %s", config.AuthURL)
-	}
-	if config.TokenURL != "" && config.TokenURL != oauth2ProductionTokenURL {
-		return nil, fmt.Errorf("NewClient requires production token URL, got: %s", config.TokenURL)
-	}
-
 	// Validate the configuration
 	if err := config.Validate(); err != nil {
 		return nil, fmt.Errorf("invalid OAuth2 configuration: %w", err)
@@ -357,7 +349,7 @@ func (c *Client) RefreshTokens() (*TokenResponse, error) {
 		return nil, NewOAuth2Error(OAuth2ErrorRefreshFailed, "no refresh token available")
 	}
 
-	return c.refreshTokensWithRetry(refreshToken, 3)
+	return c.refreshTokensWithRetry(refreshToken, 4)
 }
 
 // refreshTokensWithRetry attempts to refresh tokens with automatic retry logic
@@ -365,7 +357,7 @@ func (c *Client) refreshTokensWithRetry(refreshToken string, maxRetries int) (*T
 	var lastErr error
 	errorHandler := NewOAuth2ErrorHandler()
 
-	for attempt := 0; attempt < maxRetries; attempt++ {
+	for attempt := range maxRetries {
 		if attempt > 0 {
 			// Exponential backoff: wait 1s, 2s, 4s between retries
 			backoff := time.Duration(1<<uint(attempt-1)) * time.Second
@@ -611,13 +603,8 @@ func decodeError(resp *http.Response) *Error {
 	return e
 }
 
-// customRequest handles any requests for the client with unique paths using OAuth2 authentication.
+// customRequest handles requests with unique paths using OAuth2 authentication.
 func (c *Client) customRequest(method, path string, params, payload, result any) (*http.Response, *Error) {
-	return c.customOAuthRequest(method, path, params, payload, result)
-}
-
-// customOAuthRequest handles requests with unique paths using OAuth2 authentication.
-func (c *Client) customOAuthRequest(method, path string, params, payload, result any) (*http.Response, *Error) {
 	// Get access token (automatically refreshes if needed)
 	accessToken, err := c.tokenManager.GetAccessToken()
 	if err != nil {
@@ -666,7 +653,7 @@ func (c *Client) customOAuthRequest(method, path string, params, payload, result
 	if resp.StatusCode == http.StatusUnauthorized {
 		if _, refreshErr := c.RefreshTokens(); refreshErr == nil {
 			if newAccessToken, tokenErr := c.tokenManager.GetAccessToken(); tokenErr == nil {
-				return c.retryCustomOAuthRequest(method, path, params, payload, result, newAccessToken)
+				return c.retryCustomRequest(method, path, params, payload, result, newAccessToken)
 			}
 		}
 	}
@@ -688,8 +675,8 @@ func (c *Client) customOAuthRequest(method, path string, params, payload, result
 	return resp, nil
 }
 
-// retryCustomOAuthRequest retries a custom OAuth2 request with a new access token
-func (c *Client) retryCustomOAuthRequest(method, path string, params, payload, result any, accessToken string) (*http.Response, *Error) {
+// retryCustomRequest retries a custom OAuth2 request with a new access token
+func (c *Client) retryCustomRequest(method, path string, params, payload, result any, accessToken string) (*http.Response, *Error) {
 	fullURL := c.baseURL + path
 
 	var bodyReader io.Reader
@@ -745,13 +732,8 @@ func (c *Client) retryCustomOAuthRequest(method, path string, params, payload, r
 	return resp, nil
 }
 
-// request handles any requests for the client using OAuth2 authentication.
+// request handles requests using OAuth2 authentication with automatic token refresh.
 func (c *Client) request(method, path string, params, payload, result any) (*http.Response, *Error) {
-	return c.oauthRequest(method, path, params, payload, result)
-}
-
-// oauthRequest handles requests using OAuth2 authentication with automatic token refresh.
-func (c *Client) oauthRequest(method, path string, params, payload, result any) (*http.Response, *Error) {
 	accessToken, err := c.tokenManager.GetAccessToken()
 	if err != nil {
 		return nil, &Error{Code: "oauth2_token_error", Message: fmt.Sprintf("Failed to get access token: %v", err)}
