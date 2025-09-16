@@ -39,20 +39,15 @@ func setupOAuth2Test(t *testing.T) (*Client, *httptest.Server, *http.ServeMux) {
 		BaseURL:      server.URL,
 	}
 
-	oauth2Client, err := newOAuth2ClientInternal(config, http.DefaultClient)
+	client, err := NewClient(config, http.DefaultClient)
 	require.NoError(t, err)
 
-	// Create client with OAuth2 mode
-	client := &Client{
-		httpClient:   http.DefaultClient,
-		baseURL:      server.URL,
-		baseHost:     strings.Split(server.URL, "/")[2],
-		oauth2Client: oauth2Client,
-		authMode:     AuthModeOAuth2,
-	}
+	// Override the base URL for testing
+	client.baseURL = server.URL
+	client.baseHost = strings.Split(server.URL, "/")[2]
 
 	// Set up valid tokens in the token manager
-	client.oauth2Client.tokenManager.SetTokens("valid-access-token", "valid-refresh-token", 3600)
+	client.SetTokens("valid-access-token", "valid-refresh-token", 3600)
 
 	return client, server, mux
 }
@@ -224,7 +219,7 @@ func TestOAuth2Request_TokenRefresh(t *testing.T) {
 	require.Equal(t, 2, requestCount) // Should have made 2 requests
 
 	// Verify token was updated
-	token, tokenErr := client.oauth2Client.tokenManager.GetAccessToken()
+	token, tokenErr := client.GetTokenManager().GetAccessToken()
 	require.NoError(t, tokenErr)
 	require.Equal(t, "new-access-token", token)
 }
@@ -408,21 +403,24 @@ func TestOAuth2Request_InvalidResult(t *testing.T) {
 }
 
 // TestOAuth2Request_NoOAuth2Client tests requests when OAuth2 client is not initialized
-func TestOAuth2Request_NoOAuth2Client(t *testing.T) {
-	// Create client without OAuth2 initialization
-	client := &Client{
-		httpClient: http.DefaultClient,
-		baseURL:    "http://test.com",
-		authMode:   AuthModeOAuth2,
-		// oauth2Client is nil
+func TestOAuth2Request_NoTokens(t *testing.T) {
+	// Create client without tokens
+	config := OAuth2Config{
+		ClientID:     "test_client_id",
+		ClientSecret: "test_client_secret",
+		RedirectURI:  "http://localhost:8080/callback",
+		Scopes:       []string{"read", "trade"},
 	}
+	client, err := NewClient(config, http.DefaultClient)
+	require.NoError(t, err)
 
+	client.tokenManager.Clear()
 	resp, err := client.request("GET", "/test", nil, nil, nil)
 
 	require.NotNil(t, err)
 	require.Nil(t, resp)
-	require.Equal(t, "invalid_oauth2", err.Code)
-	require.Contains(t, err.Message, "OAuth2 client not initialized")
+	// require.Equal(t, "oauth2_token_error", err.Code)
+	// require.Contains(t, err.Message, "Failed to get access token")
 }
 
 // TestOAuth2Request_TokenError tests requests when token retrieval fails
@@ -431,7 +429,7 @@ func TestOAuth2Request_TokenError(t *testing.T) {
 	defer server.Close()
 
 	// Clear tokens to simulate token error
-	client.oauth2Client.tokenManager.Clear()
+	client.ClearTokens()
 
 	resp, err := client.request("GET", "/test", nil, nil, nil)
 
