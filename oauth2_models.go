@@ -29,6 +29,8 @@ type OAuth2Config struct {
 	AuthURL string `json:"auth_url"`
 	// The OAuth2 token endpoint URL
 	TokenURL string `json:"token_url"`
+	// The filepath to store oauth2 tokens
+	TokenFilePath *string
 }
 
 // TokenResponse represents the response from OAuth2 token exchange
@@ -310,8 +312,16 @@ type TokenManager struct {
 
 // NewTokenManager creates a new TokenManager instance with file-based storage
 // Tokens are stored in ~/.tasty-go/tokens.json by default
-func NewTokenManager() *TokenManager {
-	return NewFileTokenManager(getDefaultTokenPath())
+func NewTokenManager(filePath *string) *TokenManager {
+	var filePathParam string
+
+	if filePath != nil {
+		filePathParam = *filePath
+	} else {
+		filePathParam = getDefaultTokenPath()
+	}
+
+	return NewFileTokenManager(filePathParam)
 }
 
 // NewTokenManagerWithStorage creates a new TokenManager instance with custom storage

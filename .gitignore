@@ -27,4 +27,5 @@ go.work
 # Testing
 testing/
 test/
+test-cert/
 *.env

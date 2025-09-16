@@ -8,10 +8,12 @@ import (
 	"sync"
 	"testing"
 	"time"
+
+	"github.com/stretchr/testify/require"
 )
 
 func TestNewTokenManager(t *testing.T) {
-	tm := NewTokenManager()
+	tm := NewTokenManager(nil)
 	if tm == nil {
 		t.Fatal("NewTokenManager returned nil")
 	}
@@ -29,7 +31,7 @@ func TestNewTokenManager(t *testing.T) {
 	tm.SetTokens("test-token", "test-refresh", 3600)
 	// Create another TokenManager with default settings
 	// It should load the same tokens from the default file
-	tm2 := NewTokenManager()
+	tm2 := NewTokenManager(nil)
 	token, err := tm2.GetAccessToken()
 	if err != nil {
 		t.Fatalf("Failed to get access token from second manager: %v", err)
@@ -37,6 +39,12 @@ func TestNewTokenManager(t *testing.T) {
 	if token != "test-token" {
 		t.Errorf("Expected token to persist across TokenManager instances, got '%s'", token)
 	}
+	// Create another TokenManager with different token path
+	// It should load the same tokens from the default file
+	tmpPath := "~/.tasty-go/tmp-tokens.json"
+	tm3 := NewTokenManager(&tmpPath)
+	_, err = tm3.GetAccessToken()
+	require.Error(t, err, "There should be no token at this tmp file path")
 	// Clean up the default token file
 	tm.Clear()
 }

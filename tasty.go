@@ -86,7 +86,7 @@ func NewClient(config OAuth2Config, httpClient *http.Client) (*Client, error) {
 		config.State = state
 	}
 
-	tokenManager := NewTokenManager()
+	tokenManager := NewTokenManager(config.TokenFilePath)
 
 	c := &Client{
 		httpClient:   httpClient,
@@ -182,7 +182,7 @@ func NewCertClient(config OAuth2Config, httpClient *http.Client) (*Client, error
 		config.State = state
 	}
 
-	tokenManager := NewTokenManager()
+	tokenManager := NewTokenManager(config.TokenFilePath)
 
 	c := &Client{
 		httpClient:   httpClient,
