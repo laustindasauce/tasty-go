@@ -3,6 +3,7 @@ package tasty //nolint:testpackage // testing private field
 import (
 	"fmt"
 	"net/http"
+	"net/url"
 	"testing"
 	"time"
 
@@ -80,7 +81,7 @@ func TestGetMyWatchlist(t *testing.T) {
 	setup()
 	defer teardown()
 
-	mux.HandleFunc(fmt.Sprintf("/watchlists/%s", watchlist.Name), func(writer http.ResponseWriter, request *http.Request) {
+	mux.HandleFunc(fmt.Sprintf("/watchlists/%s", url.PathEscape(watchlist.Name)), func(writer http.ResponseWriter, request *http.Request) {
 		fmt.Fprint(writer, getWatchlistResp)
 	})
 
@@ -100,7 +101,7 @@ func TestGetMyWatchlistError(t *testing.T) {
 	setup()
 	defer teardown()
 
-	mux.HandleFunc(fmt.Sprintf("/watchlists/%s", watchlist.Name), func(writer http.ResponseWriter, request *http.Request) {
+	mux.HandleFunc(fmt.Sprintf("/watchlists/%s", url.PathEscape(watchlist.Name)), func(writer http.ResponseWriter, request *http.Request) {
 		writer.WriteHeader(401)
 		fmt.Fprint(writer, tastyUnauthorizedError)
 	})
@@ -148,7 +149,7 @@ func TestEditWatchlist(t *testing.T) {
 	setup()
 	defer teardown()
 
-	mux.HandleFunc(fmt.Sprintf("/watchlists/%s", watchlist.Name), func(writer http.ResponseWriter, request *http.Request) {
+	mux.HandleFunc(fmt.Sprintf("/watchlists/%s", url.PathEscape(watchlist.Name)), func(writer http.ResponseWriter, request *http.Request) {
 		fmt.Fprint(writer, editedWatchlistResp)
 	})
 
@@ -168,7 +169,7 @@ func TestEditWatchlistError(t *testing.T) {
 	setup()
 	defer teardown()
 
-	mux.HandleFunc(fmt.Sprintf("/watchlists/%s", watchlist.Name), func(writer http.ResponseWriter, request *http.Request) {
+	mux.HandleFunc(fmt.Sprintf("/watchlists/%s", url.PathEscape(watchlist.Name)), func(writer http.ResponseWriter, request *http.Request) {
 		writer.WriteHeader(401)
 		fmt.Fprint(writer, tastyUnauthorizedError)
 	})
@@ -182,7 +183,7 @@ func TestDeleteWatchlist(t *testing.T) {
 	setup()
 	defer teardown()
 
-	mux.HandleFunc(fmt.Sprintf("/watchlists/%s", newWatchlist.Name), func(writer http.ResponseWriter, request *http.Request) {
+	mux.HandleFunc(fmt.Sprintf("/watchlists/%s", url.PathEscape(newWatchlist.Name)), func(writer http.ResponseWriter, request *http.Request) {
 		fmt.Fprint(writer, deleteWatchlistResp)
 	})
 
@@ -209,7 +210,7 @@ func TestDeleteWatchlistError(t *testing.T) {
 	setup()
 	defer teardown()
 
-	mux.HandleFunc(fmt.Sprintf("/watchlists/%s", newWatchlist.Name), func(writer http.ResponseWriter, request *http.Request) {
+	mux.HandleFunc(fmt.Sprintf("/watchlists/%s", url.PathEscape(newWatchlist.Name)), func(writer http.ResponseWriter, request *http.Request) {
 		writer.WriteHeader(401)
 		fmt.Fprint(writer, tastyUnauthorizedError)
 	})
@@ -235,7 +236,7 @@ func TestGetPairsWatchlists(t *testing.T) {
 	w := resp[0]
 	pe := w.PairsEquations[0]
 
-	require.Equal(t, "Futures", w.Name)
+	require.Equal(t, "Stocks", w.Name)
 	require.Equal(t, 2, len(w.PairsEquations))
 	require.Equal(t, "Buy", pe.LeftAction)
 	require.Equal(t, "/ZN", pe.LeftSymbol)
@@ -243,7 +244,7 @@ func TestGetPairsWatchlists(t *testing.T) {
 	require.Equal(t, "Sell", pe.RightAction)
 	require.Equal(t, "/ZB", pe.RightSymbol)
 	require.Equal(t, 1, pe.RightQuantity)
-	require.Equal(t, 1, w.OrderIndex)
+	require.Equal(t, 4, w.OrderIndex)
 }
 
 func TestGetPairsWatchlistsError(t *testing.T) {
@@ -264,7 +265,7 @@ func TestGetPairsWatchlist(t *testing.T) {
 	setup()
 	defer teardown()
 
-	name := "Futures"
+	name := "Stocks"
 
 	mux.HandleFunc(fmt.Sprintf("/pairs-watchlists/%s", name), func(writer http.ResponseWriter, request *http.Request) {
 		fmt.Fprint(writer, getPairsWatchlistResp)
@@ -284,14 +285,14 @@ func TestGetPairsWatchlist(t *testing.T) {
 	require.Equal(t, "Sell", pe.RightAction)
 	require.Equal(t, "/ZB", pe.RightSymbol)
 	require.Equal(t, 1, pe.RightQuantity)
-	require.Equal(t, 1, w.OrderIndex)
+	require.Equal(t, 4, w.OrderIndex)
 }
 
 func TestGetPairsWatchlistError(t *testing.T) {
 	setup()
 	defer teardown()
 
-	name := "Futures"
+	name := "Stocks"
 
 	mux.HandleFunc(fmt.Sprintf("/pairs-watchlists/%s", name), func(writer http.ResponseWriter, request *http.Request) {
 		writer.WriteHeader(401)
@@ -321,11 +322,11 @@ func TestGetPublicWatchlists(t *testing.T) {
 	w := resp[0]
 	pe := w.WatchlistEntries[0]
 
-	require.Equal(t, "CRE Hospitality Price Return Index", w.Name)
-	require.Equal(t, 2, len(w.WatchlistEntries))
-	require.Equal(t, "GLPI", pe.Symbol)
+	require.Equal(t, "All Earnings", w.Name)
+	require.Equal(t, 5, len(w.WatchlistEntries))
+	require.Equal(t, "GIS", pe.Symbol)
 	require.Equal(t, EquityIT, pe.InstrumentType)
-	require.Equal(t, "Market Indices", w.GroupName)
+	require.Equal(t, "Earnings", w.GroupName)
 	require.Equal(t, 100, w.OrderIndex)
 }
 
@@ -343,29 +344,6 @@ func TestGetPublicWatchlistsError(t *testing.T) {
 	_, httpResp, err := client.GetPublicWatchlists(countsOnly)
 	expectedUnauthorized(t, err)
 	require.NotNil(t, httpResp)
-}
-
-func TestGetPublicWatchlistsCounts(t *testing.T) {
-	setup()
-	defer teardown()
-
-	mux.HandleFunc("/public-watchlists", func(writer http.ResponseWriter, request *http.Request) {
-		fmt.Fprint(writer, getPublicWatchlistsCountsResp)
-	})
-
-	countsOnly := true
-
-	countsResp, httpResp, err := client.GetPublicWatchlists(countsOnly)
-	require.Nil(t, err)
-	require.NotNil(t, httpResp)
-
-	require.Equal(t, 2, len(countsResp))
-
-	c := countsResp[0]
-
-	require.Equal(t, "CRE Hospitality Price Return Index", c.Name)
-	require.Equal(t, 317219, *c.ID)
-	require.Equal(t, 14, *c.WatchlistEntryCount)
 }
 
 func TestGetPublicWatchlistsCountsError(t *testing.T) {
@@ -390,7 +368,7 @@ func TestGetPublicWatchlist(t *testing.T) {
 
 	name := "High Options Volume"
 
-	mux.HandleFunc(fmt.Sprintf("/public-watchlists/%s", name), func(writer http.ResponseWriter, request *http.Request) {
+	mux.HandleFunc(fmt.Sprintf("/public-watchlists/%s", url.PathEscape(name)), func(writer http.ResponseWriter, request *http.Request) {
 		fmt.Fprint(writer, getPublicWatchlistResp)
 	})
 
@@ -414,7 +392,7 @@ func TestGetPublicWatchlistError(t *testing.T) {
 
 	name := "High Options Volume"
 
-	mux.HandleFunc(fmt.Sprintf("/public-watchlists/%s", name), func(writer http.ResponseWriter, request *http.Request) {
+	mux.HandleFunc(fmt.Sprintf("/public-watchlists/%s", url.PathEscape(name)), func(writer http.ResponseWriter, request *http.Request) {
 		writer.WriteHeader(401)
 		fmt.Fprint(writer, tastyUnauthorizedError)
 	})
@@ -429,6 +407,7 @@ const getWatchlistsResp = `{
     "items": [
       {
         "name": "testing with / - odd chars",
+		"user-id": 12345,
         "watchlist-entries": [
           { "symbol": "AAPL", "instrument-type": "Equity" }
         ],
@@ -443,6 +422,7 @@ const getWatchlistsResp = `{
 const getWatchlistResp = `{
   "data": {
     "name": "testing with / - odd chars",
+	"user-id": 12345,
     "watchlist-entries": [{ "symbol": "AAPL", "instrument-type": "Equity" }],
     "group-name": "test",
     "order-index": 1
@@ -490,35 +470,37 @@ const getPairsWatchlistsResp = `{
   "data": {
     "items": [
       {
-        "name": "Futures",
-        "pairs-equations": [
-          {
-            "left-action": "Buy",
-            "left-symbol": "/ZN",
-            "left-quantity": 2,
-            "right-action": "Sell",
-            "right-symbol": "/ZB",
-            "right-quantity": 1
-          },
-          {
-            "left-action": "Buy",
-            "left-symbol": "/GC",
-            "left-quantity": 1,
-            "right-action": "Sell",
-            "right-symbol": "/SI",
-            "right-quantity": 2
-          }
-        ],
-        "order-index": 1
+        "name": "Stocks",
+		"order-index": 4,
+		"pairs-equations": [
+			{
+				"left-action": "Buy",
+				"left-symbol": "/ZN",
+				"left-quantity": 2,
+				"right-action": "Sell",
+				"right-symbol": "/ZB",
+				"right-quantity": 1
+			},
+			{
+				"left-action": "Buy",
+				"left-symbol": "/GC",
+				"left-quantity": 1,
+				"right-action": "Sell",
+				"right-symbol": "/SI",
+				"right-quantity": 2
+			}
+		],
+		"created-at": "2020-11-17T22:17:27.424Z",
+		"updated-at": "2020-11-17T22:17:27.424Z"
       }
     ]
-  },
-  "context": "/pairs-watchlists"
+  }
 }`
 
 const getPairsWatchlistResp = `{
   "data": {
-    "name": "Futures",
+	"name": "Stocks",
+	"order-index": 4,
     "pairs-equations": [
       {
         "left-action": "Buy",
@@ -537,55 +519,54 @@ const getPairsWatchlistResp = `{
         "right-quantity": 2
       }
     ],
-    "order-index": 1
-  },
-  "context": "/pairs-watchlists"
+	"created-at": "2020-11-17T22:17:27.424Z",
+	"updated-at": "2020-11-17T22:17:27.424Z"
+  }
 }`
 
 const getPublicWatchlistsResp = `{
   "data": {
     "items": [
-      {
-        "name": "CRE Hospitality Price Return Index",
-        "watchlist-entries": [
-          {
-            "symbol": "GLPI",
-            "instrument_type": "Equity"
-          },
-          {
-            "symbol": "VICI",
-            "instrument_type": "Equity"
-          }
-        ],
-        "group-name": "Market Indices",
-        "order-index": 100
-      }
+		{
+			"id": "216375",
+			"name": "All Earnings",
+			"group-name": "Earnings",
+			"user-id": -1,
+			"order-index": 100,
+			"watchlist-entries": [
+				{
+					"symbol": "GIS",
+					"instrument-type": "Equity"
+				},
+				{
+					"symbol": "LEN",
+					"instrument-type": "Equity"
+				},
+				{
+					"symbol": "DRI",
+					"instrument-type": "Equity"
+				},
+				{
+					"symbol": "FDS",
+					"instrument-type": "Equity"
+				},
+				{
+					"symbol": "FDX",
+					"instrument-type": "Equity"
+				}
+			]
+		}
     ]
-  },
-  "context": "/public-watchlists"
-}`
-
-const getPublicWatchlistsCountsResp = `{
-  "data": {
-    "items": [
-      {
-        "name": "CRE Hospitality Price Return Index",
-        "id": 317219,
-        "watchlist-entry-count": 14
-      },
-      {
-        "name": "High Options Volume",
-        "id": 69136,
-        "watchlist-entry-count": 200
-      }
-    ]
-  },
-  "context": "/public-watchlists"
+  }
 }`
 
 const getPublicWatchlistResp = `{
   "data": {
-    "name": "High Options Volume",
+    "id": "69136",
+	"name": "High Options Volume",
+	"group-name": "Liquidity",
+	"user-id": -1,
+	"order-index": 100,
     "watchlist-entries": [
       {
         "symbol": "SPY",
@@ -598,6 +579,5 @@ const getPublicWatchlistResp = `{
     ],
     "group-name": "Liquidity",
     "order-index": 100
-  },
-  "context": "/public-watchlists/High%20Options%20Volume"
+  }
 }`

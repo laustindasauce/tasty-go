@@ -94,3 +94,62 @@ type MarketMetricVolatility struct {
 	PriceEarningsRatio                     decimal.Decimal                     `json:"price-earnings-ratio"`
 	EarningsPerShare                       decimal.Decimal                     `json:"earnings-per-share"`
 }
+
+type MarketDataQuery struct {
+	// Ticker(s) of indices
+	Index []string `url:"index[]"`
+	// The symbol(s) of the equities
+	Equity []string `url:"equity[]"`
+	// The symbol(s) of the equity option(s) using OCC Symbology, i.e. [FB 180629C00200000]
+	EquityOption []string `url:"equity-option[]"`
+	// Symbol(s) for future, i.e. [ES]
+	Future []string `url:"future[]"`
+	// Symbol(s) for future option(s) using proper symbology, i.e. [./ESZ5 EW4V5 251024C5850]
+	FutureOption []string `url:"future-option[]"`
+	// The symbol(s) of the cryptocurrency, i.e. [BTC]
+	Cryptocurrency []string `url:"cryptocurrency[]"`
+}
+
+type MarketData struct {
+	Symbol             string           `json:"symbol"`
+	InstrumentType     InstrumentType   `json:"instrument-type"`
+	UpdatedAt          time.Time        `json:"updated-at"`
+	Bid                *decimal.Decimal `json:"bid,omitempty"`
+	BidSize            *decimal.Decimal `json:"bid-size,omitempty"`
+	Ask                *decimal.Decimal `json:"ask,omitempty"`
+	AskSize            *decimal.Decimal `json:"ask-size,omitempty"`
+	Mid                *decimal.Decimal `json:"mid,omitempty"`
+	Mark               *decimal.Decimal `json:"mark,omitempty"`
+	Last               *decimal.Decimal `json:"last,omitempty"`
+	LastMkt            *decimal.Decimal `json:"last-mkt,omitempty"`
+	Open               *decimal.Decimal `json:"open,omitempty"`
+	DayHighPrice       *decimal.Decimal `json:"day-high-price,omitempty"`
+	DayLowPrice        *decimal.Decimal `json:"day-low-price,omitempty"`
+	Close              *decimal.Decimal `json:"close,omitempty"`
+	ClosePriceType     string           `json:"close-price-type"`
+	PrevClose          *decimal.Decimal `json:"prev-close,omitempty"`
+	PrevClosePriceType string           `json:"prev-close-price-type"`
+	SummaryDate        string           `json:"summary-date"`
+	PrevCloseDate      string           `json:"prev-close-date"`
+	IsTradingHalted    bool             `json:"is-trading-halted"`
+	HaltStartTime      int              `json:"halt-start-time"`
+	HaltEndTime        int              `json:"halt-end-time"`
+	Volume             *decimal.Decimal `json:"volume,omitempty"`
+	Volatility         *decimal.Decimal `json:"volatility,omitempty"`
+	Delta              *decimal.Decimal `json:"delta,omitempty"`
+	Gamma              *decimal.Decimal `json:"gamma,omitempty"`
+	Theta              *decimal.Decimal `json:"theta,omitempty"`
+	Rho                *decimal.Decimal `json:"rho,omitempty"`
+	Vega               *decimal.Decimal `json:"vega,omitempty"`
+	TheoPrice          *decimal.Decimal `json:"theo-price,omitempty"`
+	DxMark             *decimal.Decimal `json:"dx-mark,omitempty"`
+	TickSize           *decimal.Decimal `json:"tick-size,omitempty"`
+	OpenInterest       int              `json:"open-interest"`
+	Beta               *decimal.Decimal `json:"beta,omitempty"`
+	DividendAmount     *decimal.Decimal `json:"dividend-amount,omitempty"`
+	DividendFrequency  *decimal.Decimal `json:"dividend-frequency,omitempty"`
+	LowLimitPrice      *decimal.Decimal `json:"low-limit-price,omitempty"`
+	HighLimitPrice     *decimal.Decimal `json:"high-limit-price,omitempty"`
+	YearLowPrice       *decimal.Decimal `json:"year-low-price,omitempty"`
+	YearHighPrice      *decimal.Decimal `json:"year-high-price,omitempty"`
+}

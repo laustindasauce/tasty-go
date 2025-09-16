@@ -4,7 +4,7 @@ import (
 	"encoding/json"
 	"testing"
 
-	"github.com/austinbspencer/tasty-go"
+	"github.com/laustindasauce/tasty-go"
 	"github.com/stretchr/testify/require"
 )
 

@@ -27,26 +27,6 @@ func (c *Client) GetActiveEquities(query ActiveEquitiesQuery) ([]Equity, Paginat
 	return instrumentRes.Data.ActiveEquities, instrumentRes.Pagination, resp, nil
 }
 
-// Returns a set of equity definitions given an array of one or more symbols.
-func (c *Client) GetEquities(query EquitiesQuery) ([]Equity, *http.Response, error) {
-	path := "/instruments/equities"
-
-	type instrumentResponse struct {
-		Data struct {
-			Equities []Equity `json:"items"`
-		} `json:"data"`
-	}
-
-	instrumentRes := new(instrumentResponse)
-
-	resp, err := c.request(http.MethodGet, path, query, nil, instrumentRes)
-	if err != nil {
-		return []Equity{}, resp, err
-	}
-
-	return instrumentRes.Data.Equities, resp, nil
-}
-
 // Returns a single equity definition for the provided symbol.
 func (c *Client) GetEquity(symbol string) (Equity, *http.Response, error) {
 	// url escape required for instances where "/" exists in symbol i.e. BRK/B
@@ -65,26 +45,6 @@ func (c *Client) GetEquity(symbol string) (Equity, *http.Response, error) {
 	}
 
 	return instrumentRes.Equity, resp, nil
-}
-
-// Returns a set of equity options given one or more symbols.
-func (c *Client) GetEquityOptions(query EquityOptionsQuery) ([]EquityOption, *http.Response, error) {
-	path := "/instruments/equity-options"
-
-	type instrumentResponse struct {
-		Data struct {
-			EquityOptions []EquityOption `json:"items"`
-		} `json:"data"`
-	}
-
-	instrumentRes := new(instrumentResponse)
-
-	resp, err := c.request(http.MethodGet, path, query, nil, instrumentRes)
-	if err != nil {
-		return []EquityOption{}, resp, err
-	}
-
-	return instrumentRes.Data.EquityOptions, resp, nil
 }
 
 // Returns a set of equity options given one or more symbols.
